@@ -37,8 +37,8 @@ const schema = z
       .string()
       .optional()
       .refine(
-        (val) => !val || /^[+]?[\d\s-]+$/.test(val),
-        "Phone number can only contain digits, spaces, hyphens, and + symbol",
+        (val) => !val || /^\+?\d+$/.test(val.replace(/\s/g, "")),
+        "Phone number can only contain digits and + symbol (no spaces)",
       ),
     password: z
       .string()
@@ -81,7 +81,7 @@ export default function SignUpPage() {
       name,
       email: values.email,
       password: values.password,
-      ...(values.phone ? { phone: values.phone } : {}),
+      ...(values.phone ? { phone: values.phone.replace(/\s/g, "") } : {}),
     } as Parameters<typeof authClient.signUp.email>[0]);
     if (error) {
       setError(error.message ?? "Registration failed");
@@ -129,7 +129,7 @@ export default function SignUpPage() {
               name="phone"
               label="Phone (optional)"
               control={control}
-              placeholder="+1 234 567 8900"
+              placeholder="+12345678900"
               type="tel"
               error={errors.phone}
             />
