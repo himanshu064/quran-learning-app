@@ -163,7 +163,7 @@ export function UserDashboard() {
             {/* Resume lesson */}
             {resumeLesson && resumeLessonConfig && (
               <Link
-                href="/teaching"
+                href={resumeLesson === "lesson2" ? "/letters" : "/teaching"}
                 onClick={() => setLesson(resumeLesson)}
                 className="flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50"
               >
@@ -307,10 +307,11 @@ export function UserDashboard() {
             <div className="space-y-3">
               {lessons.map((lesson) => {
                 const lp = getLessonProgress(lesson.id);
+                const lessonHref = lesson.id === "lesson2" ? "/letters" : "/teaching";
                 return (
                   <Link
                     key={lesson.id}
-                    href="/teaching"
+                    href={lessonHref}
                     onClick={() => setLesson(lesson.id)}
                     className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-muted/50"
                   >
