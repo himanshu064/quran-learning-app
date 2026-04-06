@@ -10,6 +10,8 @@ import { VercelTabs } from "@/components/common";
 import { useLanguage, useAudioContext } from "@/providers";
 import { useProgress } from "@/hooks";
 
+const LESSON_ID = "lesson2";
+
 type PositionData = {
   titleAr: string;
   word: string;
@@ -90,15 +92,19 @@ export function LettersScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const restored = useRef(false);
 
+  // Stable ref for getLessonProgress to avoid re-triggering the data fetch
+  const getLessonProgressRef = useRef(getLessonProgress);
+  getLessonProgressRef.current = getLessonProgress;
+
   useEffect(() => {
     fetch("/data/letters/letter_positions.json")
       .then((r) => r.json())
       .then((data: { letters: LetterData[] }) => {
         setLetters(data.letters);
-        // Restore saved position
+        // Restore saved position once
         if (!restored.current) {
           restored.current = true;
-          const saved = getLessonProgress("lesson2");
+          const saved = getLessonProgressRef.current(LESSON_ID);
           if (
             saved &&
             saved.slideIndex > 0 &&
@@ -110,22 +116,29 @@ export function LettersScreen() {
         setIsLoading(false);
       })
       .catch(() => setIsLoading(false));
-  }, [getLessonProgress]);
+  }, []); // Run once on mount
 
   const total = letters.length;
   const currentLetter = letters[index];
   const currentPosition = currentLetter?.positions[position];
 
-  // Track progress on letter change
+  // Track progress on letter change — use refs to avoid re-render loops
+  const saveProgressRef = useRef(saveProgress);
+  saveProgressRef.current = saveProgress;
+  const saveLastLessonRef = useRef(saveLastLesson);
+  saveLastLessonRef.current = saveLastLesson;
+  const completeLessonRef = useRef(completeLesson);
+  completeLessonRef.current = completeLesson;
+
   useEffect(() => {
     if (total > 0) {
-      saveProgress({ lessonId: "lesson2", slideIndex: index });
-      saveLastLesson("lesson2");
+      saveProgressRef.current({ lessonId: LESSON_ID, slideIndex: index });
+      saveLastLessonRef.current(LESSON_ID);
       if (index === total - 1) {
-        completeLesson("lesson2");
+        completeLessonRef.current(LESSON_ID);
       }
     }
-  }, [index, total, saveProgress, saveLastLesson, completeLesson]);
+  }, [index, total]);
 
   const prev = useCallback(() => {
     setIndex((i) => (i - 1 + total) % total);
@@ -209,7 +222,7 @@ export function LettersScreen() {
         <div className="mb-6 flex justify-center">
           <Button
             variant="outline"
-            className="gap-2 rounded-full"
+            className="gap-2 rounded-full  cursor-pointer"
             onClick={playLetterSound}
           >
             <Volume2 className="h-4 w-4" />
@@ -288,7 +301,7 @@ export function LettersScreen() {
         </div>
       </div>
 
-      <LessonNav onPrev={prev} onNext={next} onShuffle={shuffle} />
+      <LessonNav onPrev={prev} onNext={next} />
     </div>
   );
 }

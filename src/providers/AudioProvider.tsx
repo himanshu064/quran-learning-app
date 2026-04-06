@@ -84,11 +84,13 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     stopHighlighting();
   }, [getAudio, stopHighlighting]);
 
-  // Play a URL (lowest level) — cancels any active sequence unless called from within one
+  // Play a URL (lowest level) — marks any previous sequence as cancelled
   const playUrl = useCallback(
     (url: string) => {
+      sequenceRef.current.cancelled = true;
       const audio = getAudio();
       audio.pause();
+      audio.src = "";          // clear old source to force a fresh load
       stopHighlighting();
       audio.src = url;
       audio.play().catch(() => {});
@@ -229,8 +231,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       for (const v of verses) {
         for (let w = 1; w <= v.wordCount; w++) {
           if (token.cancelled) return;
+          // playUrl sets sequenceRef.current.cancelled = true, so restore our token after
           playUrl(wbwUrl(v.surah, v.ayah, w));
-          // Set after playUrl since playUrl calls stopHighlighting which resets these
+          token.cancelled = false;
+          sequenceRef.current = token;
           setCurrentAyah(v.ayah);
           setCurrentWordIndex(w);
           await waitForEnded();
@@ -245,11 +249,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     [playUrl, waitForEnded, stopHighlighting],
   );
 
-  // Handle audio ended — only reset state if no active sequence
+  // Handle audio ended — reset state for standalone plays (not part of an active sequence)
   useEffect(() => {
     const audio = getAudio();
     const onEnded = () => {
-      // If a sequence is actively playing (not cancelled), let it drive state
+      // If a sequence is actively running (not cancelled), let it manage state
       if (!sequenceRef.current.cancelled) return;
       setIsPlaying(false);
       setCurrentAyah(-1);

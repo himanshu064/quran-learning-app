@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { BookOpen } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -33,40 +33,43 @@ export function TeachingScreen() {
   const { saveProgress, completeLesson, saveLastLesson, getLessonProgress } =
     useProgress();
 
+  // Stable refs to avoid re-render loops from progress query invalidation
+  const getLessonProgressRef = useRef(getLessonProgress);
+  getLessonProgressRef.current = getLessonProgress;
+  const saveProgressRef = useRef(saveProgress);
+  saveProgressRef.current = saveProgress;
+  const saveLastLessonRef = useRef(saveLastLesson);
+  saveLastLessonRef.current = saveLastLesson;
+  const completeLessonRef = useRef(completeLesson);
+  completeLessonRef.current = completeLesson;
+
   // Restore saved slide position when slides finish loading for a lesson
   const restoredForLesson = useRef("");
   useEffect(() => {
     if (isLoading || totalSlides === 0) return;
     if (restoredForLesson.current === lessonId) return;
     restoredForLesson.current = lessonId;
-    const saved = getLessonProgress(lessonId);
+    const saved = getLessonProgressRef.current(lessonId);
     if (saved && saved.slideIndex > 0 && saved.slideIndex < totalSlides) {
       goTo(saved.slideIndex);
     }
-  }, [lessonId, isLoading, totalSlides, getLessonProgress, goTo]);
+  }, [lessonId, isLoading, totalSlides, goTo]);
 
   // Stop audio when navigating to a new slide
   useEffect(() => {
     stop();
   }, [slideIndex, stop]);
 
-  // Save progress on slide change — useProgress handles deduplication internally
+  // Save progress on slide change
   useEffect(() => {
     if (totalSlides > 0) {
-      saveProgress({ lessonId, slideIndex });
-      saveLastLesson(lessonId);
+      saveProgressRef.current({ lessonId, slideIndex });
+      saveLastLessonRef.current(lessonId);
       if (slideIndex === totalSlides - 1) {
-        completeLesson(lessonId);
+        completeLessonRef.current(lessonId);
       }
     }
-  }, [
-    lessonId,
-    slideIndex,
-    totalSlides,
-    saveProgress,
-    saveLastLesson,
-    completeLesson,
-  ]);
+  }, [lessonId, slideIndex, totalSlides]);
 
   if (isLoading) {
     return (
