@@ -98,7 +98,7 @@ export function LettersScreen() {
         // Restore saved position
         if (!restored.current) {
           restored.current = true;
-          const saved = getLessonProgress("letters");
+          const saved = getLessonProgress("lesson2");
           if (
             saved &&
             saved.slideIndex > 0 &&
@@ -119,10 +119,10 @@ export function LettersScreen() {
   // Track progress on letter change
   useEffect(() => {
     if (total > 0) {
-      saveProgress({ lessonId: "letters", slideIndex: index });
-      saveLastLesson("letters");
+      saveProgress({ lessonId: "lesson2", slideIndex: index });
+      saveLastLesson("lesson2");
       if (index === total - 1) {
-        completeLesson("letters");
+        completeLesson("lesson2");
       }
     }
   }, [index, total, saveProgress, saveLastLesson, completeLesson]);
