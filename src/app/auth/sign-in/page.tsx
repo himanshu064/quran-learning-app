@@ -54,8 +54,7 @@ export default function SignInPage() {
     }
     toast.success("Signed in successfully");
     const role = (data?.user as { role?: string } | undefined)?.role;
-    // router.push(role === "admin" ? "/admin" : "/dashboard");
-    router.push("/dashboard");
+    router.push(role === "admin" ? "/admin" : "/dashboard");
   };
 
   return (

@@ -84,7 +84,18 @@ export default function SignUpPage() {
       ...(values.phone ? { phone: values.phone.replace(/\s/g, "") } : {}),
     } as Parameters<typeof authClient.signUp.email>[0]);
     if (error) {
-      setError(error.message ?? "Registration failed");
+      const errorMessages: Record<string, string> = {
+        FAILED_TO_CREATE_USER: "Failed to create account. Please check your inputs and try again.",
+        USER_ALREADY_EXISTS: "An account with this email already exists.",
+        INVALID_EMAIL: "Please enter a valid email address.",
+        INVALID_PASSWORD: "Password does not meet the requirements.",
+        TOO_MANY_REQUESTS: "Too many attempts. Please wait and try again.",
+      };
+      setError(
+        errorMessages[error.code ?? ""] ??
+        error.message ??
+        "Registration failed. Please try again.",
+      );
       return;
     }
     toast.success("Account created! Please check your email to verify.");

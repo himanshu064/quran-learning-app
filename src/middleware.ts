@@ -2,7 +2,7 @@ import { betterFetch } from "@better-fetch/fetch";
 import type { Session } from "better-auth/types";
 import { type NextRequest, NextResponse } from "next/server";
 
-const protectedPaths = ["/dashboard"];
+const protectedPaths = ["/dashboard", "/surahs", "/reader", "/teaching", "/letters", "/mcq", "/writing", "/lessons", "/admin"];
 const authPaths = [
   "/auth/sign-in",
   "/auth/sign-up",
@@ -88,11 +88,19 @@ export default async function authMiddleware(request: NextRequest) {
   }
 
   // User is authenticated
-  const userStatus = (session as unknown as { user?: { status?: string } })
+  const userStatus = (session as unknown as { user?: { status?: string; role?: string } })
     ?.user?.status;
+  const userRole = (session as unknown as { user?: { role?: string } })
+    ?.user?.role;
 
-  // Redirect authenticated users from auth pages or root to dashboard
+  // Redirect authenticated users from auth pages or root based on role
   if (isAuthPage || isRoot) {
+    const target = userRole === "admin" ? "/admin" : "/dashboard";
+    return NextResponse.redirect(new URL(target, request.url));
+  }
+
+  // Block non-admins from accessing admin routes
+  if (pathname.startsWith("/admin") && userRole !== "admin") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 

@@ -1,0 +1,1403 @@
+{
+  "letters": [
+    {
+      "key": "ba",
+      "glyph": "ب",
+      "nameAr": "الباء",
+      "nameEn": "Baa",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ب في أول الكلمة (بَسَطَ)",
+          "word": "بَسَطَ",
+          "roman": "ba-sa-ta",
+          "positionAr": "أول الكلمة",
+          "formShape": "بـ",
+          "audioUrl": "https://audio.qurancdn.com/wbw/042_027_002.mp3",
+          "letters": [
+            "ب",
+            "س",
+            "ط"
+          ],
+          "targetLetter": "ب"
+        },
+        "middle": {
+          "titleAr": "حرف ب في وسط الكلمة (سَبَقَ)",
+          "word": "سَبَقَ",
+          "roman": "sa-ba-qa",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـبـ",
+          "audioUrl": "https://audio.qurancdn.com/wbw/023_027_022.mp3",
+          "letters": [
+            "س",
+            "ب",
+            "ق"
+          ],
+          "targetLetter": "ب"
+        },
+        "end": {
+          "titleAr": "حرف ب في آخر الكلمة (وَقَبَ)",
+          "word": "وَقَبَ",
+          "roman": "wa-qa-ba",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـب",
+          "audioUrl": "https://audio.qurancdn.com/wbw/113_003_005.mp3",
+          "letters": [
+            "و",
+            "ق",
+            "ب"
+          ],
+          "targetLetter": "ب"
+        }
+      }
+    },
+    {
+      "key": "ta",
+      "glyph": "ت",
+      "nameAr": "التاء",
+      "nameEn": "Taa",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ت في أول الكلمة (تَرَكَ)",
+          "word": "تَرَكَ",
+          "roman": "ta-ra-ka",
+          "positionAr": "أول الكلمة",
+          "formShape": "تـ",
+          "audioUrl": "https://audio.qurancdn.com/wbw/035_045_008.mp3",
+          "letters": [
+            "ت",
+            "ر",
+            "ك"
+          ],
+          "targetLetter": "ت"
+        },
+        "middle": {
+          "titleAr": "حرف ت في وسط الكلمة (كَتَبَ)",
+          "word": "كَتَبَ",
+          "roman": "ka-ta-ba",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـتـ",
+          "audioUrl": "https://audio.qurancdn.com/wbw/059_003_003.mp3",
+          "letters": [
+            "ك",
+            "ت",
+            "ب"
+          ],
+          "targetLetter": "ت"
+        },
+        "end": {
+          "titleAr": "حرف ت في آخر الكلمة (سَكَتَ)",
+          "word": "سَكَتَ",
+          "roman": "sa-ka-ta",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـت",
+          "audioUrl": "https://audio.qurancdn.com/wbw/007_154_002.mp3",
+          "letters": [
+            "س",
+            "ك",
+            "ت"
+          ],
+          "targetLetter": "ت"
+        }
+      }
+    },
+    {
+      "key": "tha",
+      "glyph": "ث",
+      "nameAr": "الثاء",
+      "nameEn": "Thaa",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ث في أول الكلمة (ثُمَّ)",
+          "word": "ثُمَّ",
+          "roman": "thu-mma",
+          "positionAr": "أول الكلمة",
+          "formShape": "ثـ",
+          "audioUrl": "https://audio.qurancdn.com/wbw/095_005_001.mp3",
+          "letters": [
+            "ث",
+            "م"
+          ],
+          "targetLetter": "ث"
+        },
+        "middle": {
+          "titleAr": "حرف ث في وسط الكلمة (مَثَلَ)",
+          "word": "مَثَلَ",
+          "roman": "ma-tha-la",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـثـ",
+          "audioUrl": "https://audio.qurancdn.com/wbw/003_059_002.mp3",
+          "letters": [
+            "م",
+            "ث",
+            "ل"
+          ],
+          "targetLetter": "ث"
+        },
+        "end": {
+          "titleAr": "حرف ث في آخر الكلمة (بَعَثَ)",
+          "word": "بَعَثَ",
+          "roman": "ba-a-tha",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـث",
+          "audioUrl": "https://audio.qurancdn.com/wbw/062_002_003.mp3",
+          "letters": [
+            "ب",
+            "ع",
+            "ث"
+          ],
+          "targetLetter": "ث"
+        }
+      }
+    },
+    {
+      "key": "jeem",
+      "glyph": "ج",
+      "nameAr": "الجيم",
+      "nameEn": "Jeem",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ج في أول الكلمة (جَعَلَ)",
+          "word": "جَعَلَ",
+          "roman": "ja-‘a-la",
+          "positionAr": "أول الكلمة",
+          "formShape": "جـ",
+          "audioUrl": "https://audio.qurancdn.com/wbw/071_019_002.mp3",
+          "letters": [
+            "ج",
+            "ع",
+            "ل"
+          ],
+          "targetLetter": "ج"
+        },
+        "middle": {
+          "titleAr": "حرف ج في وسط الكلمة (شَجَرَ)",
+          "word": "شَجَرَ",
+          "roman": "sha-ja-ra",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـجـ",
+          "audioUrl": "https://audio.qurancdn.com/wbw/004_065_008.mp3",
+          "letters": [
+            "ش",
+            "ج",
+            "ر"
+          ],
+          "targetLetter": "ج"
+        },
+        "end": {
+          "titleAr": "حرف ج في آخر الكلمة (يَلِجُ)",
+          "word": "يَلِجُ",
+          "roman": "ya-li-ju",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـج",
+          "audioUrl": "https://audio.qurancdn.com/wbw/034_002_003.mp3",
+          "letters": [
+            "ي",
+            "ل",
+            "ج"
+          ],
+          "targetLetter": "ج"
+        }
+      }
+    },
+    {
+      "key": "haa",
+      "glyph": "ح",
+      "nameAr": "الحاء",
+      "nameEn": "Haa",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ح في أول الكلمة (حَكَمَ)",
+          "word": "حَكَمَ",
+          "roman": "ha-ka-ma",
+          "positionAr": "أول الكلمة",
+          "formShape": "حـ",
+          "audioUrl": "",
+          "letters": [
+            "ح",
+            "ك",
+            "م"
+          ],
+          "targetLetter": "ح"
+        },
+        "middle": {
+          "titleAr": "حرف ح في وسط الكلمة (نَحْنُ)",
+          "word": "نَحْنُ",
+          "roman": "na-h-nu",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـحـ",
+          "audioUrl": "",
+          "letters": [
+            "ن",
+            "ح",
+            "ن"
+          ],
+          "targetLetter": "ح"
+        },
+        "end": {
+          "titleAr": "حرف ح في آخر الكلمة (نَكَحَ)",
+          "word": "نَكَحَ",
+          "roman": "na-ka-ha",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـح",
+          "audioUrl": "",
+          "letters": [
+            "ن",
+            "ك",
+            "ح"
+          ],
+          "targetLetter": "ح"
+        }
+      }
+    },
+    {
+      "key": "kha",
+      "glyph": "خ",
+      "nameAr": "الخاء",
+      "nameEn": "Khaa",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف خ في أول الكلمة (خَلَقَ)",
+          "word": "خَلَقَ",
+          "roman": "kha-la-qa",
+          "positionAr": "أول الكلمة",
+          "formShape": "خـ",
+          "audioUrl": "",
+          "letters": [
+            "خ",
+            "ل",
+            "ق"
+          ],
+          "targetLetter": "خ"
+        },
+        "middle": {
+          "titleAr": "حرف خ في وسط الكلمة (بَخِلَ)",
+          "word": "بَخِلَ",
+          "roman": "ba-khi-la",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـخـ",
+          "audioUrl": "",
+          "letters": [
+            "ب",
+            "خ",
+            "ل"
+          ],
+          "targetLetter": "خ"
+        },
+        "end": {
+          "titleAr": "حرف خ في آخر الكلمة (نَسْلَخُ)",
+          "word": "نَسْلَخُ",
+          "roman": "na-s-la-khu",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـخ",
+          "audioUrl": "",
+          "letters": [
+            "ن",
+            "س",
+            "ل",
+            "خ"
+          ],
+          "targetLetter": "خ"
+        }
+      }
+    },
+    {
+      "key": "seen",
+      "glyph": "س",
+      "nameAr": "السين",
+      "nameEn": "Seen",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف س في أول الكلمة (سَكَنَ)",
+          "word": "سَكَنَ",
+          "roman": "sa-ka-na",
+          "positionAr": "أول الكلمة",
+          "formShape": "سـ",
+          "audioUrl": "",
+          "letters": [
+            "س",
+            "ك",
+            "ن"
+          ],
+          "targetLetter": "س"
+        },
+        "middle": {
+          "titleAr": "حرف س في وسط الكلمة (حَسَدَ)",
+          "word": "حَسَدَ",
+          "roman": "ha-sa-da",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـسـ",
+          "audioUrl": "",
+          "letters": [
+            "ح",
+            "س",
+            "د"
+          ],
+          "targetLetter": "س"
+        },
+        "end": {
+          "titleAr": "حرف س في آخر الكلمة (عَبَسَ)",
+          "word": "عَبَسَ",
+          "roman": "‘a-ba-sa",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـس",
+          "audioUrl": "",
+          "letters": [
+            "ع",
+            "ب",
+            "س"
+          ],
+          "targetLetter": "س"
+        }
+      }
+    },
+    {
+      "key": "sheen",
+      "glyph": "ش",
+      "nameAr": "الشين",
+      "nameEn": "Sheen",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ش في أول الكلمة (شَكَرَ)",
+          "word": "شَكَرَ",
+          "roman": "sha-ka-ra",
+          "positionAr": "أول الكلمة",
+          "formShape": "شـ",
+          "audioUrl": "",
+          "letters": [
+            "ش",
+            "ك",
+            "ر"
+          ],
+          "targetLetter": "ش"
+        },
+        "middle": {
+          "titleAr": "حرف ش في وسط الكلمة (كَشَفَ)",
+          "word": "كَشَفَ",
+          "roman": "ka-sha-fa",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـشـ",
+          "audioUrl": "",
+          "letters": [
+            "ك",
+            "ش",
+            "ف"
+          ],
+          "targetLetter": "ش"
+        },
+        "end": {
+          "titleAr": "حرف ش في آخر الكلمة (عَرْشٌ)",
+          "word": "عَرْشٌ",
+          "roman": "‘a-r-shu",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـش",
+          "audioUrl": "",
+          "letters": [
+            "ع",
+            "ر",
+            "ش"
+          ],
+          "targetLetter": "ش"
+        }
+      }
+    },
+    {
+      "key": "saad",
+      "glyph": "ص",
+      "nameAr": "الصاد",
+      "nameEn": "Saad",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ص في أول الكلمة (صَلَحَ)",
+          "word": "صَلَحَ",
+          "roman": "sa-la-ha",
+          "positionAr": "أول الكلمة",
+          "formShape": "صـ",
+          "audioUrl": "",
+          "letters": [
+            "ص",
+            "ل",
+            "ح"
+          ],
+          "targetLetter": "ص"
+        },
+        "middle": {
+          "titleAr": "حرف ص في وسط الكلمة (فَصَلَ)",
+          "word": "فَصَلَ",
+          "roman": "fa-sa-la",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـصـ",
+          "audioUrl": "",
+          "letters": [
+            "ف",
+            "ص",
+            "ل"
+          ],
+          "targetLetter": "ص"
+        },
+        "end": {
+          "titleAr": "حرف ص في آخر الكلمة (نَكَصَ)",
+          "word": "نَكَصَ",
+          "roman": "na-ka-sa",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـص",
+          "audioUrl": "",
+          "letters": [
+            "ن",
+            "ك",
+            "ص"
+          ],
+          "targetLetter": "ص"
+        }
+      }
+    },
+    {
+      "key": "daad",
+      "glyph": "ض",
+      "nameAr": "الضاد",
+      "nameEn": "Daad",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ض في أول الكلمة (ضَرَبَ)",
+          "word": "ضَرَبَ",
+          "roman": "da-ra-ba",
+          "positionAr": "أول الكلمة",
+          "formShape": "ضـ",
+          "audioUrl": "",
+          "letters": [
+            "ض",
+            "ر",
+            "ب"
+          ],
+          "targetLetter": "ض"
+        },
+        "middle": {
+          "titleAr": "حرف ض في وسط الكلمة (تَضَعَ)",
+          "word": "تَضَعَ",
+          "roman": "ta-da-‘a",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـضـ",
+          "audioUrl": "",
+          "letters": [
+            "ت",
+            "ض",
+            "ع"
+          ],
+          "targetLetter": "ض"
+        },
+        "end": {
+          "titleAr": "حرف ض في آخر الكلمة (بَعْضَ)",
+          "word": "بَعْضَ",
+          "roman": "ba-‘a-da",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـض",
+          "audioUrl": "",
+          "letters": [
+            "ب",
+            "ع",
+            "ض"
+          ],
+          "targetLetter": "ض"
+        }
+      }
+    },
+    {
+      "key": "taa2",
+      "glyph": "ط",
+      "nameAr": "الطاء",
+      "nameEn": "Taa",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ط في أول الكلمة (طَبَعَ)",
+          "word": "طَبَعَ",
+          "roman": "ta-ba-‘a",
+          "positionAr": "أول الكلمة",
+          "formShape": "طـ",
+          "audioUrl": "",
+          "letters": [
+            "ط",
+            "ب",
+            "ع"
+          ],
+          "targetLetter": "ط"
+        },
+        "middle": {
+          "titleAr": "حرف ط في وسط الكلمة (بَطَنَ)",
+          "word": "بَطَنَ",
+          "roman": "ba-ta-na",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـطـ",
+          "audioUrl": "",
+          "letters": [
+            "ب",
+            "ط",
+            "ن"
+          ],
+          "targetLetter": "ط"
+        },
+        "end": {
+          "titleAr": "حرف ط في آخر الكلمة (بَسَطَ)",
+          "word": "بَسَطَ",
+          "roman": "ba-sa-ta",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـط",
+          "audioUrl": "",
+          "letters": [
+            "ب",
+            "س",
+            "ط"
+          ],
+          "targetLetter": "ط"
+        }
+      }
+    },
+    {
+      "key": "zaa",
+      "glyph": "ظ",
+      "nameAr": "الظاء",
+      "nameEn": "Zaa",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ظ في أول الكلمة (ظَلَمَ)",
+          "word": "ظَلَمَ",
+          "roman": "za-la-ma",
+          "positionAr": "أول الكلمة",
+          "formShape": "ظـ",
+          "audioUrl": "",
+          "letters": [
+            "ظ",
+            "ل",
+            "م"
+          ],
+          "targetLetter": "ظ"
+        },
+        "middle": {
+          "titleAr": "حرف ظ في وسط الكلمة (نَظَرَ)",
+          "word": "نَظَرَ",
+          "roman": "na-za-ra",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـظـ",
+          "audioUrl": "",
+          "letters": [
+            "ن",
+            "ظ",
+            "ر"
+          ],
+          "targetLetter": "ظ"
+        },
+        "end": {
+          "titleAr": "حرف ظ في آخر الكلمة (يُوعَظُ)",
+          "word": "يُوعَظُ",
+          "roman": "yu-w-‘a-zu",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـظ",
+          "audioUrl": "",
+          "letters": [
+            "ي",
+            "و",
+            "ع",
+            "ظ"
+          ],
+          "targetLetter": "ظ"
+        }
+      }
+    },
+    {
+      "key": "ayn",
+      "glyph": "ع",
+      "nameAr": "العين",
+      "nameEn": "Ayn",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ع في أول الكلمة (عَمَلَ)",
+          "word": "عَمَلَ",
+          "roman": "‘a-ma-la",
+          "positionAr": "أول الكلمة",
+          "formShape": "عـ",
+          "audioUrl": "",
+          "letters": [
+            "ع",
+            "م",
+            "ل"
+          ],
+          "targetLetter": "ع"
+        },
+        "middle": {
+          "titleAr": "حرف ع في وسط الكلمة (فَعَلَ)",
+          "word": "فَعَلَ",
+          "roman": "fa-‘a-la",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـعـ",
+          "audioUrl": "",
+          "letters": [
+            "ف",
+            "ع",
+            "ل"
+          ],
+          "targetLetter": "ع"
+        },
+        "end": {
+          "titleAr": "حرف ع في آخر الكلمة (لَمَعَ)",
+          "word": "لَمَعَ",
+          "roman": "la-ma-‘a",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـع",
+          "audioUrl": "",
+          "letters": [
+            "ل",
+            "م",
+            "ع"
+          ],
+          "targetLetter": "ع"
+        }
+      }
+    },
+    {
+      "key": "ghain",
+      "glyph": "غ",
+      "nameAr": "الغين",
+      "nameEn": "Ghayn",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف غ في أول الكلمة (غَفَرَ)",
+          "word": "غَفَرَ",
+          "roman": "gha-fa-ra",
+          "positionAr": "أول الكلمة",
+          "formShape": "غـ",
+          "audioUrl": "",
+          "letters": [
+            "غ",
+            "ف",
+            "ر"
+          ],
+          "targetLetter": "غ"
+        },
+        "middle": {
+          "titleAr": "حرف غ في وسط الكلمة (لَغْوٌ)",
+          "word": "لَغْوٌ",
+          "roman": "la-gh-wu",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـغـ",
+          "audioUrl": "",
+          "letters": [
+            "ل",
+            "غ",
+            "و"
+          ],
+          "targetLetter": "غ"
+        },
+        "end": {
+          "titleAr": "حرف غ في آخر الكلمة (بَلَغَ)",
+          "word": "بَلَغَ",
+          "roman": "ba-la-gha",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـغ",
+          "audioUrl": "",
+          "letters": [
+            "ب",
+            "ل",
+            "غ"
+          ],
+          "targetLetter": "غ"
+        }
+      }
+    },
+    {
+      "key": "faa",
+      "glyph": "ف",
+      "nameAr": "الفاء",
+      "nameEn": "Faa",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ف في أول الكلمة (فَعَلَ)",
+          "word": "فَعَلَ",
+          "roman": "fa-‘a-la",
+          "positionAr": "أول الكلمة",
+          "formShape": "فـ",
+          "audioUrl": "",
+          "letters": [
+            "ف",
+            "ع",
+            "ل"
+          ],
+          "targetLetter": "ف"
+        },
+        "middle": {
+          "titleAr": "حرف ف في وسط الكلمة (كَفَرَ)",
+          "word": "كَفَرَ",
+          "roman": "ka-fa-ra",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـفـ",
+          "audioUrl": "",
+          "letters": [
+            "ك",
+            "ف",
+            "ر"
+          ],
+          "targetLetter": "ف"
+        },
+        "end": {
+          "titleAr": "حرف ف في آخر الكلمة (سَلَفَ)",
+          "word": "سَلَفَ",
+          "roman": "sa-la-fa",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـف",
+          "audioUrl": "",
+          "letters": [
+            "س",
+            "ل",
+            "ف"
+          ],
+          "targetLetter": "ف"
+        }
+      }
+    },
+    {
+      "key": "qaaf",
+      "glyph": "ق",
+      "nameAr": "القاف",
+      "nameEn": "Qaaf",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ق في أول الكلمة (قَتَلَ)",
+          "word": "قَتَلَ",
+          "roman": "qa-ta-la",
+          "positionAr": "أول الكلمة",
+          "formShape": "قـ",
+          "audioUrl": "",
+          "letters": [
+            "ق",
+            "ت",
+            "ل"
+          ],
+          "targetLetter": "ق"
+        },
+        "middle": {
+          "titleAr": "حرف ق في وسط الكلمة (تَقَعَ)",
+          "word": "تَقَعَ",
+          "roman": "ta-qa-‘a",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـقـ",
+          "audioUrl": "",
+          "letters": [
+            "ت",
+            "ق",
+            "ع"
+          ],
+          "targetLetter": "ق"
+        },
+        "end": {
+          "titleAr": "حرف ق في آخر الكلمة (سَبَقَ)",
+          "word": "سَبَقَ",
+          "roman": "sa-ba-qa",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـق",
+          "audioUrl": "",
+          "letters": [
+            "س",
+            "ب",
+            "ق"
+          ],
+          "targetLetter": "ق"
+        }
+      }
+    },
+    {
+      "key": "kaaf",
+      "glyph": "ك",
+      "nameAr": "الكاف",
+      "nameEn": "Kaaf",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ك في أول الكلمة (كَتَمَ)",
+          "word": "كَتَمَ",
+          "roman": "ka-ta-ma",
+          "positionAr": "أول الكلمة",
+          "formShape": "كـ",
+          "audioUrl": "",
+          "letters": [
+            "ك",
+            "ت",
+            "م"
+          ],
+          "targetLetter": "ك"
+        },
+        "middle": {
+          "titleAr": "حرف ك في وسط الكلمة (حَكَمَ)",
+          "word": "حَكَمَ",
+          "roman": "ha-ka-ma",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـكـ",
+          "audioUrl": "",
+          "letters": [
+            "ح",
+            "ك",
+            "م"
+          ],
+          "targetLetter": "ك"
+        },
+        "end": {
+          "titleAr": "حرف ك في آخر الكلمة (مَعَكَ)",
+          "word": "مَعَكَ",
+          "roman": "ma-‘a-ka",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـك",
+          "audioUrl": "",
+          "letters": [
+            "م",
+            "ع",
+            "ك"
+          ],
+          "targetLetter": "ك"
+        }
+      }
+    },
+    {
+      "key": "laam",
+      "glyph": "ل",
+      "nameAr": "اللام",
+      "nameEn": "Laam",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ل في أول الكلمة (لُعِنَ)",
+          "word": "لُعِنَ",
+          "roman": "lu-‘i-na",
+          "positionAr": "أول الكلمة",
+          "formShape": "لـ",
+          "audioUrl": "",
+          "letters": [
+            "ل",
+            "ع",
+            "ن"
+          ],
+          "targetLetter": "ل"
+        },
+        "middle": {
+          "titleAr": "حرف ل في وسط الكلمة (صَلَحَ)",
+          "word": "صَلَحَ",
+          "roman": "sa-la-ha",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـلـ",
+          "audioUrl": "",
+          "letters": [
+            "ص",
+            "ل",
+            "ح"
+          ],
+          "targetLetter": "ل"
+        },
+        "end": {
+          "titleAr": "حرف ل في آخر الكلمة (حَمَلَ)",
+          "word": "حَمَلَ",
+          "roman": "ha-ma-la",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـل",
+          "audioUrl": "",
+          "letters": [
+            "ح",
+            "م",
+            "ل"
+          ],
+          "targetLetter": "ل"
+        }
+      }
+    },
+    {
+      "key": "meem",
+      "glyph": "م",
+      "nameAr": "الميم",
+      "nameEn": "Meem",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف م في أول الكلمة (مَكَرَ)",
+          "word": "مَكَرَ",
+          "roman": "ma-ka-ra",
+          "positionAr": "أول الكلمة",
+          "formShape": "مـ",
+          "audioUrl": "",
+          "letters": [
+            "م",
+            "ك",
+            "ر"
+          ],
+          "targetLetter": "م"
+        },
+        "middle": {
+          "titleAr": "حرف م في وسط الكلمة (جَمَعَ)",
+          "word": "جَمَعَ",
+          "roman": "ja-ma-‘a",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـمـ",
+          "audioUrl": "",
+          "letters": [
+            "ج",
+            "م",
+            "ع"
+          ],
+          "targetLetter": "م"
+        },
+        "end": {
+          "titleAr": "حرف م في آخر الكلمة (خَتَمَ)",
+          "word": "خَتَمَ",
+          "roman": "kha-ta-ma",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـم",
+          "audioUrl": "",
+          "letters": [
+            "خ",
+            "ت",
+            "م"
+          ],
+          "targetLetter": "م"
+        }
+      }
+    },
+    {
+      "key": "noon",
+      "glyph": "ن",
+      "nameAr": "النون",
+      "nameEn": "Noon",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ن في أول الكلمة (نَفَرَ)",
+          "word": "نَفَرَ",
+          "roman": "na-fa-ra",
+          "positionAr": "أول الكلمة",
+          "formShape": "نـ",
+          "audioUrl": "",
+          "letters": [
+            "ن",
+            "ف",
+            "ر"
+          ],
+          "targetLetter": "ن"
+        },
+        "middle": {
+          "titleAr": "حرف ن في وسط الكلمة (مَنَعَ)",
+          "word": "مَنَعَ",
+          "roman": "ma-na-‘a",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـنـ",
+          "audioUrl": "",
+          "letters": [
+            "م",
+            "ن",
+            "ع"
+          ],
+          "targetLetter": "ن"
+        },
+        "end": {
+          "titleAr": "حرف ن في آخر الكلمة (سَكَنَ)",
+          "word": "سَكَنَ",
+          "roman": "sa-ka-na",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـن",
+          "audioUrl": "",
+          "letters": [
+            "س",
+            "ك",
+            "ن"
+          ],
+          "targetLetter": "ن"
+        }
+      }
+    },
+    {
+      "key": "haa2",
+      "glyph": "ه",
+      "nameAr": "الهاء",
+      "nameEn": "Haa",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ه في أول الكلمة (هَلَكَ)",
+          "word": "هَلَكَ",
+          "roman": "ha-la-ka",
+          "positionAr": "أول الكلمة",
+          "formShape": "هـ",
+          "audioUrl": "",
+          "letters": [
+            "ه",
+            "ل",
+            "ك"
+          ],
+          "targetLetter": "ه"
+        },
+        "middle": {
+          "titleAr": "حرف ه في وسط الكلمة (شَهِدَ)",
+          "word": "شَهِدَ",
+          "roman": "sha-hi-da",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـهـ",
+          "audioUrl": "",
+          "letters": [
+            "ش",
+            "ه",
+            "د"
+          ],
+          "targetLetter": "ه"
+        },
+        "end": {
+          "titleAr": "حرف ه في آخر الكلمة (لَهُ)",
+          "word": "لَهُ",
+          "roman": "la-hu",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـه",
+          "audioUrl": "",
+          "letters": [
+            "ل",
+            "ه"
+          ],
+          "targetLetter": "ه"
+        }
+      }
+    },
+    {
+      "key": "yaa",
+      "glyph": "ي",
+      "nameAr": "الياء",
+      "nameEn": "Yaa",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ي في أول الكلمة (يَلِدْ)",
+          "word": "يَلِدْ",
+          "roman": "ya-li-d",
+          "positionAr": "أول الكلمة",
+          "formShape": "يـ",
+          "audioUrl": "",
+          "letters": [
+            "ي",
+            "ل",
+            "د"
+          ],
+          "targetLetter": "ي"
+        },
+        "middle": {
+          "titleAr": "حرف ي في وسط الكلمة (بَيْنَ)",
+          "word": "بَيْنَ",
+          "roman": "ba-y-na",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـيـ",
+          "audioUrl": "",
+          "letters": [
+            "ب",
+            "ي",
+            "ن"
+          ],
+          "targetLetter": "ي"
+        },
+        "end": {
+          "titleAr": "حرف ي في آخر الكلمة (فى)",
+          "word": "فى",
+          "roman": "f-aa",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـي",
+          "audioUrl": "",
+          "letters": [
+            "ف",
+            "ى"
+          ],
+          "targetLetter": "ي"
+        }
+      }
+    },
+    {
+      "key": "alif",
+      "glyph": "ا",
+      "nameAr": "الألف",
+      "nameEn": "Alif",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ا في أول الكلمة (أَكَلَ)",
+          "word": "أَكَلَ",
+          "roman": "’a-ka-la",
+          "positionAr": "أول الكلمة",
+          "formShape": "ا",
+          "audioUrl": "",
+          "letters": [
+            "أ",
+            "ك",
+            "ل"
+          ],
+          "targetLetter": "ا"
+        },
+        "middle": {
+          "titleAr": "حرف ا في وسط الكلمة (سَأَلَ)",
+          "word": "سَأَلَ",
+          "roman": "sa-’a-la",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـا",
+          "audioUrl": "",
+          "letters": [
+            "س",
+            "أ",
+            "ل"
+          ],
+          "targetLetter": "ا"
+        },
+        "end": {
+          "titleAr": "حرف ا في آخر الكلمة (ذَرَأَ)",
+          "word": "ذَرَأَ",
+          "roman": "dha-ra-’a",
+          "positionAr": "آخر الكلمة",
+          "formShape": "أ",
+          "audioUrl": "",
+          "letters": [
+            "ذ",
+            "ر",
+            "أ"
+          ],
+          "targetLetter": "ا"
+        }
+      }
+    },
+    {
+      "key": "daal",
+      "glyph": "د",
+      "nameAr": "الدال",
+      "nameEn": "Daal",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف د في أول الكلمة (دَخَلَ)",
+          "word": "دَخَلَ",
+          "roman": "da-kha-la",
+          "positionAr": "أول الكلمة",
+          "formShape": "د",
+          "audioUrl": "",
+          "letters": [
+            "د",
+            "خ",
+            "ل"
+          ],
+          "targetLetter": "د"
+        },
+        "middle": {
+          "titleAr": "حرف د في وسط الكلمة (بَدَأَ)",
+          "word": "بَدَأَ",
+          "roman": "ba-da-’a",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـد",
+          "audioUrl": "",
+          "letters": [
+            "ب",
+            "د",
+            "أ"
+          ],
+          "targetLetter": "د"
+        },
+        "end": {
+          "titleAr": "حرف د في آخر الكلمة (وَجَدَ)",
+          "word": "وَجَدَ",
+          "roman": "wa-ja-da",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـد",
+          "audioUrl": "",
+          "letters": [
+            "و",
+            "ج",
+            "د"
+          ],
+          "targetLetter": "د"
+        }
+      }
+    },
+    {
+      "key": "dhaal",
+      "glyph": "ذ",
+      "nameAr": "الذال",
+      "nameEn": "Dhaal",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ذ في أول الكلمة (ذَهَبَ)",
+          "word": "ذَهَبَ",
+          "roman": "dha-ha-ba",
+          "positionAr": "أول الكلمة",
+          "formShape": "ذ",
+          "audioUrl": "",
+          "letters": [
+            "ذ",
+            "ه",
+            "ب"
+          ],
+          "targetLetter": "ذ"
+        },
+        "middle": {
+          "titleAr": "حرف ذ في وسط الكلمة (حَذَرَ)",
+          "word": "حَذَرَ",
+          "roman": "ha-dha-ra",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـذ",
+          "audioUrl": "",
+          "letters": [
+            "ح",
+            "ذ",
+            "ر"
+          ],
+          "targetLetter": "ذ"
+        },
+        "end": {
+          "titleAr": "حرف ذ في آخر الكلمة (أَخَذَ)",
+          "word": "أَخَذَ",
+          "roman": "’a-kha-dha",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـذ",
+          "audioUrl": "",
+          "letters": [
+            "أ",
+            "خ",
+            "ذ"
+          ],
+          "targetLetter": "ذ"
+        }
+      }
+    },
+    {
+      "key": "raa",
+      "glyph": "ر",
+      "nameAr": "الراء",
+      "nameEn": "Raa",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ر في أول الكلمة (رَفَثَ)",
+          "word": "رَفَثَ",
+          "roman": "ra-fa-tha",
+          "positionAr": "أول الكلمة",
+          "formShape": "ر",
+          "audioUrl": "",
+          "letters": [
+            "ر",
+            "ف",
+            "ث"
+          ],
+          "targetLetter": "ر"
+        },
+        "middle": {
+          "titleAr": "حرف ر في وسط الكلمة (شَرَعَ)",
+          "word": "شَرَعَ",
+          "roman": "sha-ra-‘a",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـر",
+          "audioUrl": "",
+          "letters": [
+            "ش",
+            "ر",
+            "ع"
+          ],
+          "targetLetter": "ر"
+        },
+        "end": {
+          "titleAr": "حرف ر في آخر الكلمة (صَبَرَ)",
+          "word": "صَبَرَ",
+          "roman": "sa-ba-ra",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـر",
+          "audioUrl": "",
+          "letters": [
+            "ص",
+            "ب",
+            "ر"
+          ],
+          "targetLetter": "ر"
+        }
+      }
+    },
+    {
+      "key": "zay",
+      "glyph": "ز",
+      "nameAr": "الزاي",
+      "nameEn": "Zay",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف ز في أول الكلمة (زَعَمَ)",
+          "word": "زَعَمَ",
+          "roman": "za-‘a-ma",
+          "positionAr": "أول الكلمة",
+          "formShape": "ز",
+          "audioUrl": "",
+          "letters": [
+            "ز",
+            "ع",
+            "م"
+          ],
+          "targetLetter": "ز"
+        },
+        "middle": {
+          "titleAr": "حرف ز في وسط الكلمة (نَزَلَ)",
+          "word": "نَزَلَ",
+          "roman": "na-za-la",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـز",
+          "audioUrl": "",
+          "letters": [
+            "ن",
+            "ز",
+            "ل"
+          ],
+          "targetLetter": "ز"
+        },
+        "end": {
+          "titleAr": "حرف ز في آخر الكلمة (أَعَزُّ)",
+          "word": "أَعَزُّ",
+          "roman": "’a-‘a-zu",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـز",
+          "audioUrl": "",
+          "letters": [
+            "أ",
+            "ع",
+            "ز"
+          ],
+          "targetLetter": "ز"
+        }
+      }
+    },
+    {
+      "key": "waaw",
+      "glyph": "و",
+      "nameAr": "الواو",
+      "nameEn": "Waaw",
+      "positions": {
+        "beginning": {
+          "titleAr": "حرف و في أول الكلمة (وَقَبَ)",
+          "word": "وَقَبَ",
+          "roman": "wa-qa-ba",
+          "positionAr": "أول الكلمة",
+          "formShape": "و",
+          "audioUrl": "",
+          "letters": [
+            "و",
+            "ق",
+            "ب"
+          ],
+          "targetLetter": "و"
+        },
+        "middle": {
+          "titleAr": "حرف و في وسط الكلمة (قَوْمٌ)",
+          "word": "قَوْمٌ",
+          "roman": "qa-w-mu",
+          "positionAr": "وسط الكلمة",
+          "formShape": "ـو",
+          "audioUrl": "",
+          "letters": [
+            "ق",
+            "و",
+            "م"
+          ],
+          "targetLetter": "و"
+        },
+        "end": {
+          "titleAr": "حرف و في آخر الكلمة (فَهُوَ)",
+          "word": "فَهُوَ",
+          "roman": "fa-hu-wa",
+          "positionAr": "آخر الكلمة",
+          "formShape": "ـو",
+          "audioUrl": "",
+          "letters": [
+            "ف",
+            "ه",
+            "و"
+          ],
+          "targetLetter": "و"
+        }
+      }
+    }
+  ]
+}
