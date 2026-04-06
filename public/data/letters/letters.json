@@ -1,0 +1,207 @@
+{
+  "letters": [
+    {
+      "id": 1,
+      "glyph": "ا",
+      "name_ar": "ألف",
+      "name_en": "alif",
+      "audio": "audio/letters/001-alif.mp3"
+    },
+    {
+      "id": 2,
+      "glyph": "ب",
+      "name_ar": "باء",
+      "name_en": "ba",
+      "audio": "audio/letters/002-ba.mp3"
+    },
+    {
+      "id": 3,
+      "glyph": "ت",
+      "name_ar": "تاء",
+      "name_en": "taa",
+      "audio": "audio/letters/003-taa.mp3"
+    },
+    {
+      "id": 4,
+      "glyph": "ث",
+      "name_ar": "ثاء",
+      "name_en": "tha",
+      "audio": "audio/letters/004-tha.mp3"
+    },
+    {
+      "id": 5,
+      "glyph": "ج",
+      "name_ar": "جيم",
+      "name_en": "jeem",
+      "audio": "audio/letters/005-jeem.mp3"
+    },
+    {
+      "id": 6,
+      "glyph": "ح",
+      "name_ar": "حاء",
+      "name_en": "haa",
+      "audio": "audio/letters/006-haa.mp3"
+    },
+    {
+      "id": 7,
+      "glyph": "خ",
+      "name_ar": "خاء",
+      "name_en": "khaa",
+      "audio": "audio/letters/007-khaa.mp3"
+    },
+    {
+      "id": 8,
+      "glyph": "د",
+      "name_ar": "دال",
+      "name_en": "dal",
+      "audio": "audio/letters/008-dal.mp3"
+    },
+    {
+      "id": 9,
+      "glyph": "ذ",
+      "name_ar": "ذال",
+      "name_en": "dhal",
+      "audio": "audio/letters/009-dhal.mp3"
+    },
+    {
+      "id": 10,
+      "glyph": "ر",
+      "name_ar": "راء",
+      "name_en": "raa",
+      "audio": "audio/letters/010-raa.mp3"
+    },
+    {
+      "id": 11,
+      "glyph": "ز",
+      "name_ar": "زاي",
+      "name_en": "zaa",
+      "audio": "audio/letters/011-zaa.mp3"
+    },
+    {
+      "id": 12,
+      "glyph": "س",
+      "name_ar": "سين",
+      "name_en": "seen",
+      "audio": "audio/letters/012-seen.mp3"
+    },
+    {
+      "id": 13,
+      "glyph": "ش",
+      "name_ar": "شين",
+      "name_en": "sheen",
+      "audio": "audio/letters/013-sheen.mp3"
+    },
+    {
+      "id": 14,
+      "glyph": "ص",
+      "name_ar": "صاد",
+      "name_en": "saad",
+      "audio": "audio/letters/014-saad.mp3"
+    },
+    {
+      "id": 15,
+      "glyph": "ض",
+      "name_ar": "ضاد",
+      "name_en": "dhaad",
+      "audio": "audio/letters/015-dhaad.mp3"
+    },
+    {
+      "id": 16,
+      "glyph": "ط",
+      "name_ar": "طاء",
+      "name_en": "toa",
+      "audio": "audio/letters/016-toa.mp3"
+    },
+    {
+      "id": 17,
+      "glyph": "ظ",
+      "name_ar": "ظاء",
+      "name_en": "dhaa",
+      "audio": "audio/letters/017-dhaa.mp3"
+    },
+    {
+      "id": 18,
+      "glyph": "ع",
+      "name_ar": "عين",
+      "name_en": "ain",
+      "audio": "audio/letters/018-ain.mp3"
+    },
+    {
+      "id": 19,
+      "glyph": "غ",
+      "name_ar": "غين",
+      "name_en": "ghain",
+      "audio": "audio/letters/019-ghain.mp3"
+    },
+    {
+      "id": 20,
+      "glyph": "ف",
+      "name_ar": "فاء",
+      "name_en": "faa",
+      "audio": "audio/letters/020-faa.mp3"
+    },
+    {
+      "id": 21,
+      "glyph": "ق",
+      "name_ar": "قاف",
+      "name_en": "qaaf",
+      "audio": "audio/letters/021-qaaf.mp3"
+    },
+    {
+      "id": 22,
+      "glyph": "ك",
+      "name_ar": "كاف",
+      "name_en": "kaaf",
+      "audio": "audio/letters/022-kaaf.mp3"
+    },
+    {
+      "id": 23,
+      "glyph": "ل",
+      "name_ar": "لام",
+      "name_en": "laam",
+      "audio": "audio/letters/023-laam.mp3"
+    },
+    {
+      "id": 24,
+      "glyph": "م",
+      "name_ar": "ميم",
+      "name_en": "meem",
+      "audio": "audio/letters/024-meem.mp3"
+    },
+    {
+      "id": 25,
+      "glyph": "ن",
+      "name_ar": "نون",
+      "name_en": "noon",
+      "audio": "audio/letters/025-noon.mp3"
+    },
+    {
+      "id": 26,
+      "glyph": "و",
+      "name_ar": "واو",
+      "name_en": "waw",
+      "audio": "audio/letters/026-waw.mp3"
+    },
+    {
+      "id": 27,
+      "glyph": "ه",
+      "name_ar": "هاء",
+      "name_en": "ha",
+      "audio": "audio/letters/027-ha.mp3"
+    },
+    {
+      "id": 28,
+      "glyph": "ي",
+      "name_ar": "ياء",
+      "name_en": "yaa",
+      "audio": "audio/letters/028-yaa.mp3"
+    },
+    {
+      "id": 29,
+      "glyph": "ء",
+      "name_ar": "همزة",
+      "name_en": "hamza",
+      "audio": "audio/letters/029-hamza.mp3"
+    }
+  ]
+}

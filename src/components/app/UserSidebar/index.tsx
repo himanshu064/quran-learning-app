@@ -4,6 +4,12 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
+  BookOpen,
+  BookText,
+  GraduationCap,
+  Languages,
+  ListChecks,
+  PenLine,
   LogOut,
   BookOpenCheck,
   ChevronsUpDown,
@@ -14,6 +20,7 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -34,6 +41,15 @@ import { useLanguage } from "@/providers";
 
 const mainNav = [
   { key: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard },
+];
+
+const learningNav = [
+  { key: "nav.surahs", href: "/surahs", icon: BookOpen },
+  { key: "nav.reader", href: "/reader", icon: BookText },
+  { key: "nav.teaching", href: "/teaching", icon: GraduationCap },
+  { key: "nav.letters", href: "/letters", icon: Languages },
+  { key: "nav.mcq", href: "/mcq", icon: ListChecks },
+  { key: "nav.writing", href: "/writing", icon: PenLine },
 ];
 
 function getInitials(name: string) {
@@ -94,10 +110,39 @@ export function UserSidebar({
       </SidebarHeader>
       <SidebarSeparator className="mx-0" />
       <SidebarContent>
+        {/* Main nav */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainNav.map((item) => {
+                const label = t(item.key);
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive(item.href)}
+                      tooltip={label}
+                    >
+                      <Link href={item.href}>
+                        <item.icon />
+                        <span>{label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator className="mx-0" />
+
+        {/* Learning nav */}
+        <SidebarGroup>
+          <SidebarGroupLabel>{t("nav.learningLabel")}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {learningNav.map((item) => {
                 const label = t(item.key);
                 return (
                   <SidebarMenuItem key={item.href}>

@@ -28,6 +28,7 @@ export default async function AppLayout({
     }
   } catch {}
 
+  // Read language from cookie (set by LanguageProvider on toggle) — prevents flash
   const cookieStore = await cookies();
   const langCookie = cookieStore.get("app_language")?.value;
   const defaultLanguage =

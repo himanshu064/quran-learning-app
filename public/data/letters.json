@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "letters": [
+    {
+      "id": "alif",
+      "glyph": "ا",
+      "nameAr": "الألف",
+      "nameEn": "Alif",
+      "order": 1,
+      "tags": ["basic_alphabet", "long_vowel"],
+
+      "makhrajAudio": "audio/letters/alif_makhraj.mp3",
+      "makhrajDescriptionAr": "خروج الصوت من الجوف مع انفتاح الفم.",
+      "makhrajDescriptionEn": "Sound flows from the empty space of the mouth/throat.",
+
+      "forms": {
+        "isolated": "ا",
+        "initial": "ا",
+        "medial": "ـا",
+        "final": "ـا"
+      },
+
+      "exampleWords": [
+        {
+          "text": "آمَنُوا",
+          "surah": 2,
+          "ayah": 9,
+          "wordIndex": 1,
+          "position": "initial"
+        },
+        {
+          "text": "الدِّينِ",
+          "surah": 1,
+          "ayah": 4,
+          "wordIndex": 4,
+          "position": "medial"
+        }
+      ]
+    },
+
+    {
+      "id": "ba",
+      "glyph": "ب",
+      "nameAr": "الباء",
+      "nameEn": "Ba",
+      "order": 2,
+      "tags": ["basic_alphabet", "open_vowels"],
+
+      "makhrajAudio": "audio/letters/ba_makhraj.mp3",
+      "makhrajDescriptionAr": "انطباق الشفتين ثم انفصالهما مع خروج الصوت.",
+      "makhrajDescriptionEn": "Both lips meet then separate as the sound is released.",
+
+      "forms": {
+        "isolated": "ب",
+        "initial": "بـ",
+        "medial": "ـبـ",
+        "final": "ـب"
+      },
+
+      "exampleWords": [
+        {
+          "text": "بِسْمِ",
+          "surah": 1,
+          "ayah": 1,
+          "wordIndex": 1,
+          "position": "initial"
+        },
+        {
+          "text": "قَلْبٌ",
+          "surah": 2,
+          "ayah": 10,
+          "wordIndex": 3,
+          "position": "medial"
+        },
+        {
+          "text": "يَكْتُبْ",
+          "surah": 96,
+          "ayah": 4,
+          "wordIndex": 4,
+          "position": "final"
+        }
+      ]
+    }
+  ]
+}

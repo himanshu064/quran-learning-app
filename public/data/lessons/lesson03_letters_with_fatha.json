@@ -1,0 +1,1360 @@
+{
+  "113:5": [
+    {
+      "word": "حَسَدَ",
+      "wordIndex": 5,
+      "quranWord": "حَسَدَ",
+      "count": 1
+    }
+  ],
+  "113:3": [
+    {
+      "word": "وَقَبَ",
+      "wordIndex": 5,
+      "quranWord": "وَقَبَ",
+      "count": 1
+    }
+  ],
+  "113:2": [
+    {
+      "word": "خَلَقَ",
+      "wordIndex": 4,
+      "quranWord": "خَلَقَ",
+      "count": 58
+    }
+  ],
+  "111:2": [
+    {
+      "word": "كَسَبَ",
+      "wordIndex": 6,
+      "quranWord": "كَسَبَ",
+      "count": 3
+    }
+  ],
+  "105:1": [
+    {
+      "word": "تَرَ",
+      "wordIndex": 2,
+      "quranWord": "تَرَ",
+      "count": 31
+    },
+    {
+      "word": "فَعَلَ",
+      "wordIndex": 4,
+      "quranWord": "فَعَلَ",
+      "count": 7
+    }
+  ],
+  "104:2": [
+    {
+      "word": "جَمَعَ",
+      "wordIndex": 2,
+      "quranWord": "جَمَعَ",
+      "count": 1
+    }
+  ],
+  "96:12": [
+    {
+      "word": "أَمَرَ",
+      "wordIndex": 2,
+      "quranWord": "أَمَرَ",
+      "count": 7
+    }
+  ],
+  "94:6": [
+    {
+      "word": "مَعَ",
+      "wordIndex": 2,
+      "quranWord": "مَعَ",
+      "count": 49
+    }
+  ],
+  "94:4": [
+    {
+      "word": "لَكَ",
+      "wordIndex": 2,
+      "quranWord": "لَكَ",
+      "count": 59
+    }
+  ],
+  "93:8": [
+    {
+      "word": "وَوَجَدَكَ",
+      "wordIndex": 1,
+      "quranWord": "وَوَجَدَكَ",
+      "count": 2
+    }
+  ],
+  "90:3": [
+    {
+      "word": "وَلَدَ",
+      "wordIndex": 3,
+      "quranWord": "وَلَدَ",
+      "count": 2
+    }
+  ],
+  "89:16": [
+    {
+      "word": "فَقَدَرَ",
+      "wordIndex": 5,
+      "quranWord": "فَقَدَرَ",
+      "count": 1
+    }
+  ],
+  "88:23": [
+    {
+      "word": "وَكَفَرَ",
+      "wordIndex": 4,
+      "quranWord": "وَكَفَرَ",
+      "count": 1
+    }
+  ],
+  "87:15": [
+    {
+      "word": "وَذَكَرَ",
+      "wordIndex": 1,
+      "quranWord": "وَذَكَرَ",
+      "count": 2
+    }
+  ],
+  "84:17": [
+    {
+      "word": "وَسَقَ",
+      "wordIndex": 3,
+      "quranWord": "وَسَقَ",
+      "count": 1
+    }
+  ],
+  "82:7": [
+    {
+      "word": "خَلَقَكَ",
+      "wordIndex": 2,
+      "quranWord": "خَلَقَكَ",
+      "count": 2
+    },
+    {
+      "word": "فَعَدَلَكَ",
+      "wordIndex": 4,
+      "quranWord": "فَعَدَلَكَ",
+      "count": 1
+    }
+  ],
+  "80:1": [
+    {
+      "word": "عَبَسَ",
+      "wordIndex": 1,
+      "quranWord": "عَبَسَ",
+      "count": 2
+    }
+  ],
+  "79:28": [
+    {
+      "word": "رَفَعَ",
+      "wordIndex": 1,
+      "quranWord": "رَفَعَ",
+      "count": 2
+    }
+  ],
+  "79:23": [
+    {
+      "word": "فَحَشَرَ",
+      "wordIndex": 1,
+      "quranWord": "فَحَشَرَ",
+      "count": 1
+    }
+  ],
+  "75:39": [
+    {
+      "word": "فَجَعَلَ",
+      "wordIndex": 1,
+      "quranWord": "فَجَعَلَ",
+      "count": 2
+    }
+  ],
+  "75:38": [
+    {
+      "word": "فَخَلَقَ",
+      "wordIndex": 4,
+      "quranWord": "فَخَلَقَ",
+      "count": 1
+    }
+  ],
+  "75:33": [
+    {
+      "word": "ذَهَبَ",
+      "wordIndex": 2,
+      "quranWord": "ذَهَبَ",
+      "count": 5
+    }
+  ],
+  "75:11": [
+    {
+      "word": "وَزَرَ",
+      "wordIndex": 3,
+      "quranWord": "وَزَرَ",
+      "count": 1
+    }
+  ],
+  "75:8": [
+    {
+      "word": "وَخَسَفَ",
+      "wordIndex": 1,
+      "quranWord": "وَخَسَفَ",
+      "count": 1
+    }
+  ],
+  "74:42": [
+    {
+      "word": "سَقَرَ",
+      "wordIndex": 4,
+      "quranWord": "سَقَرَ",
+      "count": 3
+    }
+  ],
+  "74:30": [
+    {
+      "word": "عَشَرَ",
+      "wordIndex": 3,
+      "quranWord": "عَشَرَ",
+      "count": 4
+    }
+  ],
+  "74:22": [
+    {
+      "word": "وَبَسَرَ",
+      "wordIndex": 3,
+      "quranWord": "وَبَسَرَ",
+      "count": 1
+    }
+  ],
+  "74:21": [
+    {
+      "word": "نَظَرَ",
+      "wordIndex": 2,
+      "quranWord": "نَظَرَ",
+      "count": 2
+    }
+  ],
+  "73:20": [
+    {
+      "word": "مَعَكَ",
+      "wordIndex": 15,
+      "quranWord": "مَعَكَۚ",
+      "count": 7
+    }
+  ],
+  "71:28": [
+    {
+      "word": "دَخَلَ",
+      "wordIndex": 6,
+      "quranWord": "دَخَلَ",
+      "count": 2
+    }
+  ],
+  "71:19": [
+    {
+      "word": "جَعَلَ",
+      "wordIndex": 2,
+      "quranWord": "جَعَلَ",
+      "count": 44
+    }
+  ],
+  "71:16": [
+    {
+      "word": "وَجَعَلَ",
+      "wordIndex": 1,
+      "quranWord": "وَجَعَلَ",
+      "count": 29
+    }
+  ],
+  "71:4": [
+    {
+      "word": "أَجَلَ",
+      "wordIndex": 10,
+      "quranWord": "أَجَلَ",
+      "count": 2
+    }
+  ],
+  "70:18": [
+    {
+      "word": "وَجَمَعَ",
+      "wordIndex": 1,
+      "quranWord": "وَجَمَعَ",
+      "count": 1
+    }
+  ],
+  "69:29": [
+    {
+      "word": "هَلَكَ",
+      "wordIndex": 1,
+      "quranWord": "هَلَكَ",
+      "count": 4
+    }
+  ],
+  "66:11": [
+    {
+      "word": "وَضَرَبَ",
+      "wordIndex": 1,
+      "quranWord": "وَضَرَبَ",
+      "count": 4
+    }
+  ],
+  "66:10": [
+    {
+      "word": "ضَرَبَ",
+      "wordIndex": 1,
+      "quranWord": "ضَرَبَ",
+      "count": 6
+    }
+  ],
+  "66:2": [
+    {
+      "word": "فَرَضَ",
+      "wordIndex": 2,
+      "quranWord": "فَرَضَ",
+      "count": 4
+    }
+  ],
+  "65:1": [
+    {
+      "word": "ظَلَمَ",
+      "wordIndex": 32,
+      "quranWord": "ظَلَمَ",
+      "count": 4
+    }
+  ],
+  "64:7": [
+    {
+      "word": "زَعَمَ",
+      "wordIndex": 1,
+      "quranWord": "زَعَمَ",
+      "count": 1
+    }
+  ],
+  "62:2": [
+    {
+      "word": "بَعَثَ",
+      "wordIndex": 3,
+      "quranWord": "بَعَثَ",
+      "count": 4
+    }
+  ],
+  "59:16": [
+    {
+      "word": "كَفَرَ",
+      "wordIndex": 8,
+      "quranWord": "كَفَرَ",
+      "count": 18
+    }
+  ],
+  "59:3": [
+    {
+      "word": "كَتَبَ",
+      "wordIndex": 3,
+      "quranWord": "كَتَبَ",
+      "count": 8
+    }
+  ],
+  "59:2": [
+    {
+      "word": "وَقَذَفَ",
+      "wordIndex": 29,
+      "quranWord": "وَقَذَفَ",
+      "count": 2
+    }
+  ],
+  "57:16": [
+    {
+      "word": "نَزَلَ",
+      "wordIndex": 11,
+      "quranWord": "نَزَلَ",
+      "count": 4
+    }
+  ],
+  "57:10": [
+    {
+      "word": "وَعَدَ",
+      "wordIndex": 31,
+      "quranWord": "وَعَدَ",
+      "count": 10
+    }
+  ],
+  "57:8": [
+    {
+      "word": "أَخَذَ",
+      "wordIndex": 11,
+      "quranWord": "أَخَذَ",
+      "count": 9
+    }
+  ],
+  "55:19": [
+    {
+      "word": "مَرَجَ",
+      "wordIndex": 1,
+      "quranWord": "مَرَجَ",
+      "count": 2
+    }
+  ],
+  "55:15": [
+    {
+      "word": "وَخَلَقَ",
+      "wordIndex": 1,
+      "quranWord": "وَخَلَقَ",
+      "count": 5
+    }
+  ],
+  "55:7": [
+    {
+      "word": "وَوَضَعَ",
+      "wordIndex": 3,
+      "quranWord": "وَوَضَعَ",
+      "count": 1
+    }
+  ],
+  "54:35": [
+    {
+      "word": "شَكَرَ",
+      "wordIndex": 7,
+      "quranWord": "شَكَرَ",
+      "count": 2
+    }
+  ],
+  "54:29": [
+    {
+      "word": "فَعَقَرَ",
+      "wordIndex": 4,
+      "quranWord": "فَعَقَرَ",
+      "count": 1
+    }
+  ],
+  "53:11": [
+    {
+      "word": "كَذَبَ",
+      "wordIndex": 2,
+      "quranWord": "كَذَبَ",
+      "count": 2
+    }
+  ],
+  "48:27": [
+    {
+      "word": "صَدَقَ",
+      "wordIndex": 2,
+      "quranWord": "صَدَقَ",
+      "count": 2
+    }
+  ],
+  "47:21": [
+    {
+      "word": "عَزَمَ",
+      "wordIndex": 5,
+      "quranWord": "عَزَمَ",
+      "count": 1
+    }
+  ],
+  "47:16": [
+    {
+      "word": "طَبَعَ",
+      "wordIndex": 19,
+      "quranWord": "طَبَعَ",
+      "count": 3
+    }
+  ],
+  "47:4": [
+    {
+      "word": "تَضَعَ",
+      "wordIndex": 18,
+      "quranWord": "تَضَعَ",
+      "count": 1
+    }
+  ],
+  "46:35": [
+    {
+      "word": "صَبَرَ",
+      "wordIndex": 3,
+      "quranWord": "صَبَرَ",
+      "count": 2
+    }
+  ],
+  "46:15": [
+    {
+      "word": "بَلَغَ",
+      "wordIndex": 16,
+      "quranWord": "بَلَغَ",
+      "count": 9
+    },
+    {
+      "word": "وَبَلَغَ",
+      "wordIndex": 18,
+      "quranWord": "وَبَلَغَ",
+      "count": 1
+    }
+  ],
+  "45:23": [
+    {
+      "word": "وَخَتَمَ",
+      "wordIndex": 10,
+      "quranWord": "وَخَتَمَ",
+      "count": 2
+    }
+  ],
+  "44:43": [
+    {
+      "word": "شَجَرَتَ",
+      "wordIndex": 2,
+      "quranWord": "شَجَرَتَ",
+      "count": 1
+    }
+  ],
+  "42:43": [
+    {
+      "word": "وَغَفَرَ",
+      "wordIndex": 3,
+      "quranWord": "وَغَفَرَ",
+      "count": 1
+    }
+  ],
+  "42:27": [
+    {
+      "word": "بَسَطَ",
+      "wordIndex": 2,
+      "quranWord": "بَسَطَ",
+      "count": 1
+    }
+  ],
+  "42:13": [
+    {
+      "word": "شَرَعَ",
+      "wordIndex": 1,
+      "quranWord": "شَرَعَ",
+      "count": 1
+    }
+  ],
+  "40:48": [
+    {
+      "word": "حَكَمَ",
+      "wordIndex": 10,
+      "quranWord": "حَكَمَ",
+      "count": 1
+    }
+  ],
+  "40:43": [
+    {
+      "word": "جَرَمَ",
+      "wordIndex": 2,
+      "quranWord": "جَرَمَ",
+      "count": 5
+    }
+  ],
+  "40:8": [
+    {
+      "word": "صَلَحَ",
+      "wordIndex": 8,
+      "quranWord": "صَلَحَ",
+      "count": 2
+    }
+  ],
+  "39:22": [
+    {
+      "word": "شَرَحَ",
+      "wordIndex": 2,
+      "quranWord": "شَرَحَ",
+      "count": 2
+    }
+  ],
+  "38:75": [
+    {
+      "word": "مَنَعَكَ",
+      "wordIndex": 4,
+      "quranWord": "مَنَعَكَ",
+      "count": 3
+    }
+  ],
+  "38:73": [
+    {
+      "word": "فَسَجَدَ",
+      "wordIndex": 1,
+      "quranWord": "فَسَجَدَ",
+      "count": 2
+    }
+  ],
+  "38:24": [
+    {
+      "word": "ظَلَمَكَ",
+      "wordIndex": 3,
+      "quranWord": "ظَلَمَكَ",
+      "count": 1
+    }
+  ],
+  "38:5": [
+    {
+      "word": "أَجَعَلَ",
+      "wordIndex": 1,
+      "quranWord": "أَجَعَلَ",
+      "count": 1
+    }
+  ],
+  "37:140": [
+    {
+      "word": "أَبَقَ",
+      "wordIndex": 2,
+      "quranWord": "أَبَقَ",
+      "count": 1
+    }
+  ],
+  "37:88": [
+    {
+      "word": "فَنَظَرَ",
+      "wordIndex": 1,
+      "quranWord": "فَنَظَرَ",
+      "count": 1
+    }
+  ],
+  "36:77": [
+    {
+      "word": "يَرَ",
+      "wordIndex": 2,
+      "quranWord": "يَرَ",
+      "count": 2
+    }
+  ],
+  "36:52": [
+    {
+      "word": "وَصَدَقَ",
+      "wordIndex": 11,
+      "quranWord": "وَصَدَقَ",
+      "count": 2
+    }
+  ],
+  "36:27": [
+    {
+      "word": "غَفَرَ",
+      "wordIndex": 2,
+      "quranWord": "غَفَرَ",
+      "count": 1
+    }
+  ],
+  "35:45": [
+    {
+      "word": "تَرَكَ",
+      "wordIndex": 8,
+      "quranWord": "تَرَكَ",
+      "count": 12
+    }
+  ],
+  "33:64": [
+    {
+      "word": "لَعَنَ",
+      "wordIndex": 3,
+      "quranWord": "لَعَنَ",
+      "count": 1
+    }
+  ],
+  "32:9": [
+    {
+      "word": "وَنَفَخَ",
+      "wordIndex": 3,
+      "quranWord": "وَنَفَخَ",
+      "count": 1
+    }
+  ],
+  "32:7": [
+    {
+      "word": "وَبَدَأَ",
+      "wordIndex": 6,
+      "quranWord": "وَبَدَأَ",
+      "count": 1
+    }
+  ],
+  "30:41": [
+    {
+      "word": "ظَهَرَ",
+      "wordIndex": 1,
+      "quranWord": "ظَهَرَ",
+      "count": 4
+    }
+  ],
+  "30:30": [
+    {
+      "word": "فَطَرَ",
+      "wordIndex": 8,
+      "quranWord": "فَطَرَ",
+      "count": 2
+    }
+  ],
+  "29:69": [
+    {
+      "word": "لَمَعَ",
+      "wordIndex": 8,
+      "quranWord": "لَمَعَ",
+      "count": 1
+    }
+  ],
+  "29:20": [
+    {
+      "word": "بَدَأَ",
+      "wordIndex": 7,
+      "quranWord": "بَدَأَ",
+      "count": 1
+    }
+  ],
+  "28:82": [
+    {
+      "word": "لَخَسَفَ",
+      "wordIndex": 21,
+      "quranWord": "لَخَسَفَ",
+      "count": 1
+    }
+  ],
+  "28:79": [
+    {
+      "word": "فَخَرَجَ",
+      "wordIndex": 1,
+      "quranWord": "فَخَرَجَ",
+      "count": 3
+    }
+  ],
+  "28:32": [
+    {
+      "word": "يَدَكَ",
+      "wordIndex": 2,
+      "quranWord": "يَدَكَ",
+      "count": 5
+    }
+  ],
+  "28:23": [
+    {
+      "word": "وَجَدَ",
+      "wordIndex": 5,
+      "quranWord": "وَجَدَ",
+      "count": 3
+    },
+    {
+      "word": "وَرَدَ",
+      "wordIndex": 2,
+      "quranWord": "وَرَدَ",
+      "count": 1
+    },
+    {
+      "word": "وَوَجَدَ",
+      "wordIndex": 11,
+      "quranWord": "وَوَجَدَ",
+      "count": 3
+    }
+  ],
+  "28:16": [
+    {
+      "word": "فَغَفَرَ",
+      "wordIndex": 8,
+      "quranWord": "فَغَفَرَ",
+      "count": 1
+    }
+  ],
+  "28:15": [
+    {
+      "word": "فَوَجَدَ",
+      "wordIndex": 8,
+      "quranWord": "فَوَجَدَ",
+      "count": 1
+    },
+    {
+      "word": "وَدَخَلَ",
+      "wordIndex": 1,
+      "quranWord": "وَدَخَلَ",
+      "count": 3
+    }
+  ],
+  "28:9": [
+    {
+      "word": "وَلَكَ",
+      "wordIndex": 7,
+      "quranWord": "وَلَكَۖ",
+      "count": 1
+    }
+  ],
+  "27:85": [
+    {
+      "word": "وَوَقَعَ",
+      "wordIndex": 1,
+      "quranWord": "وَوَقَعَ",
+      "count": 1
+    }
+  ],
+  "27:82": [
+    {
+      "word": "وَقَعَ",
+      "wordIndex": 2,
+      "quranWord": "وَقَعَ",
+      "count": 5
+    }
+  ],
+  "27:22": [
+    {
+      "word": "فَمَكَثَ",
+      "wordIndex": 1,
+      "quranWord": "فَمَكَثَ",
+      "count": 1
+    }
+  ],
+  "26:69": [
+    {
+      "word": "نَبَأَ",
+      "wordIndex": 3,
+      "quranWord": "نَبَأَ",
+      "count": 4
+    }
+  ],
+  "26:33": [
+    {
+      "word": "وَنَزَعَ",
+      "wordIndex": 1,
+      "quranWord": "وَنَزَعَ",
+      "count": 2
+    }
+  ],
+  "26:21": [
+    {
+      "word": "فَوَهَبَ",
+      "wordIndex": 5,
+      "quranWord": "فَوَهَبَ",
+      "count": 1
+    }
+  ],
+  "25:40": [
+    {
+      "word": "مَطَرَ",
+      "wordIndex": 7,
+      "quranWord": "مَطَرَ",
+      "count": 1
+    }
+  ],
+  "24:33": [
+    {
+      "word": "عَرَضَ",
+      "wordIndex": 37,
+      "quranWord": "عَرَضَ",
+      "count": 4
+    }
+  ],
+  "24:9": [
+    {
+      "word": "غَضَبَ",
+      "wordIndex": 3,
+      "quranWord": "غَضَبَ",
+      "count": 1
+    }
+  ],
+  "23:112": [
+    {
+      "word": "عَدَدَ",
+      "wordIndex": 6,
+      "quranWord": "عَدَدَ",
+      "count": 3
+    }
+  ],
+  "23:27": [
+    {
+      "word": "سَبَقَ",
+      "wordIndex": 22,
+      "quranWord": "سَبَقَ",
+      "count": 4
+    }
+  ],
+  "22:65": [
+    {
+      "word": "تَقَعَ",
+      "wordIndex": 18,
+      "quranWord": "تَقَعَ",
+      "count": 1
+    }
+  ],
+  "20:111": [
+    {
+      "word": "حَمَلَ",
+      "wordIndex": 8,
+      "quranWord": "حَمَلَ",
+      "count": 1
+    }
+  ],
+  "20:86": [
+    {
+      "word": "فَرَجَعَ",
+      "wordIndex": 1,
+      "quranWord": "فَرَجَعَ",
+      "count": 1
+    }
+  ],
+  "20:60": [
+    {
+      "word": "فَجَمَعَ",
+      "wordIndex": 3,
+      "quranWord": "فَجَمَعَ",
+      "count": 1
+    }
+  ],
+  "20:53": [
+    {
+      "word": "وَسَلَكَ",
+      "wordIndex": 6,
+      "quranWord": "وَسَلَكَ",
+      "count": 1
+    }
+  ],
+  "19:59": [
+    {
+      "word": "فَخَلَفَ",
+      "wordIndex": 1,
+      "quranWord": "فَخَلَفَ",
+      "count": 2
+    }
+  ],
+  "19:4": [
+    {
+      "word": "وَهَنَ",
+      "wordIndex": 4,
+      "quranWord": "وَهَنَ",
+      "count": 1
+    }
+  ],
+  "18:55": [
+    {
+      "word": "مَنَعَ",
+      "wordIndex": 2,
+      "quranWord": "مَنَعَ",
+      "count": 2
+    }
+  ],
+  "18:50": [
+    {
+      "word": "فَفَسَقَ",
+      "wordIndex": 12,
+      "quranWord": "فَفَسَقَ",
+      "count": 1
+    }
+  ],
+  "17:94": [
+    {
+      "word": "أَبَعَثَ",
+      "wordIndex": 12,
+      "quranWord": "أَبَعَثَ",
+      "count": 1
+    }
+  ],
+  "17:81": [
+    {
+      "word": "وَزَهَقَ",
+      "wordIndex": 4,
+      "quranWord": "وَزَهَقَ",
+      "count": 1
+    }
+  ],
+  "16:54": [
+    {
+      "word": "كَشَفَ",
+      "wordIndex": 3,
+      "quranWord": "كَشَفَ",
+      "count": 1
+    }
+  ],
+  "16:26": [
+    {
+      "word": "مَكَرَ",
+      "wordIndex": 2,
+      "quranWord": "مَكَرَ",
+      "count": 2
+    }
+  ],
+  "16:13": [
+    {
+      "word": "ذَرَأَ",
+      "wordIndex": 2,
+      "quranWord": "ذَرَأَ",
+      "count": 2
+    }
+  ],
+  "14:39": [
+    {
+      "word": "وَهَبَ",
+      "wordIndex": 4,
+      "quranWord": "وَهَبَ",
+      "count": 1
+    }
+  ],
+  "13:10": [
+    {
+      "word": "جَهَرَ",
+      "wordIndex": 7,
+      "quranWord": "جَهَرَ",
+      "count": 1
+    }
+  ],
+  "12:100": [
+    {
+      "word": "وَرَفَعَ",
+      "wordIndex": 1,
+      "quranWord": "وَرَفَعَ",
+      "count": 3
+    }
+  ],
+  "12:81": [
+    {
+      "word": "سَرَقَ",
+      "wordIndex": 8,
+      "quranWord": "سَرَقَ",
+      "count": 2
+    }
+  ],
+  "12:76": [
+    {
+      "word": "فَبَدَأَ",
+      "wordIndex": 1,
+      "quranWord": "فَبَدَأَ",
+      "count": 1
+    }
+  ],
+  "12:34": [
+    {
+      "word": "فَصَرَفَ",
+      "wordIndex": 4,
+      "quranWord": "فَصَرَفَ",
+      "count": 1
+    }
+  ],
+  "12:4": [
+    {
+      "word": "أَحَدَ",
+      "wordIndex": 8,
+      "quranWord": "أَحَدَ",
+      "count": 1
+    }
+  ],
+  "11:118": [
+    {
+      "word": "لَجَعَلَ",
+      "wordIndex": 4,
+      "quranWord": "لَجَعَلَ",
+      "count": 1
+    }
+  ],
+  "10:81": [
+    {
+      "word": "عَمَلَ",
+      "wordIndex": 16,
+      "quranWord": "عَمَلَ",
+      "count": 2
+    }
+  ],
+  "10:2": [
+    {
+      "word": "قَدَمَ",
+      "wordIndex": 17,
+      "quranWord": "قَدَمَ",
+      "count": 1
+    }
+  ],
+  "9:127": [
+    {
+      "word": "صَرَفَ",
+      "wordIndex": 15,
+      "quranWord": "صَرَفَ",
+      "count": 1
+    }
+  ],
+  "9:122": [
+    {
+      "word": "نَفَرَ",
+      "wordIndex": 7,
+      "quranWord": "نَفَرَ",
+      "count": 1
+    }
+  ],
+  "9:93": [
+    {
+      "word": "وَطَبَعَ",
+      "wordIndex": 13,
+      "quranWord": "وَطَبَعَ",
+      "count": 1
+    }
+  ],
+  "9:90": [
+    {
+      "word": "وَقَعَدَ",
+      "wordIndex": 7,
+      "quranWord": "وَقَعَدَ",
+      "count": 1
+    }
+  ],
+  "9:48": [
+    {
+      "word": "وَظَهَرَ",
+      "wordIndex": 12,
+      "quranWord": "وَظَهَرَ",
+      "count": 1
+    }
+  ],
+  "8:48": [
+    {
+      "word": "نَكَصَ",
+      "wordIndex": 19,
+      "quranWord": "نَكَصَ",
+      "count": 1
+    }
+  ],
+  "8:38": [
+    {
+      "word": "سَلَفَ",
+      "wordIndex": 10,
+      "quranWord": "سَلَفَ",
+      "count": 5
+    }
+  ],
+  "7:154": [
+    {
+      "word": "سَكَتَ",
+      "wordIndex": 2,
+      "quranWord": "سَكَتَ",
+      "count": 1
+    }
+  ],
+  "7:150": [
+    {
+      "word": "رَجَعَ",
+      "wordIndex": 2,
+      "quranWord": "رَجَعَ",
+      "count": 1
+    }
+  ],
+  "7:127": [
+    {
+      "word": "وَيَذَرَكَ",
+      "wordIndex": 12,
+      "quranWord": "وَيَذَرَكَ",
+      "count": 1
+    }
+  ],
+  "7:118": [
+    {
+      "word": "فَوَقَعَ",
+      "wordIndex": 1,
+      "quranWord": "فَوَقَعَ",
+      "count": 1
+    },
+    {
+      "word": "وَبَطَلَ",
+      "wordIndex": 3,
+      "quranWord": "وَبَطَلَ",
+      "count": 1
+    }
+  ],
+  "7:70": [
+    {
+      "word": "وَنَذَرَ",
+      "wordIndex": 6,
+      "quranWord": "وَنَذَرَ",
+      "count": 1
+    }
+  ],
+  "7:33": [
+    {
+      "word": "بَطَنَ",
+      "wordIndex": 10,
+      "quranWord": "بَطَنَ",
+      "count": 2
+    }
+  ],
+  "6:157": [
+    {
+      "word": "وَصَدَفَ",
+      "wordIndex": 24,
+      "quranWord": "وَصَدَفَ",
+      "count": 1
+    }
+  ],
+  "6:77": [
+    {
+      "word": "أَفَلَ",
+      "wordIndex": 9,
+      "quranWord": "أَفَلَ",
+      "count": 2
+    }
+  ],
+  "6:13": [
+    {
+      "word": "سَكَنَ",
+      "wordIndex": 3,
+      "quranWord": "سَكَنَ",
+      "count": 1
+    }
+  ],
+  "5:106": [
+    {
+      "word": "حَضَرَ",
+      "wordIndex": 7,
+      "quranWord": "حَضَرَ",
+      "count": 5
+    }
+  ],
+  "5:95": [
+    {
+      "word": "قَتَلَ",
+      "wordIndex": 16,
+      "quranWord": "قَتَلَ",
+      "count": 4
+    }
+  ],
+  "5:60": [
+    {
+      "word": "وَعَبَدَ",
+      "wordIndex": 19,
+      "quranWord": "وَعَبَدَ",
+      "count": 1
+    }
+  ],
+  "5:31": [
+    {
+      "word": "فَبَعَثَ",
+      "wordIndex": 1,
+      "quranWord": "فَبَعَثَ",
+      "count": 2
+    }
+  ],
+  "5:3": [
+    {
+      "word": "أَكَلَ",
+      "wordIndex": 17,
+      "quranWord": "أَكَلَ",
+      "count": 1
+    }
+  ],
+  "4:65": [
+    {
+      "word": "شَجَرَ",
+      "wordIndex": 8,
+      "quranWord": "شَجَرَ",
+      "count": 1
+    }
+  ],
+  "4:22": [
+    {
+      "word": "نَكَحَ",
+      "wordIndex": 4,
+      "quranWord": "نَكَحَ",
+      "count": 1
+    }
+  ],
+  "3:154": [
+    {
+      "word": "لَبَرَزَ",
+      "wordIndex": 56,
+      "quranWord": "لَبَرَزَ",
+      "count": 1
+    }
+  ],
+  "3:59": [
+    {
+      "word": "مَثَلَ",
+      "wordIndex": 2,
+      "quranWord": "مَثَلَ",
+      "count": 1
+    },
+    {
+      "word": "مَثَلَ",
+      "wordIndex": 2,
+      "quranWord": "مَثَلَ",
+      "count": 1
+    }
+  ],
+  "3:54": [
+    {
+      "word": "وَمَكَرَ",
+      "wordIndex": 2,
+      "quranWord": "وَمَكَرَ",
+      "count": 1
+    }
+  ],
+  "2:251": [
+    {
+      "word": "وَقَتَلَ",
+      "wordIndex": 4,
+      "quranWord": "وَقَتَلَ",
+      "count": 1
+    }
+  ],
+  "2:249": [
+    {
+      "word": "فَصَلَ",
+      "wordIndex": 2,
+      "quranWord": "فَصَلَ",
+      "count": 1
+    }
+  ],
+  "2:243": [
+    {
+      "word": "حَذَرَ",
+      "wordIndex": 10,
+      "quranWord": "حَذَرَ",
+      "count": 2
+    }
+  ],
+  "2:197": [
+    {
+      "word": "رَفَثَ",
+      "wordIndex": 9,
+      "quranWord": "رَفَثَ",
+      "count": 1
+    }
+  ],
+  "2:186": [
+    {
+      "word": "سَأَلَكَ",
+      "wordIndex": 2,
+      "quranWord": "سَأَلَكَ",
+      "count": 1
+    }
+  ],
+  "2:140": [
+    {
+      "word": "كَتَمَ",
+      "wordIndex": 21,
+      "quranWord": "كَتَمَ",
+      "count": 1
+    }
+  ],
+  "2:101": [
+    {
+      "word": "نَبَذَ",
+      "wordIndex": 10,
+      "quranWord": "نَبَذَ",
+      "count": 1
+    }
+  ],
+  "2:76": [
+    {
+      "word": "فَتَحَ",
+      "wordIndex": 15,
+      "quranWord": "فَتَحَ",
+      "count": 1
+    }
+  ],
+  "2:20": [
+    {
+      "word": "لَذَهَبَ",
+      "wordIndex": 17,
+      "quranWord": "لَذَهَبَ",
+      "count": 1
+    },
+    {
+      "word": "لَذَهَبَ",
+      "wordIndex": 17,
+      "quranWord": "لَذَهَبَ",
+      "count": 1
+    }
+  ],
+  "2:7": [
+    {
+      "word": "خَتَمَ",
+      "wordIndex": 1,
+      "quranWord": "خَتَمَ",
+      "count": 1
+    }
+  ]
+}

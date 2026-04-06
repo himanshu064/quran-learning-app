@@ -2,6 +2,7 @@
 
 import { BookOpenCheck } from "lucide-react";
 import { ThemeToggle, LanguageToggle } from "@/components/common";
+import { LessonSelector } from "@/components/app/LessonSelector";
 import { useLanguage } from "@/providers";
 
 export function AppTopbar({ appName }: { appName?: string }) {
@@ -19,8 +20,13 @@ export function AppTopbar({ appName }: { appName?: string }) {
         </span>
       </div>
 
+      {/* Lesson selector */}
+      <div className="ms-auto flex items-center gap-2 sm:ms-4">
+        <LessonSelector />
+      </div>
+
       {/* Right side controls */}
-      <div className="ms-auto flex items-center gap-1">
+      <div className="flex items-center gap-1">
         <LanguageToggle />
         <ThemeToggle />
       </div>
