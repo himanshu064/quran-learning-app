@@ -4,8 +4,8 @@ import { user } from "../db/auth-schema";
 import { eq } from "drizzle-orm";
 
 async function seedAdmin() {
-  const email = process.env.ADMIN_EMAIL || "admin@example.com";
-  const password = process.env.ADMIN_PASSWORD || "admin@123";
+  const email = process.env.ADMIN_EMAIL || "admin@yopmail.com";
+  const password = process.env.ADMIN_PASSWORD || "Admin@123";
   const name = process.env.ADMIN_NAME || "Admin";
 
   // Check if user already exists

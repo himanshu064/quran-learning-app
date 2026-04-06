@@ -25,7 +25,7 @@ async function sendViaResend(payload: EmailPayload): Promise<SendResult> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return { success: false, error: "RESEND_API_KEY not set" };
 
-  const from = process.env.EMAIL_FROM || "noreply@example.com";
+  const from = process.env.EMAIL_FROM || "noreply@siradulwusul.com";
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
