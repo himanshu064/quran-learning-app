@@ -1,6 +1,5 @@
 "use server";
 
-import { eq, and } from "drizzle-orm";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/database";
@@ -87,23 +86,13 @@ export async function saveMcqScore(
 export async function saveReadingPosition(surah: number, ayah: number) {
   const userId = await getUserId();
 
-  const existing = await db
-    .select()
-    .from(userSettings)
-    .where(eq(userSettings.userId, userId));
-
-  if (existing.length === 0) {
-    await db.insert(userSettings).values({
-      userId,
-      lastReadSurah: surah,
-      lastReadAyah: ayah,
+  await db
+    .insert(userSettings)
+    .values({ userId, lastReadSurah: surah, lastReadAyah: ayah })
+    .onConflictDoUpdate({
+      target: userSettings.userId,
+      set: { lastReadSurah: surah, lastReadAyah: ayah, updatedAt: new Date() },
     });
-  } else {
-    await db
-      .update(userSettings)
-      .set({ lastReadSurah: surah, lastReadAyah: ayah })
-      .where(eq(userSettings.userId, userId));
-  }
 }
 
 /**
@@ -112,17 +101,11 @@ export async function saveReadingPosition(surah: number, ayah: number) {
 export async function saveLastLesson(lessonId: string) {
   const userId = await getUserId();
 
-  const existing = await db
-    .select()
-    .from(userSettings)
-    .where(eq(userSettings.userId, userId));
-
-  if (existing.length === 0) {
-    await db.insert(userSettings).values({ userId, lastLesson: lessonId });
-  } else {
-    await db
-      .update(userSettings)
-      .set({ lastLesson: lessonId })
-      .where(eq(userSettings.userId, userId));
-  }
+  await db
+    .insert(userSettings)
+    .values({ userId, lastLesson: lessonId })
+    .onConflictDoUpdate({
+      target: userSettings.userId,
+      set: { lastLesson: lessonId, updatedAt: new Date() },
+    });
 }

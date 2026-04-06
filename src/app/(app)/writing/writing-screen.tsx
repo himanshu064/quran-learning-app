@@ -117,10 +117,19 @@ function fireConfetti() {
 export function WritingScreen() {
   const { language } = useLanguage();
   const { slides, isLoading, config } = useLessonContext();
-  const { playWordAudio, playUrl } = useAudioContext();
+  const { playWordAudio, playUrl, isPlaying } = useAudioContext();
   const { saveProgress, saveLastLesson, getLessonProgress } = useProgress();
   const restoredWriting = useRef(false);
 
+  // Stable refs to avoid re-render loops from progress query invalidation
+  const getLessonProgressRef = useRef(getLessonProgress);
+  getLessonProgressRef.current = getLessonProgress;
+  const saveProgressRef = useRef(saveProgress);
+  saveProgressRef.current = saveProgress;
+  const saveLastLessonRef = useRef(saveLastLesson);
+  saveLastLessonRef.current = saveLastLesson;
+
+  const [hasListened, setHasListened] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
   const [typedLetters, setTypedLetters] = useState<LetterCluster[]>([]);
   const [attempts, setAttempts] = useState(0);
@@ -142,19 +151,19 @@ export function WritingScreen() {
   useEffect(() => {
     if (restoredWriting.current || total === 0) return;
     restoredWriting.current = true;
-    const saved = getLessonProgress(config.id);
+    const saved = getLessonProgressRef.current(config.id);
     if (saved && saved.slideIndex > 0 && saved.slideIndex < total) {
       setWordIndex(saved.slideIndex);
     }
-  }, [total, config.id, getLessonProgress]);
+  }, [total, config.id]);
 
   // Track progress on word change
   useEffect(() => {
     if (total > 0) {
-      saveProgress({ lessonId: config.id, slideIndex: wordIndex });
-      saveLastLesson(config.id);
+      saveProgressRef.current({ lessonId: config.id, slideIndex: wordIndex });
+      saveLastLessonRef.current(config.id);
     }
-  }, [wordIndex, total, config.id, saveProgress, saveLastLesson]);
+  }, [wordIndex, total, config.id]);
 
   // Letter pool: base letters from word + 3 distractors
   const letterPool = useMemo(() => {
@@ -179,6 +188,7 @@ export function WritingScreen() {
   const playCurrentWord = useCallback(() => {
     if (currentWord) {
       playWordAudio(currentWord.surah, currentWord.ayah, currentWord.wordIndex);
+      setHasListened(true);
     }
   }, [currentWord, playWordAudio]);
 
@@ -280,6 +290,7 @@ export function WritingScreen() {
           setAttempts(0);
           setFeedback({ text: "", type: "" });
           setRevealed(false);
+          setHasListened(false);
         }
       }, 1500);
     } else {
@@ -304,6 +315,7 @@ export function WritingScreen() {
             setAttempts(0);
             setFeedback({ text: "", type: "" });
             setRevealed(false);
+            setHasListened(false);
           }
         }, 2500);
       } else {
@@ -319,6 +331,7 @@ export function WritingScreen() {
       setAttempts(0);
       setFeedback({ text: "", type: "" });
       setRevealed(false);
+      setHasListened(false);
     }
   }, [wordIndex, total]);
 
@@ -408,7 +421,7 @@ export function WritingScreen() {
           <button
             key={`${letter}-${i}`}
             onClick={() => appendLetter(letter)}
-            disabled={revealed}
+            disabled={!hasListened || isPlaying || revealed}
             className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-600 font-uthmani text-xl text-white transition-colors hover:bg-emerald-700 disabled:opacity-50 cursor-pointer"
             dir="rtl"
           >
@@ -426,7 +439,7 @@ export function WritingScreen() {
           <button
             key={h.key}
             onClick={() => applyHaraka(h.key)}
-            disabled={revealed || typedLetters.length === 0}
+            disabled={!hasListened || isPlaying || revealed || typedLetters.length === 0}
             className="rounded-full bg-orange-500 px-3 py-1.5 font-uthmani text-sm text-white transition-colors hover:bg-orange-600 disabled:opacity-50 cursor-pointer"
             title={language === "ar" ? h.label : h.labelEn}
           >
@@ -442,6 +455,7 @@ export function WritingScreen() {
           size="sm"
           className="gap-1.5 cursor-pointer"
           onClick={handleBackspace}
+          disabled={!hasListened || isPlaying}
         >
           <Delete className="h-4 w-4" />
           {language === "ar" ? "حذف" : "Delete"}
@@ -451,6 +465,7 @@ export function WritingScreen() {
           size="sm"
           className="gap-1.5 cursor-pointer"
           onClick={clearAll}
+          disabled={!hasListened || isPlaying}
         >
           <Trash2 className="h-4 w-4" />
           {language === "ar" ? "مسح" : "Clear"}
@@ -459,7 +474,7 @@ export function WritingScreen() {
           size="sm"
           className="gap-1.5 cursor-pointer"
           onClick={checkAnswer}
-          disabled={revealed}
+          disabled={!hasListened || isPlaying || revealed}
         >
           <Check className="h-4 w-4" />
           {language === "ar" ? "تحقق" : "Check"}

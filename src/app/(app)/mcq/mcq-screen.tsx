@@ -43,9 +43,16 @@ function fireConfetti() {
 export function McqScreen() {
   const { language } = useLanguage();
   const { slides, isLoading, config } = useLessonContext();
-  const { playWordAudio, playUrl } = useAudioContext();
+  const { playWordAudio, playUrl, isPlaying } = useAudioContext();
   const { saveMcqScore, saveProgress, saveLastLesson } = useProgress();
 
+  // Stable refs to avoid re-render loops from progress query invalidation
+  const saveProgressRef = useRef(saveProgress);
+  saveProgressRef.current = saveProgress;
+  const saveLastLessonRef = useRef(saveLastLesson);
+  saveLastLessonRef.current = saveLastLesson;
+
+  const [hasListened, setHasListened] = useState(false);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [answeredCorrectly, setAnsweredCorrectly] = useState(false);
@@ -66,10 +73,10 @@ export function McqScreen() {
   // Track progress on question change
   useEffect(() => {
     if (totalQuestions > 0) {
-      saveProgress({ lessonId: config.id, slideIndex: questionIndex });
-      saveLastLesson(config.id);
+      saveProgressRef.current({ lessonId: config.id, slideIndex: questionIndex });
+      saveLastLessonRef.current(config.id);
     }
-  }, [questionIndex, totalQuestions, config.id, saveProgress, saveLastLesson]);
+  }, [questionIndex, totalQuestions, config.id]);
 
   // 4 options: 1 correct + 3 distractors
   const options = useMemo(() => {
@@ -93,6 +100,7 @@ export function McqScreen() {
   const playCurrentWord = useCallback(() => {
     if (currentWord) {
       playWordAudio(currentWord.surah, currentWord.ayah, currentWord.wordIndex);
+      setHasListened(true);
     }
   }, [currentWord, playWordAudio]);
 
@@ -139,6 +147,7 @@ export function McqScreen() {
     setAttempts(0);
     setAnsweredCorrectly(false);
     setSelectedBtns({});
+    setHasListened(false);
   }, [questionIndex, totalQuestions, score, config.id, saveMcqScore]);
 
   if (isLoading) {
@@ -182,6 +191,7 @@ export function McqScreen() {
             setAttempts(0);
             setAnsweredCorrectly(false);
             setSelectedBtns({});
+            setHasListened(false);
           }}
         >
           {language === "ar" ? "إعادة" : "Try Again"}
@@ -221,7 +231,7 @@ export function McqScreen() {
             <button
               key={`${questionIndex}-${idx}`}
               onClick={() => handleChoice(idx, opt)}
-              disabled={answeredCorrectly || state === "incorrect"}
+              disabled={!hasListened || isPlaying || answeredCorrectly || state === "incorrect"}
               className={cn(
                 "rounded-2xl border p-2 font-uthmani text-[2.4rem] leading-[2.3] transition-all",
                 "disabled:cursor-not-allowed",
