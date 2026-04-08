@@ -119,7 +119,7 @@
   --accent: #1e293b;                  /* slate-800 */
   --accent-foreground: #e2e8f0;
   --destructive: #b91c1c;
-  --border: rgba(148, 163, 184, 0.25); /* slate-400 / 25% */
+  --border: rgba(148, 163, 184, 0.35); /* slate-400 / 35% — matches client */
   --input: rgba(148, 163, 184, 0.2);
   --ring: #0f766e;                    /* teal-700 */
   --chart-1: oklch(0.488 0.243 264.376);
@@ -151,4 +151,27 @@
   .backdrop-blur {
     -webkit-backdrop-filter: blur(10px);
   }
+}
+
+/* ── Client design utilities ── */
+
+/* Ayah card radial halo glow (dark mode only) */
+.ayah-halo {
+  pointer-events: none;
+  position: absolute;
+  inset: -30%;
+  z-index: 0;
+  opacity: 0.6;
+  background: radial-gradient(ellipse at center, rgba(37, 99, 235, 0.18), transparent 60%);
+}
+
+/* Green play-button glow shadow */
+.shadow-play {
+  box-shadow: 0 0.625rem 1.625rem rgba(34, 197, 94, 0.55);
+}
+
+/* Client-style scrollable surah list */
+.surah-scroll {
+  max-height: 29.75rem;
+  overflow-y: auto;
 }

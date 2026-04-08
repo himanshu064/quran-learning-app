@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+// Card replaced with client-style divs
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -122,12 +122,12 @@ export function TeachingPanel() {
     // Letter slides use existing components
     if (currentSlide?.type === "letter") {
       return (
-        <div className="flex flex-col items-center gap-6">
-          <div className="flex w-full items-center justify-between rounded-2xl border border-border bg-card px-4 py-3">
+        <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-6">
+          <div className="flex w-full items-center justify-between rounded-[1.125rem] border border-border bg-card px-4 py-3">
             <span className="text-sm font-medium">
               {language === "ar" ? config.labelAr : config.labelEn}
             </span>
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="outline" className="text-xs">
               {language === "ar"
                 ? `حرف ${slideIndex + 1} / ${totalSlides}`
                 : `Letter ${slideIndex + 1} / ${totalSlides}`}
@@ -143,12 +143,12 @@ export function TeachingPanel() {
 
     if (currentSlide?.type === "letter-forms") {
       return (
-        <div className="flex flex-col items-center gap-6">
-          <div className="flex w-full items-center justify-between rounded-2xl border border-border bg-card px-4 py-3">
+        <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-6">
+          <div className="flex w-full items-center justify-between rounded-[1.125rem] border border-border bg-card px-4 py-3">
             <span className="text-sm font-medium">
               {language === "ar" ? config.labelAr : config.labelEn}
             </span>
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="outline" className="text-xs">
               {slideIndex + 1} / {totalSlides}
             </Badge>
           </div>
@@ -179,9 +179,9 @@ export function TeachingPanel() {
   const isHighlighted = isPlaying && activeWord && currentWordIndex === activeWord.wordIndex;
 
   return (
-    <div className="flex flex-1 flex-col gap-2.5">
+    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-2.5">
       {/* Headline card */}
-      <div className="flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3">
+      <div className="flex items-center justify-between rounded-[1.125rem] border border-border bg-card px-4 py-3">
         <span className="text-sm font-medium">
           {selectedWord
             ? (language === "ar" ? "الكلمة المختارة" : "Selected word")
@@ -189,7 +189,7 @@ export function TeachingPanel() {
               ? `درس اليوم: ${config.labelAr.split("—")[1]?.trim() || config.labelAr}`
               : `Today's lesson: ${config.labelEn.split("—")[1]?.trim() || config.labelEn}`}
         </span>
-        <Badge variant="secondary" className="text-xs">
+        <Badge variant="outline" className="text-xs">
           {selectedWord
             ? (language === "ar"
                 ? `سورة ${selectedWord.surah} · آية ${selectedWord.ayah}`
@@ -201,73 +201,69 @@ export function TeachingPanel() {
       </div>
 
       {/* Main teaching card */}
-      <Card>
-        <CardContent className="flex flex-col items-center p-6 sm:p-8">
-          {/* Source tag */}
-          {activeWord && (
-            <Badge variant="secondary" className="mb-4 text-xs">
-              {language === "ar"
-                ? `من سورة ${activeWord.surah} · آية ${activeWord.ayah}`
-                : `From surah ${activeWord.surah} · Ayah ${activeWord.ayah}`}
-            </Badge>
+      <div className="flex flex-col items-center rounded-[1.125rem] border border-border bg-card p-6 sm:p-8">
+        {/* Source tag */}
+        {activeWord && (
+          <Badge variant="outline" className="mb-4 text-xs">
+            {language === "ar"
+              ? `من سورة ${activeWord.surah} · آية ${activeWord.ayah}`
+              : `From surah ${activeWord.surah} · Ayah ${activeWord.ayah}`}
+          </Badge>
+        )}
+
+        {/* Large word */}
+        <div
+          className={cn(
+            "font-uthmani text-[2.4rem] leading-[2.3] transition-all duration-300 cursor-pointer",
+            isHighlighted &&
+              "text-emerald-400 drop-shadow-[0_0_16px_rgba(16,185,129,0.4)]",
           )}
+          dir="rtl"
+          onClick={handlePlayWord}
+        >
+          {activeWord?.word || "—"}
+        </div>
 
-          {/* Large word */}
-          <div
+        {/* Play + nav buttons */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <Button
+            size="icon"
             className={cn(
-              "font-uthmani text-[2.4rem] leading-[2.3] transition-all duration-300 cursor-pointer",
-              isHighlighted &&
-                "text-emerald-400 drop-shadow-[0_0_16px_rgba(16,185,129,0.4)]",
+              "h-12 w-12 rounded-full bg-primary shadow-play cursor-pointer",
+              isHighlighted && "bg-emerald-500 hover:bg-emerald-600",
             )}
-            dir="rtl"
-            onClick={handlePlayWord}
+            onClick={isPlaying ? stop : handlePlayWord}
+            title={language === "ar" ? (isPlaying ? "إيقاف" : "تشغيل") : (isPlaying ? "Stop" : "Play")}
           >
-            {activeWord?.word || "—"}
-          </div>
-
-          {/* Play + nav buttons */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <Button
-              size="icon"
-              className={cn(
-                "h-12 w-12 rounded-full shadow-[0_0.625rem_1.5rem_rgba(15,118,110,0.45)] cursor-pointer",
-                isHighlighted && "bg-emerald-500 hover:bg-emerald-600",
-              )}
-              onClick={isPlaying ? stop : handlePlayWord}
-              title={language === "ar" ? (isPlaying ? "إيقاف" : "تشغيل") : (isPlaying ? "Stop" : "Play")}
-            >
-              {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-            </Button>
-            <Button
-              variant="outline"
-              className="gap-1.5 rounded-full cursor-pointer"
-              onClick={() => { clearSelectedWord(); prev(); }}
-            >
-              <SkipBack className="h-4 w-4" />
-              {language === "ar" ? "الكلمة السابقة" : "Previous word"}
-            </Button>
-            <Button
-              variant="outline"
-              className="gap-1.5 rounded-full cursor-pointer"
-              onClick={() => { clearSelectedWord(); next(); }}
-            >
-              {language === "ar" ? "الكلمة التالية" : "Next word"}
-              <SkipForward className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="gap-1.5 rounded-full cursor-pointer"
-              onClick={() => { clearSelectedWord(); shuffle(); }}
-            >
-              <Shuffle className="h-4 w-4" />
-              {language === "ar" ? "عشوائي" : "Random"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+          </Button>
+          <Button
+            variant="outline"
+            className="gap-1.5 rounded-full cursor-pointer"
+            onClick={() => { clearSelectedWord(); prev(); }}
+          >
+            {language === "ar" ? "الكلمة السابقة" : "Previous word"}
+          </Button>
+          <Button
+            variant="outline"
+            className="gap-1.5 rounded-full cursor-pointer"
+            onClick={() => { clearSelectedWord(); next(); }}
+          >
+            {language === "ar" ? "الكلمة التالية" : "Next word"}
+          </Button>
+          <Button
+            variant="outline"
+            className="gap-1.5 rounded-full cursor-pointer"
+            onClick={() => { clearSelectedWord(); shuffle(); }}
+          >
+            <Shuffle className="h-4 w-4" />
+            {language === "ar" ? "عشوائي" : "Random"}
+          </Button>
+        </div>
+      </div>
 
       {/* Footer note */}
-      <p className="text-center text-xs text-muted-foreground">
+      <p className="text-center text-xs text-primary/70">
         {language === "ar"
           ? 'هذه الشاشة تعرض نفس "الكلمة اليوم" لكن في بطاقة كبيرة ومركّزة.'
           : 'This screen shows the same "Word of the day" but in a large, focused card.'}

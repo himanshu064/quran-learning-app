@@ -5,8 +5,6 @@ import confetti from "canvas-confetti";
 import { Volume2, ArrowRight, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage, useLessonContext, useAudioContext } from "@/providers";
 import { useProgress } from "@/hooks";
 import {
@@ -254,79 +252,75 @@ export function McqPanel() {
   const isLetterQuiz = currentItem?.type === "letter";
 
   return (
-    <div className="flex flex-1 flex-col gap-4">
-      <Card>
-        <CardContent className="p-6 sm:p-8">
-          <h2 className="mb-2 text-center text-lg font-semibold">
-            {language === "ar"
-              ? isLetterQuiz ? "اختر الحرف الذي تسمعه" : "اختر الكلمة التي تسمعها"
-              : isLetterQuiz ? "Choose the letter you hear" : "Choose the word you hear"}
-          </h2>
-          <p className="mb-6 text-center text-sm text-muted-foreground">
-            {language === "ar"
-              ? "اضغط زر الصوت للاستماع، ثم اضغط على الإجابة الصحيحة من بين الخيارات الأربعة."
-              : "Press the sound button to listen, then press the correct answer from the four options."}
-          </p>
+    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4">
+      <div className="rounded-[1.125rem] border border-border bg-card p-6 sm:p-8">
+        <h2 className="mb-2 text-center text-lg font-semibold">
+          {language === "ar"
+            ? isLetterQuiz ? "اختر الحرف الذي تسمعه" : "اختر الكلمة التي تسمعها"
+            : isLetterQuiz ? "Choose the letter you hear" : "Choose the word you hear"}
+        </h2>
+        <p className="mb-6 text-center text-sm text-muted-foreground">
+          {language === "ar"
+            ? "اضغط زر الصوت 🔊 للاستماع، ثم اضغط على الكلمة الصحيحة من بين الخيارات الأربعة."
+            : "Press the 🔊 sound button to listen, then press the correct word from the four options."}
+        </p>
 
-          {/* Controls */}
-          <div className="mb-6 flex flex-wrap items-center justify-center gap-3">
-            <Button
-              size="lg"
-              className="gap-2 rounded-full cursor-pointer"
-              onClick={playCurrentItem}
-            >
-              <Volume2 className="h-4 w-4" />
-              {language === "ar" ? "استمع" : "Listen"}
-            </Button>
-            {answeredCorrectly && (
-              <Button
-                variant="outline"
-                size="lg"
-                className="gap-2 rounded-full cursor-pointer"
-                onClick={handleNext}
+        {/* Controls */}
+        <div className="mb-6 flex flex-wrap items-center justify-center gap-3">
+          <Button
+            size="lg"
+            className="gap-2 rounded-full bg-primary cursor-pointer"
+            onClick={playCurrentItem}
+          >
+            <Volume2 className="h-4 w-4" />
+            {language === "ar" ? "استمع للكلمة" : "Listen to word"}
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            className="gap-2 rounded-full cursor-pointer"
+            onClick={answeredCorrectly ? handleNext : undefined}
+            disabled={!answeredCorrectly}
+          >
+            <ArrowRight className="h-4 w-4" />
+            {language === "ar" ? "الكلمة التالية" : "Next word"}
+          </Button>
+        </div>
+
+        {/* 2x2 grid — client style: large cards with rounded borders */}
+        <div className="grid grid-cols-2 gap-3">
+          {options.map((opt, idx) => {
+            const state = selectedBtns[idx];
+            return (
+              <button
+                key={`${questionIndex}-${idx}`}
+                onClick={() => handleChoice(idx, opt)}
+                disabled={!hasListened || isPlaying || answeredCorrectly || state === "incorrect"}
+                className={cn(
+                  "h-auto rounded-[1.125rem] border border-border bg-card p-6 font-uthmani transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-50",
+                  isLetterQuiz ? "text-[3.5rem] leading-[2]" : "text-[2.4rem] leading-[2.3]",
+                  state === "correct" && "border-emerald-500 bg-emerald-500/18",
+                  state === "incorrect" && "border-red-500 bg-red-500/16",
+                  !state && "hover:border-primary/50 hover:bg-primary/5 hover:-translate-y-px",
+                )}
+                dir="rtl"
               >
-                {language === "ar" ? "التالي" : "Next"}
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+                {opt}
+              </button>
+            );
+          })}
+        </div>
 
-          {/* 2x2 grid */}
-          <div className="grid grid-cols-2 gap-3">
-            {options.map((opt, idx) => {
-              const state = selectedBtns[idx];
-              return (
-                <Button
-                  key={`${questionIndex}-${idx}`}
-                  variant="outline"
-                  onClick={() => handleChoice(idx, opt)}
-                  disabled={!hasListened || isPlaying || answeredCorrectly || state === "incorrect"}
-                  className={cn(
-                    "h-auto rounded-2xl p-4 font-uthmani transition-all cursor-pointer",
-                    isLetterQuiz ? "text-[3.5rem] leading-[2]" : "text-[2.4rem] leading-[2.3]",
-                    state === "correct" && "border-emerald-500 bg-emerald-500/18 hover:bg-emerald-500/25",
-                    state === "incorrect" && "border-red-500 bg-red-500/16 hover:bg-red-500/20",
-                    !state && "hover:border-primary/50 hover:bg-primary/5 hover:-translate-y-px",
-                  )}
-                  dir="rtl"
-                >
-                  {opt}
-                </Button>
-              );
-            })}
-          </div>
-
-          {/* Feedback */}
-          <p className={cn(
-            "mt-4 min-h-5 text-center text-sm",
-            answeredCorrectly && attempts === 0 ? "text-emerald-500" : attempts > 0 ? "text-red-500" : "text-muted-foreground",
-          )}>
-            {answeredCorrectly && attempts === 0 && (language === "ar" ? "أحسنت! اخترت الإجابة الصحيحة" : "Correct! You chose the right answer")}
-            {!answeredCorrectly && attempts === 1 && (language === "ar" ? "ليست هذه الإجابة، جرّب خيارًا آخر" : "Not this one, try another option")}
-            {answeredCorrectly && attempts >= 2 && (language === "ar" ? "هذا هو الجواب الصحيح" : "This is the correct answer")}
-          </p>
-        </CardContent>
-      </Card>
+        {/* Feedback */}
+        <p className={cn(
+          "mt-4 min-h-5 text-center text-sm",
+          answeredCorrectly && attempts === 0 ? "text-emerald-500" : attempts > 0 ? "text-red-500" : "text-muted-foreground",
+        )}>
+          {answeredCorrectly && attempts === 0 && (language === "ar" ? "أحسنت! اخترت الإجابة الصحيحة" : "Correct! You chose the right answer")}
+          {!answeredCorrectly && attempts === 1 && (language === "ar" ? "ليست هذه الإجابة، جرّب خيارًا آخر" : "Not this one, try another option")}
+          {answeredCorrectly && attempts >= 2 && (language === "ar" ? "هذا هو الجواب الصحيح" : "This is the correct answer")}
+        </p>
+      </div>
     </div>
   );
 }

@@ -31,7 +31,7 @@ export function PillTabNav({
   const { language } = useLanguage();
 
   return (
-    <div className="inline-flex shrink-0 gap-0 overflow-hidden rounded-full border border-border bg-muted">
+    <div className="inline-flex shrink-0 items-center gap-0 overflow-hidden rounded-full border border-border">
       {TABS.map((tab) => (
         <Button
           key={tab.key}
@@ -39,10 +39,10 @@ export function PillTabNav({
           size="sm"
           onClick={() => onTabChange(tab.key)}
           className={cn(
-            "h-auto rounded-none px-4 py-2 text-sm font-medium cursor-pointer",
+            "h-auto rounded-none px-3 py-1.5 text-xs font-medium cursor-pointer",
             "text-muted-foreground hover:text-foreground hover:bg-transparent",
             activeTab === tab.key &&
-              "bg-primary/16 text-primary hover:bg-primary/16 hover:text-primary",
+              "bg-primary/[0.16] text-primary hover:bg-primary/[0.16] hover:text-primary",
           )}
         >
           {language === "ar" ? tab.ar : tab.en}

@@ -1,15 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage } from "@/providers";
-import { useDebounce, useProgress } from "@/hooks";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { useProgress } from "@/hooks";
 import type { TabKey } from "@/components/app/PillTabNav";
 
 type SurahMeta = {
@@ -35,8 +32,6 @@ export function SurahsPanel({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => setMounted(true), []);
-  const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search, 200);
 
   useEffect(() => {
     fetch("/data/quran-metadata-surah-name.json")
@@ -47,15 +42,6 @@ export function SurahsPanel({
       })
       .catch(() => setIsLoading(false));
   }, []);
-
-  const filtered = debouncedSearch
-    ? surahs.filter(
-        (s) =>
-          s.name_simple.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-          s.name_arabic.includes(debouncedSearch) ||
-          String(s.id) === debouncedSearch,
-      )
-    : surahs;
 
   const lastSurah = settings?.lastReadSurah;
   const lastAyah = settings?.lastReadAyah;
@@ -68,7 +54,7 @@ export function SurahsPanel({
   };
 
   return (
-    <div className="flex flex-1 flex-col gap-3">
+    <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-3">
       {/* Chips row */}
       <div className="flex flex-wrap gap-2">
         {lastSurahMeta && (
@@ -89,109 +75,84 @@ export function SurahsPanel({
       {/* Continue where you left */}
       {lastSurahMeta && (
         <>
-          <p className="text-sm text-primary">
+          <p className="text-sm text-muted-foreground">
             {language === "ar" ? "تابع من حيث توقفت" : "Continue where you left"}
           </p>
-          <Card
+          <div
             role="button"
             tabIndex={0}
-            className="cursor-pointer transition-all hover:-translate-y-px"
+            className="grid cursor-pointer grid-cols-[auto_1fr_auto] items-center gap-3 rounded-[1.125rem] border border-border bg-card p-3 transition-all hover:border-primary/30 hover:-translate-y-px"
             onClick={() => handleSurahClick(lastSurah!, lastAyah || 1)}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleSurahClick(lastSurah!, lastAyah || 1); }}
           >
-            <CardContent className="grid grid-cols-[auto_1fr_auto] items-center gap-3 p-3">
-              <div className="grid h-8 w-8 place-items-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                {lastSurah}
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <span className="text-sm font-medium">
-                  {lastSurahMeta.name_simple} · {lastSurahMeta.verses_count}{" "}
-                  {language === "ar" ? "آيات" : "verses"}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {language === "ar" ? "آخر آية:" : "Last ayah:"}{" "}
-                  {lastAyah || 1}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className="font-uthmani text-lg font-semibold text-muted-foreground"
-                  dir="rtl"
-                >
-                  {lastSurahMeta.name_arabic}
-                </span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </div>
-            </CardContent>
-          </Card>
+            <div className="grid h-9 w-9 place-items-center rounded-full border border-border text-sm font-bold text-primary">
+              {lastSurah}
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <span className="font-uthmani text-base font-semibold" dir="rtl">
+                {lastSurahMeta.name_arabic}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {lastSurahMeta.name_simple} · {lastSurahMeta.verses_count}{" "}
+                {language === "ar" ? "آيات" : "verses"}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {language === "ar" ? "آخر آية:" : "Last ayah:"} {lastAyah || 1}
+              </span>
+            </div>
+            <ChevronLeft className="h-4 w-4 text-muted-foreground" />
+          </div>
         </>
       )}
 
-      {/* Search */}
-      <div className="relative w-full sm:max-w-xs">
-        <Search className="absolute inset-s-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={
-            language === "ar" ? "ابحث عن سورة..." : "Search surahs..."
-          }
-          className="ps-9"
-        />
-      </div>
-
       {/* All Surahs */}
-      <p className="text-sm text-primary">
+      <p className="text-sm text-muted-foreground">
         {language === "ar" ? "كل السور" : "All Surahs"}
       </p>
 
       {isLoading ? (
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 rounded-xl" />
+        <div className="space-y-2">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} className="h-16 rounded-xl" />
           ))}
         </div>
-      ) : filtered.length === 0 ? (
+      ) : surahs.length === 0 ? (
         <div className="py-12 text-center text-sm text-muted-foreground">
           {language === "ar" ? "لم يتم العثور على سور" : "No surahs found"}
         </div>
       ) : (
-        <div className="grid flex-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((surah) => (
+        <div className="surah-scroll rounded-[1.125rem] border border-border bg-card">
+          {surahs.map((surah, idx) => (
             <div
               key={surah.id}
               role="button"
               tabIndex={0}
-              className="group flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-card p-3 transition-all hover:border-primary/30 hover:bg-primary/5 hover:-translate-y-px"
+              className={`grid cursor-pointer grid-cols-[auto_1fr_auto] items-center gap-3 px-3 py-3 transition-all hover:bg-primary/5 ${
+                idx < surahs.length - 1 ? "border-b border-border" : ""
+              }`}
               onClick={() => handleSurahClick(surah.id)}
               onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleSurahClick(surah.id); }}
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-sm font-bold text-primary">
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-border text-sm font-bold text-primary">
                 {surah.id}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">
-                  {surah.name_simple}
+                <p className="text-sm font-medium">
+                  {surah.name_simple} · {surah.verses_count}{" "}
+                  {language === "ar" ? "آيات" : "verses"}
                 </p>
-                <p className="truncate text-xs text-muted-foreground">
-                  {surah.verses_count}{" "}
-                  {language === "ar" ? "آية" : "verses"}
-                  {" · "}
+                <p className="text-xs text-muted-foreground">
                   {surah.revelation_place === "makkah"
-                    ? language === "ar"
-                      ? "مكية"
-                      : "Meccan"
-                    : language === "ar"
-                      ? "مدنية"
-                      : "Medinan"}
+                    ? language === "ar" ? "مكّية" : "Meccan"
+                    : language === "ar" ? "مدنيّة" : "Medinan"}
                 </p>
               </div>
-              <span
-                className="shrink-0 font-uthmani text-lg font-semibold text-muted-foreground group-hover:text-foreground"
-                dir="rtl"
-              >
-                {surah.name_arabic}
-              </span>
+              <div className="flex shrink-0 items-center gap-2">
+                <span className="font-uthmani text-base font-semibold" dir="rtl">
+                  {surah.name_arabic}
+                </span>
+                <ChevronLeft className="h-4 w-4 text-muted-foreground" />
+              </div>
             </div>
           ))}
         </div>

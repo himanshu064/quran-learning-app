@@ -34,7 +34,13 @@ export function AppShell({
             />
             <SidebarInset>
               {!isDashboard && <UserTopbar />}
-              <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8">
+              <main
+                className={
+                  isDashboard
+                    ? "flex overflow-auto bg-background p-3 md:p-5 lg:p-6"
+                    : "flex-1 overflow-auto p-4 md:p-6 lg:p-8"
+                }
+              >
                 {children}
               </main>
               <MiniPlayer />

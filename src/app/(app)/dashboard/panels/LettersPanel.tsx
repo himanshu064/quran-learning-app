@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+// Card replaced with client-style divs
 import { ProgressIndicator } from "@/components/lesson";
 import { VercelTabs } from "@/components/common";
 import { useLanguage, useAudioContext } from "@/providers";
@@ -212,23 +212,21 @@ export function LettersPanel() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4">
       {/* Headline */}
-      <Card className="w-full">
-        <CardContent className="flex items-center justify-between px-4 py-3">
-          <span className="text-sm font-medium">
-            {language === "ar" ? "أشكال الحروف في الكلمة" : "Letter Forms in Words"}
-          </span>
-          <Badge variant="secondary" className="text-xs">
-            {index + 1} / {total}
-          </Badge>
-        </CardContent>
-      </Card>
+      <div className="flex w-full items-center justify-between rounded-[1.125rem] border border-border bg-card px-4 py-3">
+        <span className="text-sm font-medium">
+          {language === "ar" ? "أشكال الحروف في الكلمة" : "Letter Forms in Words"}
+        </span>
+        <Badge variant="outline" className="text-xs">
+          {index + 1} / {total}
+        </Badge>
+      </div>
 
       <ProgressIndicator current={index} total={total} className="w-full max-w-md" />
 
       {/* Letter card */}
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 sm:p-8">
+      <div className="w-full max-w-md rounded-[1.125rem] border border-border bg-card p-6 sm:p-8">
         {currentPosition && (
           <p className="mb-4 text-center text-sm font-medium text-muted-foreground" dir="rtl">
             {currentPosition.titleAr}
@@ -252,7 +250,7 @@ export function LettersPanel() {
 
         {currentPosition ? (
           <div className="mb-6 text-center">
-            <div className="flex items-center justify-center gap-1 font-uthmani text-6xl leading-relaxed sm:text-7xl" dir="rtl">
+            <div className="flex flex-wrap items-center justify-center gap-1 font-uthmani text-4xl leading-relaxed sm:text-5xl" dir="rtl">
               {currentPosition.letters.map((letter, i) => (
                 <span
                   key={i}
@@ -368,24 +366,22 @@ function SelectedWordLetters({
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4">
       {/* Headline */}
-      <Card className="w-full">
-        <CardContent className="flex items-center justify-between px-4 py-3">
-          <span className="text-sm font-medium">
-            {language === "ar" ? "حروف الكلمة المختارة" : "Letters of Selected Word"}
-          </span>
-          <Badge variant="secondary" className="text-xs">
-            {language === "ar"
-              ? `سورة ${surah} · آية ${ayah}`
-              : `Surah ${surah} · Ayah ${ayah}`}
-          </Badge>
-        </CardContent>
-      </Card>
+      <div className="flex w-full items-center justify-between rounded-[1.125rem] border border-border bg-card px-4 py-3">
+        <span className="text-sm font-medium">
+          {language === "ar" ? "حروف الكلمة المختارة" : "Letters of Selected Word"}
+        </span>
+        <Badge variant="outline" className="text-xs">
+          {language === "ar"
+            ? `سورة ${surah} · آية ${ayah}`
+            : `Surah ${surah} · Ayah ${ayah}`}
+        </Badge>
+      </div>
 
       {/* Word display */}
-      <Card className="w-full max-w-md">
-        <CardContent className="p-6 sm:p-8">
+      <div className="w-full max-w-md rounded-[1.125rem] border border-border bg-card">
+        <div className="p-6 sm:p-8">
           {/* Full word */}
           <p className="mb-2 text-center font-uthmani text-3xl" dir="rtl">
             {word}
@@ -397,12 +393,12 @@ function SelectedWordLetters({
           </p>
 
           {/* Individual letters */}
-          <div className="mb-6 flex items-center justify-center gap-2 font-uthmani text-6xl leading-relaxed sm:text-7xl" dir="rtl">
+          <div className="mb-6 flex flex-wrap items-center justify-center gap-1.5 font-uthmani text-4xl leading-relaxed sm:text-5xl" dir="rtl">
             {wordLetters.map((letter, i) => (
               <span
                 key={i}
                 className={cn(
-                  "inline-block cursor-pointer rounded-lg px-2 py-1 transition-all duration-200",
+                  "inline-block cursor-pointer rounded-lg px-1.5 py-0.5 transition-all duration-200",
                   i === activeLetterIdx
                     ? "text-emerald-700 dark:text-emerald-400 scale-110 border-2 border-emerald-500 dark:border-emerald-400 bg-emerald-500/15 shadow-[0_0_16px_rgba(16,185,129,0.3)]"
                     : "border-2 border-transparent hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-muted/50",
@@ -430,8 +426,8 @@ function SelectedWordLetters({
               </Button>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Letter nav */}
       <div className="flex items-center justify-center gap-2">

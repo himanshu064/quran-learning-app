@@ -1,5 +1,6 @@
 "use client";
 
+import { Globe } from "lucide-react";
 import { useLanguage } from "@/providers";
 import { Button } from "@/components/ui/button";
 
@@ -8,19 +9,14 @@ export function LanguageToggle() {
 
   return (
     <Button
-      variant="ghost"
+      variant="outline"
       size="sm"
       onClick={toggleLanguage}
-      className="cursor-pointer gap-1 px-2 font-semibold"
+      className="cursor-pointer gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium"
       aria-label="Toggle language"
     >
-      <span className={language === "ar" ? "text-primary" : "text-muted-foreground"}>
-        AR
-      </span>
-      <span className="text-muted-foreground">/</span>
-      <span className={language === "en" ? "text-primary" : "text-muted-foreground"}>
-        EN
-      </span>
+      <Globe className="h-3.5 w-3.5" />
+      <span>{language === "ar" ? "العربية" : "English"}</span>
     </Button>
   );
 }

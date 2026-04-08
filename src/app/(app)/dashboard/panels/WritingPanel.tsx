@@ -5,8 +5,6 @@ import confetti from "canvas-confetti";
 import { Volume2, Delete, Trash2, Check, SkipForward, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage, useLessonContext, useAudioContext } from "@/providers";
 import { useProgress } from "@/hooks";
 import { praiseAudioUrl, retryAudioUrl, revealAudioUrl, writingInstructionUrl } from "@/lib/quran";
@@ -19,6 +17,7 @@ const HARAKAT_MAP: Record<string, string> = {
   damma: "\u064F",
   sukun: "\u0652",
   shadda: "\u0651",
+  silent: "\u0652",
 };
 
 const HARAKAT_BUTTONS = [
@@ -27,6 +26,7 @@ const HARAKAT_BUTTONS = [
   { key: "damma", display: "ـُ", label: "ضمة", labelEn: "Damma" },
   { key: "sukun", display: "ـْ", label: "سكون", labelEn: "Sukun" },
   { key: "shadda", display: "ـّ", label: "شدة", labelEn: "Shadda" },
+  { key: "silent", display: "ـْ", label: "صامت", labelEn: "Silent" },
 ];
 
 const ALL_ARABIC_LETTERS = "ابتثجحخدذرزسشصضطظعغفقكلمنهوي".split("");
@@ -36,6 +36,7 @@ type LetterCluster = {
   vowel: string | null;
   shadda: boolean;
   sukun: boolean;
+  silent: boolean;
 };
 
 // Unified write item for both word and letter slides
@@ -69,6 +70,7 @@ function buildClusterString(c: LetterCluster): string {
   if (c.shadda) result += HARAKAT_MAP.shadda;
   if (c.vowel) result += HARAKAT_MAP[c.vowel];
   if (c.sukun) result += HARAKAT_MAP.sukun;
+  if (c.silent) result += HARAKAT_MAP.silent;
   return result;
 }
 
@@ -196,7 +198,7 @@ export function WritingPanel() {
 
   const appendLetter = useCallback((ch: string) => {
     if (revealed) return;
-    setTypedLetters((prev) => [...prev, { base: ch, vowel: null, shadda: false, sukun: false }]);
+    setTypedLetters((prev) => [...prev, { base: ch, vowel: null, shadda: false, sukun: false, silent: false }]);
     setFeedback({ text: "", type: "" });
   }, [revealed]);
 
@@ -206,9 +208,10 @@ export function WritingPanel() {
       if (prev.length === 0) return prev;
       const updated = [...prev];
       const last = { ...updated[updated.length - 1] };
-      if (type === "fatha" || type === "kasra" || type === "damma") { last.vowel = type; last.sukun = false; }
-      else if (type === "shadda") { last.shadda = !last.shadda; if (last.shadda) last.sukun = false; }
-      else if (type === "sukun") { last.sukun = true; last.vowel = null; }
+      if (type === "fatha" || type === "kasra" || type === "damma") { last.vowel = type; last.sukun = false; last.silent = false; }
+      else if (type === "shadda") { last.shadda = !last.shadda; if (last.shadda) { last.sukun = false; last.silent = false; } }
+      else if (type === "sukun") { last.sukun = true; last.vowel = null; last.silent = false; }
+      else if (type === "silent") { last.silent = true; last.vowel = null; last.sukun = false; }
       updated[updated.length - 1] = last;
       return updated;
     });
@@ -220,7 +223,8 @@ export function WritingPanel() {
       if (prev.length === 0) return prev;
       const updated = [...prev];
       const last = { ...updated[updated.length - 1] };
-      if (last.sukun) { last.sukun = false; updated[updated.length - 1] = last; }
+      if (last.silent) { last.silent = false; updated[updated.length - 1] = last; }
+      else if (last.sukun) { last.sukun = false; updated[updated.length - 1] = last; }
       else if (last.vowel) { last.vowel = null; updated[updated.length - 1] = last; }
       else if (last.shadda) { last.shadda = false; updated[updated.length - 1] = last; }
       else { updated.pop(); }
@@ -277,132 +281,125 @@ export function WritingPanel() {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-4">
-      <Card>
-        <CardContent className="p-6 sm:p-8">
-          <h2 className="mb-2 text-center text-lg font-semibold">
-            {language === "ar"
-              ? isLetterMode ? "اكتب الحرف الذي تسمعه" : "اكتب الكلمة التي تسمعها"
-              : isLetterMode ? "Write the letter you hear" : "Write the word you hear"}
-          </h2>
-          <p className="mb-6 text-center text-sm text-muted-foreground">
-            {language === "ar"
-              ? isLetterMode
-                ? "اضغط على استمع ثم اختر الحرف الصحيح."
-                : "اكتب الكلمة التي تسمعها باستخدام الحروف والحركات الصحيحة. اضغط على استمع للكلمة عندما تكون جاهزًا."
-              : isLetterMode
-                ? "Press Listen, then select the correct letter."
-                : "Write the word you hear using correct letters and diacritics. Press Listen to word when ready."}
-          </p>
+    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4">
+      <div className="rounded-[1.125rem] border border-border bg-card p-6 sm:p-8">
+        <h2 className="mb-2 text-center text-lg font-semibold">
+          {language === "ar"
+            ? isLetterMode ? "اكتب الحرف الذي تسمعه" : "اكتب الكلمة التي تسمعها"
+            : isLetterMode ? "Write the letter you hear" : "Write the word you hear"}
+        </h2>
+        <p className="mb-6 text-center text-sm text-muted-foreground">
+          {language === "ar"
+            ? isLetterMode
+              ? "اضغط على استمع ثم اختر الحرف الصحيح."
+              : "اكتب الكلمة التي تسمعها باستخدام الحروف والحركات الصحيحة. اضغط على 🔊 استمع للكلمة عندما تكون جاهزًا."
+            : isLetterMode
+              ? "Press Listen, then select the correct letter."
+              : "Write the word you hear using correct letters and diacritics. Press 🔊 Listen to word when ready."}
+        </p>
 
-          {/* Word progress */}
-          <div className="mb-4 text-end">
-            <Badge variant="secondary" className="text-xs">
-              {language === "ar"
-                ? `${isLetterMode ? "حرف" : "كلمة"} ${wordIndex + 1} / ${total}`
-                : `${isLetterMode ? "Letter" : "Word"} ${wordIndex + 1} / ${total}`}
-            </Badge>
+        {/* Controls */}
+        <div className="mb-6 flex flex-wrap items-center justify-center gap-3">
+          <Button
+            size="lg"
+            className="gap-2 rounded-full bg-primary cursor-pointer"
+            onClick={playCurrentItem}
+          >
+            <Volume2 className="h-4 w-4" />
+            {language === "ar" ? "استمع للكلمة" : "Listen to word"}
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            className="gap-2 rounded-full cursor-pointer"
+            onClick={skipWord}
+          >
+            <SkipForward className="h-4 w-4" />
+            {language === "ar" ? "كلمة جديدة" : "Next word"}
+          </Button>
+        </div>
+
+        {/* Word you typed label */}
+        <div className="mb-1 text-end text-xs text-muted-foreground">
+          {language === "ar" ? "الكلمة التي كتبتها:" : "Word you typed:"}
+        </div>
+
+        {/* Preview area */}
+        <div className="mb-4 w-full rounded-[1.125rem] border border-border bg-muted p-4 text-center">
+          <span className={cn(
+            "font-uthmani leading-[2.3]",
+            isLetterMode ? "text-[3.5rem]" : "text-[2.4rem]",
+            !typedWord && "text-muted-foreground/30",
+          )} dir="rtl">
+            {typedWord || "..."}
+          </span>
+        </div>
+
+        {/* Revealed answer */}
+        {revealed && currentItem && (
+          <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-2 text-center">
+            <p className="mb-1 text-xs text-amber-500">{language === "ar" ? "الإجابة الصحيحة:" : "Correct answer:"}</p>
+            <span className={cn("font-uthmani", isLetterMode ? "text-3xl" : "text-2xl")} dir="rtl">{currentItem.text}</span>
           </div>
+        )}
 
-          {/* Controls */}
-          <div className="mb-6 flex flex-wrap items-center justify-center gap-3">
-            <Button
-              size="lg"
-              className="gap-2 rounded-full cursor-pointer"
-              onClick={playCurrentItem}
+        {/* Letter buttons — green circles */}
+        <div className="mb-4 flex flex-wrap justify-center gap-2">
+          {letterPool.map((letter, i) => (
+            <button
+              key={`${letter}-${i}`}
+              onClick={() => appendLetter(letter)}
+              disabled={!hasListened || isPlaying || revealed}
+              className={cn(
+                "flex items-center justify-center rounded-full bg-emerald-500 font-uthmani text-white transition-all hover:bg-emerald-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40",
+                isLetterMode ? "h-14 w-14 text-2xl" : "h-12 w-12 text-xl",
+              )}
+              dir="rtl"
             >
-              <Volume2 className="h-4 w-4" />
-              {language === "ar" ? "استمع" : "Listen"}
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="gap-2 rounded-full cursor-pointer"
-              onClick={skipWord}
-            >
-              <SkipForward className="h-4 w-4" />
-              {language === "ar" ? "التالي" : "Next"}
-            </Button>
-          </div>
+              {letter}
+            </button>
+          ))}
+        </div>
 
-          {/* Preview area */}
-          <div className="mb-4 w-full rounded-xl border bg-muted p-4 text-center">
-            <span className={cn(
-              "font-uthmani leading-[2.3]",
-              isLetterMode ? "text-[3.5rem]" : "text-[2.4rem]",
-              !typedWord && "text-muted-foreground/30",
-            )} dir="rtl">
-              {typedWord || "..."}
-            </span>
-          </div>
-
-          {/* Revealed answer */}
-          {revealed && currentItem && (
-            <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-2 text-center">
-              <p className="mb-1 text-xs text-amber-500">{language === "ar" ? "الإجابة الصحيحة:" : "Correct answer:"}</p>
-              <span className={cn("font-uthmani", isLetterMode ? "text-3xl" : "text-2xl")} dir="rtl">{currentItem.text}</span>
-            </div>
-          )}
-
-          {/* Letter buttons */}
-          <div className="mb-4 flex flex-wrap justify-center gap-1.5">
-            {letterPool.map((letter, i) => (
-              <Button
-                key={`${letter}-${i}`}
-                onClick={() => appendLetter(letter)}
-                disabled={!hasListened || isPlaying || revealed}
-                className={cn(
-                  "rounded-xl bg-emerald-600 font-uthmani text-white hover:bg-emerald-700 cursor-pointer",
-                  isLetterMode ? "h-14 w-14 text-2xl" : "h-12 w-12 text-xl",
-                )}
-                dir="rtl"
+        {/* Harakat toolbar — orange circles */}
+        {!isLetterMode && (
+          <div className="mb-4 flex items-center justify-center gap-2 rounded-[1.125rem] border border-border bg-muted px-3 py-2.5">
+            <span className="me-1 text-xs text-muted-foreground">{language === "ar" ? "الحركات:" : "Diacritics:"}</span>
+            {HARAKAT_BUTTONS.map((h) => (
+              <button
+                key={h.key}
+                onClick={() => applyHaraka(h.key)}
+                disabled={!hasListened || isPlaying || revealed || typedLetters.length === 0}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500 font-uthmani text-lg text-white transition-all hover:bg-orange-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+                title={language === "ar" ? h.label : h.labelEn}
               >
-                {letter}
-              </Button>
+                {h.display}
+              </button>
             ))}
           </div>
+        )}
 
-          {/* Harakat toolbar — hide for letter mode since single letters don't need diacritics */}
-          {!isLetterMode && (
-            <div className="mb-4 flex items-center justify-center gap-1.5 rounded-xl border bg-muted px-3 py-2">
-              <span className="me-1 text-xs text-muted-foreground">{language === "ar" ? "الحركات:" : "Diacritics:"}</span>
-              {HARAKAT_BUTTONS.map((h) => (
-                <Button
-                  key={h.key}
-                  size="sm"
-                  onClick={() => applyHaraka(h.key)}
-                  disabled={!hasListened || isPlaying || revealed || typedLetters.length === 0}
-                  className="rounded-full bg-orange-500 px-3 py-1.5 font-uthmani text-sm text-white hover:bg-orange-600 cursor-pointer"
-                  title={language === "ar" ? h.label : h.labelEn}
-                >
-                  {h.display}
-                </Button>
-              ))}
-            </div>
-          )}
+        {/* Edit controls */}
+        <div className="mb-4 flex items-center justify-center gap-2">
+          <Button variant="outline" className="gap-1.5 rounded-full cursor-pointer" onClick={handleBackspace} disabled={!hasListened || isPlaying}>
+            <Delete className="h-4 w-4" />
+            {language === "ar" ? "حذف آخر حرف/حركة" : "Delete last letter/diacritic"}
+          </Button>
+          <Button variant="outline" className="gap-1.5 rounded-full cursor-pointer" onClick={clearAll} disabled={!hasListened || isPlaying}>
+            <Trash2 className="h-4 w-4" />
+            {language === "ar" ? "مسح الكلمة" : "Clear word"}
+          </Button>
+          <Button className="gap-1.5 rounded-full cursor-pointer" onClick={checkAnswer} disabled={!hasListened || isPlaying || revealed}>
+            <Check className="h-4 w-4" />
+            {language === "ar" ? "تحقق من الكلمة" : "Check word"}
+          </Button>
+        </div>
 
-          {/* Edit controls */}
-          <div className="mb-4 flex items-center justify-center gap-2">
-            <Button variant="outline" size="sm" className="gap-1.5 cursor-pointer" onClick={handleBackspace} disabled={!hasListened || isPlaying}>
-              <Delete className="h-4 w-4" />
-              {language === "ar" ? "حذف" : "Delete"}
-            </Button>
-            <Button variant="outline" size="sm" className="gap-1.5 cursor-pointer" onClick={clearAll} disabled={!hasListened || isPlaying}>
-              <Trash2 className="h-4 w-4" />
-              {language === "ar" ? "مسح" : "Clear"}
-            </Button>
-            <Button size="sm" className="gap-1.5 cursor-pointer" onClick={checkAnswer} disabled={!hasListened || isPlaying || revealed}>
-              <Check className="h-4 w-4" />
-              {language === "ar" ? "تحقق" : "Check"}
-            </Button>
-          </div>
-
-          {/* Feedback */}
-          <p className={cn("min-h-5 text-center text-sm", feedback.type === "ok" && "text-emerald-500", feedback.type === "error" && "text-red-500")}>
-            {feedback.text}
-          </p>
-        </CardContent>
-      </Card>
+        {/* Feedback */}
+        <p className={cn("min-h-5 text-center text-sm", feedback.type === "ok" && "text-emerald-500", feedback.type === "error" && "text-red-500")}>
+          {feedback.text}
+        </p>
+      </div>
     </div>
   );
 }

@@ -18,7 +18,7 @@ export function LessonSelector() {
 
   return (
     <Select value={lessonId} onValueChange={setLesson}>
-      <SelectTrigger className="w-full max-w-64">
+      <SelectTrigger className="h-8 w-auto max-w-48 rounded-full border-border px-3 text-xs">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

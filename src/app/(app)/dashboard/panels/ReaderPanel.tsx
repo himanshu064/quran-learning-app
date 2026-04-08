@@ -6,23 +6,21 @@ import {
   Play,
   Pause,
   SkipBack,
-  SkipForward,
   Shuffle,
-  ChevronLeft,
-  ChevronRight,
   BookOpen,
+  Search,
+
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage, useAudioContext, useLessonContext } from "@/providers";
 import { useProgress } from "@/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { useSelectedWord } from "../selected-word-context";
-import type { WordSlide } from "@/types";
+import type { WordSlide, LetterSlide } from "@/types";
 
 type QuranVerse = {
   id: number;
@@ -107,15 +105,16 @@ export function ReaderPanel() {
   const currentSurah = surahMeta?.[String(surah)];
   const maxAyah = currentSurah?.verses_count ?? 286;
 
-  // Current lesson word slide
+  // Current lesson word/letter slide
   const wordSlide =
     currentSlide?.type === "word" ? (currentSlide as WordSlide) : null;
+  const letterSlide =
+    currentSlide?.type === "letter" ? (currentSlide as LetterSlide) : null;
+  const activeSlide = wordSlide ?? letterSlide;
 
   // Auto-navigate to the verse only when lesson nav buttons change the slide
-  // (not on mount/remount — that would override the user's manually chosen ayah)
   const prevSlideIndexRef = useRef(slideIndex);
   useEffect(() => {
-    // Skip on first render / mount — only react to actual slide changes
     if (prevSlideIndexRef.current === slideIndex) return;
     prevSlideIndexRef.current = slideIndex;
     if (!wordSlide) return;
@@ -139,12 +138,10 @@ export function ReaderPanel() {
     return result;
   }, [quranText, surah, ayahFrom, ayahTo, maxAyah]);
 
-  // Save reading position — but only after user has actively navigated,
-  // not on initial mount with default values (which would reset "continue where you left")
+  // Save reading position
   const hasUserNavigated = useRef(false);
   useEffect(() => {
     if (!hasUserNavigated.current) {
-      // Skip saving on first render — defaults would overwrite the real last position
       hasUserNavigated.current = true;
       return;
     }
@@ -153,7 +150,7 @@ export function ReaderPanel() {
     }
   }, [surah, ayahFrom, savePosition]);
 
-  // Navigate ayahs — crosses surah boundaries
+  // Navigate ayahs
   const goToAyah = useCallback(
     (delta: number) => {
       const currentAyahVal = ayahFrom ?? 1;
@@ -179,7 +176,7 @@ export function ReaderPanel() {
     [surah, ayahFrom, maxAyah, surahMeta, setSurah, setAyahFrom, setAyahTo],
   );
 
-  // When user clicks a word in the verse: play it, set it as selected, try to match lesson slide
+  // When user clicks a word
   const handleWordClick = useCallback(
     (
       verseSurah: number,
@@ -187,18 +184,13 @@ export function ReaderPanel() {
       wordIdx: number,
       wordText: string,
     ) => {
-      // Play the word audio
       playWordAudio(verseSurah, verseAyah, wordIdx);
-
-      // Set the selected word — this is what Word/Choose/Write tabs will use
       setSelectedWord({
         word: wordText.trim(),
         surah: verseSurah,
         ayah: verseAyah,
         wordIndex: wordIdx,
       });
-
-      // Also try to find this word in the lesson slides and navigate to it
       const matchIndex = slides.findIndex(
         (s) =>
           s.type === "word" &&
@@ -253,48 +245,55 @@ export function ReaderPanel() {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-2.5">
       {/* Location card */}
-      <Card>
-        <CardContent className="px-3 py-2.5">
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            <label className="text-muted-foreground">
-              {language === "ar" ? "سورة" : "Surah"}
-            </label>
-            <Input
-              type="number"
-              min={1}
-              max={114}
-              value={surah}
-              onChange={(e) => setSurah(Number(e.target.value) || 1)}
-              className="w-16 rounded-lg text-sm"
-              dir="ltr"
-            />
-            <span className="text-muted-foreground/70">|</span>
-            <label className="text-muted-foreground">
-              {language === "ar" ? "آية" : "Ayah"}
-            </label>
-            <Input
-              type="number"
-              min={1}
-              max={maxAyah}
-              value={ayahFrom}
-              onChange={(e) => setAyahFrom(Number(e.target.value) || 1)}
-              className="w-16 rounded-lg text-sm"
-              dir="ltr"
-            />
-            <span className="text-muted-foreground/70">–</span>
-            <Input
-              type="number"
-              min={0}
-              max={maxAyah}
-              value={ayahTo || ""}
-              onChange={(e) => setAyahTo(Number(e.target.value) || 0)}
-              className="w-16 rounded-lg text-sm"
-              dir="ltr"
-              placeholder="—"
-            />
-          </div>
-        </CardContent>
-      </Card>
+      <div className="rounded-[1.125rem] border border-border bg-card px-3 py-2.5">
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <label className="text-muted-foreground">
+            {language === "ar" ? "سورة" : "Surah"}
+          </label>
+          <Input
+            type="number"
+            min={1}
+            max={114}
+            value={surah}
+            onChange={(e) => setSurah(Number(e.target.value) || 1)}
+            className="w-16 rounded-lg text-sm"
+            dir="ltr"
+          />
+          <span className="text-muted-foreground/70">|</span>
+          <label className="text-muted-foreground">
+            {language === "ar" ? "آية" : "Ayah"}
+          </label>
+          <Input
+            type="number"
+            min={1}
+            max={maxAyah}
+            value={ayahFrom}
+            onChange={(e) => setAyahFrom(Number(e.target.value) || 1)}
+            className="w-16 rounded-lg text-sm"
+            dir="ltr"
+          />
+          <span className="text-muted-foreground/70">–</span>
+          <Input
+            type="number"
+            min={0}
+            max={maxAyah}
+            value={ayahTo || ""}
+            onChange={(e) => setAyahTo(Number(e.target.value) || 0)}
+            className="w-16 rounded-lg text-sm"
+            dir="ltr"
+            placeholder="—"
+          />
+          <Button
+            size="icon"
+            className="h-8 w-8 shrink-0 rounded-full bg-primary cursor-pointer"
+            onClick={() => {
+              /* trigger re-render with current values — already reactive via nuqs */
+            }}
+          >
+            <Search className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
 
       {/* Surah header ornament */}
       {currentSurah && (
@@ -343,20 +342,20 @@ export function ReaderPanel() {
       {isTextLoading ? (
         <Skeleton className="h-56 rounded-2xl" />
       ) : (
-        <Card
-          className="relative flex min-h-55 cursor-default items-center justify-center overflow-hidden rounded-2xl p-6"
+        <div
+          className="relative flex min-h-55 cursor-default items-center justify-center overflow-hidden rounded-[1.125rem] border border-border bg-card p-6"
           onClick={() => {
-            if (wordSlide) setShowOverlay((p) => !p);
+            if (activeSlide) setShowOverlay((p) => !p);
           }}
         >
-          {/* Halo glow — only in dark mode */}
-          <div className="pointer-events-none absolute inset-[-30%] z-0 hidden opacity-60 dark:block bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.18),transparent_60%)]" />
+          {/* Halo glow — dark mode only */}
+          <div className="ayah-halo hidden dark:block" />
 
           {/* Verse text */}
           <div
             className={cn(
               "relative z-10 space-y-6 transition-opacity duration-200",
-              showOverlay && wordSlide && "opacity-0",
+              showOverlay && activeSlide && "opacity-0",
             )}
             dir="rtl"
           >
@@ -384,12 +383,9 @@ export function ReaderPanel() {
                   >
                     {verse.text.split(" ").map((word, i) => {
                       const wordIdx = i + 1;
-                      // Audio highlight (during playback)
                       const isAudioActive =
                         currentWordIndex === wordIdx &&
                         currentAyah === verse.ayah;
-                      // Selected word highlight — only ONE word at a time
-                      // selectedWord takes priority; fall back to wordSlide only if no selectedWord
                       const highlightSource = selectedWord || wordSlide;
                       const isLessonWord =
                         highlightSource &&
@@ -410,12 +406,9 @@ export function ReaderPanel() {
                           }}
                           className={cn(
                             "inline-block cursor-pointer rounded-md border-2 border-transparent px-1.5 py-px mx-0.5 transition-colors duration-200",
-                            // Default hover state
                             "hover:bg-emerald-500/15 hover:text-emerald-700 hover:border-emerald-500 dark:hover:bg-emerald-500/25 dark:hover:text-emerald-300 dark:hover:border-emerald-400",
-                            // Audio playback highlight (takes priority)
                             isAudioActive &&
                               "bg-emerald-500/15 text-emerald-700 border-emerald-500 dark:bg-emerald-500/25 dark:text-emerald-300 dark:border-emerald-400",
-                            // Selected word highlight (persistent box)
                             !isAudioActive &&
                               isLessonWord &&
                               "border-primary bg-primary/10 text-primary",
@@ -441,14 +434,19 @@ export function ReaderPanel() {
           </div>
 
           {/* Lesson overlay (flash card) */}
-          {showOverlay && wordSlide && (
+          {showOverlay && activeSlide && (
             <div
               className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-card/95 p-8 text-center backdrop-blur-sm"
               dir="rtl"
             >
               <div className="font-uthmani text-[2.4rem] leading-[2.3]">
-                {wordSlide.word}
+                {wordSlide?.word ?? letterSlide?.glyph}
               </div>
+              {letterSlide && (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {language === "ar" ? letterSlide.name_ar : letterSlide.name_en}
+                </p>
+              )}
               <p className="mt-4 text-xs text-muted-foreground">
                 {language === "ar"
                   ? "اضغط على البطاقة لإظهار الآية الكاملة"
@@ -456,12 +454,21 @@ export function ReaderPanel() {
               </p>
             </div>
           )}
-        </Card>
+        </div>
       )}
 
-      {/* Lesson word nav — navigates between lesson words (syncs verse display) */}
+      {/* Lesson word nav — icon buttons row below verse (play, back, expand) */}
       {totalSlides > 0 && (
         <div className="flex items-center justify-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8 rounded-full cursor-pointer"
+            onClick={isPlaying ? stop : handlePlay}
+            title={language === "ar" ? "تشغيل" : "Play"}
+          >
+            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+          </Button>
           <Button
             variant="outline"
             size="icon"
@@ -470,15 +477,6 @@ export function ReaderPanel() {
             title={language === "ar" ? "الكلمة السابقة" : "Previous word"}
           >
             <SkipBack className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8 rounded-full cursor-pointer"
-            onClick={lessonNext}
-            title={language === "ar" ? "الكلمة التالية" : "Next word"}
-          >
-            <SkipForward className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
@@ -493,80 +491,84 @@ export function ReaderPanel() {
       )}
 
       {/* Lesson info card */}
-      {wordSlide && (
-        <Card>
-          <CardContent className="flex items-center justify-between px-4 py-3">
-            <div className="flex items-center gap-1.5 text-sm">
-              <BookOpen className="h-4 w-4 text-primary" />
-              {language === "ar" ? "كلمة من القرآن" : "Word from Quran"}
-            </div>
-            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-              {wordSlide.count > 0 && (
-                <span>
-                  {language === "ar"
-                    ? `في القرآن: ${wordSlide.count} مرة`
-                    : `In Quran: ${wordSlide.count} times`}
-                </span>
-              )}
-              <Badge variant="secondary" className="text-xs">
-                {slideIndex + 1} / {totalSlides}
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
+      {activeSlide && (
+        <div className="flex items-center justify-between rounded-[1.125rem] border border-border bg-card px-4 py-3">
+          <div className="flex items-center gap-1.5 text-sm">
+            <BookOpen className="h-4 w-4 text-primary" />
+            {letterSlide
+              ? (language === "ar" ? "حرف من الأبجدية" : "Arabic Alphabet")
+              : (language === "ar" ? "كلمة من القرآن" : "Word from Quran")}
+          </div>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            {wordSlide && wordSlide.count > 0 && (
+              <span>
+                {language === "ar"
+                  ? `في القرآن: ${wordSlide.count} مرة`
+                  : `In Quran: ${wordSlide.count} times`}
+              </span>
+            )}
+            {letterSlide && (
+              <span className="font-uthmani text-base">
+                {letterSlide.glyph}
+              </span>
+            )}
+            <span>
+              {language === "ar" ? "التقدم:" : "Progress:"}{" "}
+              {slideIndex + 1} / {totalSlides}
+            </span>
+          </div>
+        </div>
       )}
 
-      {/* Player card */}
+      {/* Player / Recitation card */}
       {verses.length > 0 && (
         <div className="space-y-1">
-          <Card>
-            <CardContent className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm text-muted-foreground">
-                {language === "ar" ? "تلاوة" : "Recitation"}
-              </span>
-              <div className="flex items-center gap-2">
-                <div className="inline-flex overflow-hidden rounded-full border border-border">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={cn(
-                      "h-auto rounded-none px-3 py-1 text-xs cursor-pointer",
-                      mode === "wbw"
-                        ? "bg-primary/16 text-primary"
-                        : "text-muted-foreground",
-                    )}
-                    onClick={() => setMode("wbw")}
-                  >
-                    {language === "ar" ? "كلمة بكلمة" : "Word by word"}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={cn(
-                      "h-auto rounded-none px-3 py-1 text-xs cursor-pointer",
-                      mode === "verse"
-                        ? "bg-primary/16 text-primary"
-                        : "text-muted-foreground",
-                    )}
-                    onClick={() => setMode("verse")}
-                  >
-                    {language === "ar" ? "الآية كاملة" : "Full verse"}
-                  </Button>
-                </div>
+          <div className="flex items-center justify-between rounded-[1.125rem] border border-border bg-card px-4 py-3">
+            <span className="text-sm text-muted-foreground">
+              {language === "ar" ? "تلاوة" : "Recitation"}
+            </span>
+            <div className="flex items-center gap-2">
+              <div className="inline-flex overflow-hidden rounded-full border border-border">
                 <Button
-                  size="icon"
-                  className="h-10 w-10 rounded-full shadow-[0_0.625rem_1.5rem_rgba(15,118,110,0.45)] cursor-pointer"
-                  onClick={isPlaying ? stop : handlePlay}
-                >
-                  {isPlaying ? (
-                    <Pause className="h-5 w-5" />
-                  ) : (
-                    <Play className="h-5 w-5" />
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "h-auto rounded-none px-3 py-1 text-xs cursor-pointer",
+                    mode === "wbw"
+                      ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
+                      : "text-muted-foreground",
                   )}
+                  onClick={() => setMode("wbw")}
+                >
+                  {language === "ar" ? "كلمة بكلمة" : "Word by word"}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "h-auto rounded-none px-3 py-1 text-xs cursor-pointer",
+                    mode === "verse"
+                      ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
+                      : "text-muted-foreground",
+                  )}
+                  onClick={() => setMode("verse")}
+                >
+                  {language === "ar" ? "الآية كاملة" : "Full verse"}
                 </Button>
               </div>
-            </CardContent>
-          </Card>
+              <Button
+                size="icon"
+                className="h-10 w-10 rounded-full bg-emerald-500 hover:bg-emerald-600 shadow-play cursor-pointer"
+                onClick={isPlaying ? stop : handlePlay}
+              >
+                {isPlaying ? (
+                  <Pause className="h-5 w-5 text-white" />
+                ) : (
+                  <Play className="h-5 w-5 text-white" />
+                )}
+              </Button>
+            </div>
+          </div>
           <p className="text-center text-xs text-muted-foreground">
             {language === "ar"
               ? "القارئ: محمود خليل الحصري (المعلّم)"
@@ -575,25 +577,6 @@ export function ReaderPanel() {
         </div>
       )}
 
-      {/* Previous / Next ayah text buttons */}
-      <div className="flex items-center justify-center gap-2">
-        <Button
-          variant="outline"
-          className="gap-1.5 rounded-full cursor-pointer"
-          onClick={() => goToAyah(-1)}
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {language === "ar" ? "السابقة" : "Previous"}
-        </Button>
-        <Button
-          variant="outline"
-          className="gap-1.5 rounded-full cursor-pointer"
-          onClick={() => goToAyah(1)}
-        >
-          {language === "ar" ? "التالية" : "Next"}
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
     </div>
   );
 }
