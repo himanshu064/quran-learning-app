@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { UserDashboard } from "./user-dashboard";
+import { UnifiedScreen } from "./unified-screen";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
 export default function DashboardPage() {
-  return <UserDashboard />;
+  return <UnifiedScreen />;
 }

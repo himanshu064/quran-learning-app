@@ -146,7 +146,16 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     async (surah: number, ayah: number, wordCount?: number) => {
       const audio = getAudio();
       audio.pause();
-      stopHighlighting();
+      // Stop previous highlighting loop but keep ayah state
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      timingsRef.current = [];
+      setCurrentWordIndex(-1);
+
+      // Set the current ayah so highlighting condition matches in components
+      setCurrentAyah(ayah);
 
       // Load timing data
       let timings = await getWordTimings(surah, ayah);
@@ -184,7 +193,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         rafRef.current = requestAnimationFrame(tick);
       }, { once: true });
     },
-    [getAudio, stopHighlighting],
+    [getAudio],
   );
 
   // Helper: wait for audio to finish playing
@@ -228,13 +237,16 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       sequenceRef.current.cancelled = true;
       sequenceRef.current = token;
 
+      const audio = getAudio();
+
       for (const v of verses) {
         for (let w = 1; w <= v.wordCount; w++) {
           if (token.cancelled) return;
-          // playUrl sets sequenceRef.current.cancelled = true, so restore our token after
-          playUrl(wbwUrl(v.surah, v.ayah, w));
-          token.cancelled = false;
-          sequenceRef.current = token;
+          // Play directly without going through playUrl to avoid resetting highlight state
+          audio.pause();
+          audio.src = wbwUrl(v.surah, v.ayah, w);
+          audio.play().catch(() => {});
+          setIsPlaying(true);
           setCurrentAyah(v.ayah);
           setCurrentWordIndex(w);
           await waitForEnded();
@@ -243,10 +255,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       if (!token.cancelled) {
         setIsPlaying(false);
         setCurrentAyah(-1);
-        stopHighlighting();
+        setCurrentWordIndex(-1);
       }
     },
-    [playUrl, waitForEnded, stopHighlighting],
+    [getAudio, waitForEnded],
   );
 
   // Handle audio ended — reset state for standalone plays (not part of an active sequence)

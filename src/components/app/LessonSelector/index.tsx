@@ -18,7 +18,7 @@ export function LessonSelector() {
 
   return (
     <Select value={lessonId} onValueChange={setLesson}>
-      <SelectTrigger className="w-52 sm:w-64">
+      <SelectTrigger className="w-full max-w-64">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

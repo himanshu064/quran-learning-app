@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   LayoutDashboard,
   BookOpen,
@@ -37,6 +37,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { LessonSelector } from "@/components/app/LessonSelector";
 import { useLanguage } from "@/providers";
 
 const mainNav = [
@@ -44,12 +45,12 @@ const mainNav = [
 ];
 
 const learningNav = [
-  { key: "nav.surahs", href: "/surahs", icon: BookOpen },
-  { key: "nav.reader", href: "/reader", icon: BookText },
-  { key: "nav.teaching", href: "/teaching", icon: GraduationCap },
-  { key: "nav.letters", href: "/letters", icon: Languages },
-  { key: "nav.mcq", href: "/mcq", icon: ListChecks },
-  { key: "nav.writing", href: "/writing", icon: PenLine },
+  { key: "nav.surahs", href: "/dashboard?tab=home", icon: BookOpen },
+  { key: "nav.reader", href: "/dashboard?tab=reader", icon: BookText },
+  { key: "nav.teaching", href: "/dashboard?tab=teaching", icon: GraduationCap },
+  { key: "nav.letters", href: "/dashboard?tab=letters", icon: Languages },
+  { key: "nav.mcq", href: "/dashboard?tab=mcq", icon: ListChecks },
+  { key: "nav.writing", href: "/dashboard?tab=writing", icon: PenLine },
 ];
 
 function getInitials(name: string) {
@@ -72,11 +73,18 @@ export function UserSidebar({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isMobile } = useSidebar();
   const { t, direction } = useLanguage();
 
   const isActive = (href: string) => {
-    if (href === "/dashboard") return pathname === "/dashboard";
+    if (href === "/dashboard") {
+      return pathname === "/dashboard" && !searchParams.get("tab");
+    }
+    if (href.startsWith("/dashboard?tab=")) {
+      const tab = href.split("tab=")[1];
+      return pathname === "/dashboard" && searchParams.get("tab") === tab;
+    }
     return pathname.startsWith(href);
   };
 
@@ -160,6 +168,18 @@ export function UserSidebar({
                 );
               })}
             </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator className="mx-0" />
+
+        {/* Lesson selector */}
+        <SidebarGroup>
+          <SidebarGroupLabel>{t("nav.lessonLabel")}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <div className="px-2">
+              <LessonSelector />
+            </div>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

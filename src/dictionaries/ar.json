@@ -29,7 +29,8 @@
     "mcq": "اختر",
     "writing": "اكتب",
     "learning": "منصة التعلم",
-    "learningLabel": "التعلم"
+    "learningLabel": "التعلم",
+    "lessonLabel": "الدرس"
   },
   "status": {
     "active": "نشط",

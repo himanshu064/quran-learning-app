@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { LanguageProvider, LessonProvider, AudioProvider } from "@/providers";
 import { UserSidebar, UserTopbar, MiniPlayer } from "@/components/app";
@@ -17,6 +18,10 @@ export function AppShell({
   defaultLanguage: "ar" | "en";
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  // Dashboard uses its own UnifiedTopbar — hide default topbar there
+  const isDashboard = pathname === "/dashboard";
+
   return (
     <LanguageProvider defaultLanguage={defaultLanguage}>
       <LessonProvider>
@@ -28,7 +33,7 @@ export function AppShell({
               appName={appName}
             />
             <SidebarInset>
-              <UserTopbar />
+              {!isDashboard && <UserTopbar />}
               <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8">
                 {children}
               </main>
