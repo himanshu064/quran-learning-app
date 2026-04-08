@@ -152,15 +152,15 @@ export function LettersPanel() {
 
   const playLetterSound = useCallback(() => {
     if (!currentLetter) return;
+    stop(); // stop any current audio first
     const audioPath = LETTER_AUDIO[currentLetter.glyph];
     if (audioPath) playLetterAudio(audioPath);
-  }, [currentLetter, playLetterAudio]);
+  }, [currentLetter, playLetterAudio, stop]);
 
   // When a letter in the word display is clicked:
-  // 1. Find that letter in the master letters list
-  // 2. Determine its position (beginning/middle/end) based on index in the word
-  // 3. Switch to that letter + position tab
-  // 4. Play the letter audio
+  // 1. Determine its position (beginning/middle/end) based on index in the word
+  // 2. Switch the position tab (but don't change the main letter index / progress)
+  // 3. Play the letter audio
   const handleLetterInWordClick = useCallback(
     (clickedLetter: string, letterIndex: number, totalLetters: number) => {
       // Determine position based on index in the word
@@ -173,38 +173,25 @@ export function LettersPanel() {
         newPosition = "middle";
       }
 
-      // Strip harakat to get base glyph for matching
+      // Switch position tab only (don't change index to avoid progress counter jumping)
+      setPosition(newPosition);
+
+      // Strip harakat to get base glyph for audio
       const baseGlyph = clickedLetter.replace(/[\u064B-\u0652]/g, "");
 
-      // Find the letter in the master list
-      const letterIdx = letters.findIndex((l) => l.glyph === baseGlyph);
-      if (letterIdx !== -1) {
-        // Only switch if that letter has data for the determined position
-        const letterData = letters[letterIdx];
-        if (letterData.positions[newPosition]) {
-          setIndex(letterIdx);
-          setPosition(newPosition);
-        } else {
-          // Fallback: switch to letter, keep current position or find first available
-          setIndex(letterIdx);
-          const available = (["beginning", "middle", "end"] as Position[]).find(
-            (p) => letterData.positions[p] !== null,
-          );
-          if (available) setPosition(available);
-        }
-      }
-
       // Play the letter audio
+      stop();
       const audioPath = LETTER_AUDIO[baseGlyph];
       if (audioPath) playLetterAudio(audioPath);
     },
-    [letters, playLetterAudio],
+    [playLetterAudio, stop],
   );
 
   const playWordSound = useCallback(() => {
     if (!currentPosition?.audioUrl) return;
+    stop(); // stop any current audio first
     playUrl(currentPosition.audioUrl);
-  }, [currentPosition, playUrl]);
+  }, [currentPosition, playUrl, stop]);
 
   if (isLoading) {
     return (
@@ -312,12 +299,10 @@ export function LettersPanel() {
               variant={isPlaying ? "default" : "outline"}
               size="lg"
               className={cn("mt-4 gap-2 rounded-full cursor-pointer", isPlaying && "bg-emerald-500 hover:bg-emerald-600")}
-              onClick={isPlaying ? stop : playWordSound}
+              onClick={playWordSound}
             >
               <Volume2 className={cn("h-5 w-5", isPlaying && "animate-pulse")} />
-              {isPlaying
-                ? language === "ar" ? "إيقاف" : "Stop"
-                : language === "ar" ? "تشغيل الكلمة" : "Play Word"}
+              {language === "ar" ? "تشغيل الكلمة" : "Play Word"}
             </Button>
           </div>
         ) : (
@@ -386,6 +371,7 @@ function SelectedWordLetters({
 
   const handleLetterClick = (idx: number) => {
     setActiveLetterIdx(idx);
+    stop();
     const glyph = wordLetters[idx];
     const audioPath = letterAudioMap[glyph];
     if (audioPath) playLetterAudio(audioPath);
@@ -393,6 +379,7 @@ function SelectedWordLetters({
 
   const handlePlayActive = () => {
     if (activeLetter) {
+      stop();
       const audioPath = letterAudioMap[activeLetter];
       if (audioPath) playLetterAudio(audioPath);
     }
@@ -452,7 +439,7 @@ function SelectedWordLetters({
                 variant={isPlaying ? "default" : "outline"}
                 size="lg"
                 className={cn("gap-2 rounded-full cursor-pointer", isPlaying && "bg-emerald-500 hover:bg-emerald-600")}
-                onClick={isPlaying ? stop : handlePlayActive}
+                onClick={handlePlayActive}
               >
                 <Volume2 className={cn("h-5 w-5", isPlaying && "animate-pulse")} />
                 {isPlaying

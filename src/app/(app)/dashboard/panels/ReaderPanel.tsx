@@ -380,7 +380,7 @@ export function ReaderPanel() {
                         <span
                           key={i}
                           className={cn(
-                            "inline-block cursor-pointer rounded-lg border-2 border-transparent px-3 py-2 mx-1 transition-all duration-200",
+                            "inline-block cursor-pointer rounded-md border-2 border-transparent px-2 py-0.5 mx-1 transition-all duration-200",
                             // Default hover state
                             "hover:bg-emerald-500/15 hover:text-emerald-700 hover:border-emerald-500 hover:scale-[1.08] dark:hover:bg-emerald-500/25 dark:hover:text-emerald-300 dark:hover:border-emerald-400",
                             // Audio playback highlight (takes priority)

@@ -196,12 +196,18 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     [getAudio],
   );
 
-  // Helper: wait for audio to finish playing
+  // Helper: wait for audio to finish playing (resolves on ended OR error)
   const waitForEnded = useCallback(
     () =>
       new Promise<void>((resolve) => {
         const audio = getAudio();
-        audio.addEventListener("ended", () => resolve(), { once: true });
+        const cleanup = () => {
+          audio.removeEventListener("ended", onDone);
+          audio.removeEventListener("error", onDone);
+        };
+        const onDone = () => { cleanup(); resolve(); };
+        audio.addEventListener("ended", onDone, { once: true });
+        audio.addEventListener("error", onDone, { once: true });
       }),
     [getAudio],
   );
