@@ -93,14 +93,16 @@ function normalizeArabic(str: string): string {
 }
 
 function fireConfetti() {
-  const duration = 1500;
-  const end = Date.now() + duration;
-  const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
-  function frame() {
-    confetti({ ...defaults, particleCount: 40, origin: { x: Math.random(), y: Math.random() - 0.2 } });
-    if (Date.now() < end) requestAnimationFrame(frame);
-  }
-  frame();
+  try {
+    const duration = 1500;
+    const end = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
+    function frame() {
+      confetti({ ...defaults, particleCount: 40, origin: { x: Math.random(), y: Math.random() - 0.2 } });
+      if (Date.now() < end) requestAnimationFrame(frame);
+    }
+    frame();
+  } catch { /* graceful degradation if confetti not supported */ }
 }
 
 export function WritingPanel() {

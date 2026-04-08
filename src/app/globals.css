@@ -145,3 +145,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Safari backdrop-filter support */
+@supports (-webkit-backdrop-filter: blur(10px)) {
+  .backdrop-blur {
+    -webkit-backdrop-filter: blur(10px);
+  }
+}

@@ -158,28 +158,10 @@ export function LettersPanel() {
   }, [currentLetter, playLetterAudio, stop]);
 
   // When a letter in the word display is clicked:
-  // 1. Determine its position (beginning/middle/end) based on index in the word
-  // 2. Switch the position tab (but don't change the main letter index / progress)
-  // 3. Play the letter audio
+  // Only play that letter's audio — don't change position tab or word
   const handleLetterInWordClick = useCallback(
-    (clickedLetter: string, letterIndex: number, totalLetters: number) => {
-      // Determine position based on index in the word
-      let newPosition: Position;
-      if (letterIndex === 0) {
-        newPosition = "beginning";
-      } else if (letterIndex === totalLetters - 1) {
-        newPosition = "end";
-      } else {
-        newPosition = "middle";
-      }
-
-      // Switch position tab only (don't change index to avoid progress counter jumping)
-      setPosition(newPosition);
-
-      // Strip harakat to get base glyph for audio
+    (clickedLetter: string) => {
       const baseGlyph = clickedLetter.replace(/[\u064B-\u0652]/g, "");
-
-      // Play the letter audio
       stop();
       const audioPath = LETTER_AUDIO[baseGlyph];
       if (audioPath) playLetterAudio(audioPath);
@@ -281,7 +263,7 @@ export function LettersPanel() {
                       : "border-2 border-transparent hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-muted/50",
                   )}
                   onClick={() =>
-                    handleLetterInWordClick(letter, i, currentPosition.letters.length)
+                    handleLetterInWordClick(letter)
                   }
                 >
                   {letter}

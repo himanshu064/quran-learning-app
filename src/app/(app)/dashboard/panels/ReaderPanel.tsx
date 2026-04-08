@@ -181,7 +181,12 @@ export function ReaderPanel() {
 
   // When user clicks a word in the verse: play it, set it as selected, try to match lesson slide
   const handleWordClick = useCallback(
-    (verseSurah: number, verseAyah: number, wordIdx: number, wordText: string) => {
+    (
+      verseSurah: number,
+      verseAyah: number,
+      wordIdx: number,
+      wordText: string,
+    ) => {
       // Play the word audio
       playWordAudio(verseSurah, verseAyah, wordIdx);
 
@@ -305,13 +310,23 @@ export function ReaderPanel() {
             filter: "drop-shadow(0 0.75rem 1.25rem rgba(0, 0, 0, 0.45))",
           }}
         >
-          <span className="flex items-center justify-center text-lg font-bold text-slate-800" dir="ltr">
+          <span
+            className="flex items-center justify-center text-lg font-bold text-slate-800"
+            dir="ltr"
+          >
             {currentSurah.verses_count}
           </span>
-          <span className="flex items-center justify-center font-uthmani text-[1.75rem] font-semibold text-slate-900" dir="rtl">
-            {currentSurah.name_arabic_tashkeel || `سورة ${currentSurah.name_arabic}`}
+          <span
+            className="flex items-center justify-center font-uthmani text-[1.75rem] font-semibold text-slate-900"
+            dir="rtl"
+          >
+            {currentSurah.name_arabic_tashkeel ||
+              `سورة ${currentSurah.name_arabic}`}
           </span>
-          <span className="flex items-center justify-center text-lg font-bold text-slate-800" dir="ltr">
+          <span
+            className="flex items-center justify-center text-lg font-bold text-slate-800"
+            dir="ltr"
+          >
             {surah}
           </span>
         </div>
@@ -329,13 +344,13 @@ export function ReaderPanel() {
         <Skeleton className="h-56 rounded-2xl" />
       ) : (
         <Card
-          className="relative flex min-h-[13.75rem] cursor-default items-center justify-center overflow-hidden rounded-2xl p-6"
+          className="relative flex min-h-55 cursor-default items-center justify-center overflow-hidden rounded-2xl p-6"
           onClick={() => {
             if (wordSlide) setShowOverlay((p) => !p);
           }}
         >
           {/* Halo glow — only in dark mode */}
-          <div className="pointer-events-none absolute inset-[-30%] z-0 hidden opacity-60 dark:block bg-[radial-gradient(ellipse_at_center,_rgba(37,99,235,0.18),_transparent_60%)]" />
+          <div className="pointer-events-none absolute inset-[-30%] z-0 hidden opacity-60 dark:block bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.18),transparent_60%)]" />
 
           {/* Verse text */}
           <div
@@ -357,16 +372,22 @@ export function ReaderPanel() {
                   {verses.length > 1 && (
                     <div className="mb-2 flex items-center gap-2" dir="ltr">
                       <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-                        {language === "ar" ? `آية ${verse.ayah}` : `Ayah ${verse.ayah}`}
+                        {language === "ar"
+                          ? `آية ${verse.ayah}`
+                          : `Ayah ${verse.ayah}`}
                       </span>
                     </div>
                   )}
-                  <p className="font-uthmani text-[2.3rem] leading-[3] text-center" style={{ wordSpacing: "0.75rem" }}>
+                  <p
+                    className="font-uthmani text-[2.3rem] leading-[5] text-center"
+                    style={{ wordSpacing: "0.75rem" }}
+                  >
                     {verse.text.split(" ").map((word, i) => {
                       const wordIdx = i + 1;
                       // Audio highlight (during playback)
                       const isAudioActive =
-                        currentWordIndex === wordIdx && currentAyah === verse.ayah;
+                        currentWordIndex === wordIdx &&
+                        currentAyah === verse.ayah;
                       // Selected word highlight — only ONE word at a time
                       // selectedWord takes priority; fall back to wordSlide only if no selectedWord
                       const highlightSource = selectedWord || wordSlide;
@@ -379,21 +400,34 @@ export function ReaderPanel() {
                       return (
                         <span
                           key={i}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              handleWordClick(verse.surah, verse.ayah, wordIdx, word);
+                            }
+                          }}
                           className={cn(
-                            "inline-block cursor-pointer rounded-md border-2 border-transparent px-2 py-0.5 mx-1 transition-all duration-200",
+                            "inline-block cursor-pointer rounded-md border-2 border-transparent px-1.5 py-px mx-0.5 transition-colors duration-200",
                             // Default hover state
-                            "hover:bg-emerald-500/15 hover:text-emerald-700 hover:border-emerald-500 hover:scale-[1.08] dark:hover:bg-emerald-500/25 dark:hover:text-emerald-300 dark:hover:border-emerald-400",
+                            "hover:bg-emerald-500/15 hover:text-emerald-700 hover:border-emerald-500 dark:hover:bg-emerald-500/25 dark:hover:text-emerald-300 dark:hover:border-emerald-400",
                             // Audio playback highlight (takes priority)
                             isAudioActive &&
-                              "bg-emerald-500/15 text-emerald-700 border-emerald-500 scale-[1.08] dark:bg-emerald-500/25 dark:text-emerald-300 dark:border-emerald-400",
-                            // Lesson word highlight (persistent green ring)
+                              "bg-emerald-500/15 text-emerald-700 border-emerald-500 dark:bg-emerald-500/25 dark:text-emerald-300 dark:border-emerald-400",
+                            // Selected word highlight (persistent box)
                             !isAudioActive &&
                               isLessonWord &&
-                              "border-primary bg-primary/10 text-primary scale-[1.05]",
+                              "border-primary bg-primary/10 text-primary",
                           )}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleWordClick(verse.surah, verse.ayah, wordIdx, word);
+                            handleWordClick(
+                              verse.surah,
+                              verse.ayah,
+                              wordIdx,
+                              word,
+                            );
                           }}
                         >
                           {word}{" "}

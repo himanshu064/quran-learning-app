@@ -93,8 +93,11 @@ export function SurahsPanel({
             {language === "ar" ? "تابع من حيث توقفت" : "Continue where you left"}
           </p>
           <Card
+            role="button"
+            tabIndex={0}
             className="cursor-pointer transition-all hover:-translate-y-px"
             onClick={() => handleSurahClick(lastSurah!, lastAyah || 1)}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleSurahClick(lastSurah!, lastAyah || 1); }}
           >
             <CardContent className="grid grid-cols-[auto_1fr_auto] items-center gap-3 p-3">
               <div className="grid h-8 w-8 place-items-center rounded-full bg-primary/10 text-sm font-bold text-primary">
@@ -157,8 +160,11 @@ export function SurahsPanel({
           {filtered.map((surah) => (
             <div
               key={surah.id}
+              role="button"
+              tabIndex={0}
               className="group flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-card p-3 transition-all hover:border-primary/30 hover:bg-primary/5 hover:-translate-y-px"
               onClick={() => handleSurahClick(surah.id)}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleSurahClick(surah.id); }}
             >
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-sm font-bold text-primary">
                 {surah.id}
