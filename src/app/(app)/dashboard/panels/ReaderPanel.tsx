@@ -139,8 +139,15 @@ export function ReaderPanel() {
     return result;
   }, [quranText, surah, ayahFrom, ayahTo, maxAyah]);
 
-  // Save reading position
+  // Save reading position — but only after user has actively navigated,
+  // not on initial mount with default values (which would reset "continue where you left")
+  const hasUserNavigated = useRef(false);
   useEffect(() => {
+    if (!hasUserNavigated.current) {
+      // Skip saving on first render — defaults would overwrite the real last position
+      hasUserNavigated.current = true;
+      return;
+    }
     if (surah && ayahFrom) {
       savePosition({ surah, ayah: ayahFrom });
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useQueryState, parseAsInteger } from "nuqs";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -90,8 +90,13 @@ export function ReaderScreen() {
     return result;
   }, [quranText, surah, ayahFrom, ayahTo, maxAyah]);
 
-  // Save reading position
+  // Save reading position — skip first render to avoid overwriting with defaults
+  const hasUserNavigated = useRef(false);
   useEffect(() => {
+    if (!hasUserNavigated.current) {
+      hasUserNavigated.current = true;
+      return;
+    }
     if (surah && ayahFrom) {
       savePosition({ surah, ayah: ayahFrom });
     }
