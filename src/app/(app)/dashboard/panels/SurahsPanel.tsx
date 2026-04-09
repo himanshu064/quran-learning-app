@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Search } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -30,6 +30,7 @@ export function SurahsPanel({
   const { settings } = useProgress();
   const [surahs, setSurahs] = useState<SurahMeta[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [query, setQuery] = useState("");
 
   useEffect(() => setMounted(true), []);
 
@@ -54,7 +55,7 @@ export function SurahsPanel({
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-3">
+    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-3">
       {/* Chips row */}
       <div className="flex flex-wrap gap-2">
         {lastSurahMeta && (
@@ -88,22 +89,36 @@ export function SurahsPanel({
             <div className="grid h-9 w-9 place-items-center rounded-full border border-border text-sm font-bold text-primary">
               {lastSurah}
             </div>
-            <div className="flex flex-col gap-0.5">
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium">
+                {lastSurahMeta.name_simple} · {lastSurahMeta.verses_count}{" "}
+                {language === "ar" ? "آيات" : "verses"}
+              </p>
+              <p className="truncate text-xs text-muted-foreground">
+                {language === "ar" ? "آخر آية:" : "Last ayah:"} {lastAyah || 1}
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
               <span className="font-uthmani text-base font-semibold" dir="rtl">
                 {lastSurahMeta.name_arabic}
               </span>
-              <span className="text-xs text-muted-foreground">
-                {lastSurahMeta.name_simple} · {lastSurahMeta.verses_count}{" "}
-                {language === "ar" ? "آيات" : "verses"}
-              </span>
-              <span className="text-xs text-muted-foreground">
-                {language === "ar" ? "آخر آية:" : "Last ayah:"} {lastAyah || 1}
-              </span>
+              <ChevronLeft className="h-4 w-4 text-muted-foreground" />
             </div>
-            <ChevronLeft className="h-4 w-4 text-muted-foreground" />
           </div>
         </>
       )}
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={language === "ar" ? "ابحث عن سورة..." : "Search surahs..."}
+          className="w-full rounded-[1.125rem] border border-border bg-card py-2.5 ps-10 pe-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary/50"
+        />
+      </div>
 
       {/* All Surahs */}
       <p className="text-sm text-muted-foreground">
@@ -111,52 +126,61 @@ export function SurahsPanel({
       </p>
 
       {isLoading ? (
-        <div className="space-y-2">
-          {Array.from({ length: 8 }).map((_, i) => (
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 9 }).map((_, i) => (
             <Skeleton key={i} className="h-16 rounded-xl" />
           ))}
         </div>
-      ) : surahs.length === 0 ? (
-        <div className="py-12 text-center text-sm text-muted-foreground">
-          {language === "ar" ? "لم يتم العثور على سور" : "No surahs found"}
-        </div>
-      ) : (
-        <div className="surah-scroll rounded-[1.125rem] border border-border bg-card">
-          {surahs.map((surah, idx) => (
-            <div
-              key={surah.id}
-              role="button"
-              tabIndex={0}
-              className={`grid cursor-pointer grid-cols-[auto_1fr_auto] items-center gap-3 px-3 py-3 transition-all hover:bg-primary/5 ${
-                idx < surahs.length - 1 ? "border-b border-border" : ""
-              }`}
-              onClick={() => handleSurahClick(surah.id)}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleSurahClick(surah.id); }}
-            >
-              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-border text-sm font-bold text-primary">
-                {surah.id}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium">
-                  {surah.name_simple} · {surah.verses_count}{" "}
-                  {language === "ar" ? "آيات" : "verses"}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {surah.revelation_place === "makkah"
-                    ? language === "ar" ? "مكّية" : "Meccan"
-                    : language === "ar" ? "مدنيّة" : "Medinan"}
-                </p>
-              </div>
-              <div className="flex shrink-0 items-center gap-2">
-                <span className="font-uthmani text-base font-semibold" dir="rtl">
+      ) : (() => {
+        const q = query.trim().toLowerCase();
+        const filtered = q
+          ? surahs.filter(
+              (s) =>
+                s.name_simple.toLowerCase().includes(q) ||
+                String(s.id).includes(q) ||
+                s.name_arabic.includes(query.trim()),
+            )
+          : surahs;
+        if (filtered.length === 0) {
+          return (
+            <div className="py-12 text-center text-sm text-muted-foreground">
+              {language === "ar" ? "لم يتم العثور على سور" : "No surahs found"}
+            </div>
+          );
+        }
+        return (
+          <div className="surah-scroll grid max-h-[60vh] grid-cols-1 gap-2 overflow-y-auto pe-1 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((surah) => (
+              <div
+                key={surah.id}
+                role="button"
+                tabIndex={0}
+                className="grid cursor-pointer grid-cols-[auto_1fr_auto] items-center gap-3 rounded-[1.125rem] border border-border bg-card px-3 py-3 transition-all hover:-translate-y-px hover:border-primary/30 hover:bg-primary/5"
+                onClick={() => handleSurahClick(surah.id)}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleSurahClick(surah.id); }}
+              >
+                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-border text-sm font-bold text-primary">
+                  {surah.id}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">
+                    {surah.name_simple}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {surah.verses_count} {language === "ar" ? "آيات" : "verses"} ·{" "}
+                    {surah.revelation_place === "makkah"
+                      ? language === "ar" ? "مكّية" : "Meccan"
+                      : language === "ar" ? "مدنيّة" : "Medinan"}
+                  </p>
+                </div>
+                <span className="font-uthmani shrink-0 text-base font-semibold" dir="rtl">
                   {surah.name_arabic}
                 </span>
-                <ChevronLeft className="h-4 w-4 text-muted-foreground" />
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        );
+      })()}
     </div>
   );
 }

@@ -172,6 +172,6 @@
 
 /* Client-style scrollable surah list */
 .surah-scroll {
-  max-height: 29.75rem;
+  max-height: 21.75rem;
   overflow-y: auto;
 }
