@@ -6,10 +6,8 @@ import {
   Play,
   Pause,
   SkipBack,
-  Shuffle,
+  SkipForward,
   BookOpen,
-  Search,
-
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -283,15 +281,6 @@ export function ReaderPanel() {
             dir="ltr"
             placeholder="—"
           />
-          <Button
-            size="icon"
-            className="h-8 w-8 shrink-0 rounded-full bg-primary cursor-pointer"
-            onClick={() => {
-              /* trigger re-render with current values — already reactive via nuqs */
-            }}
-          >
-            <Search className="h-3.5 w-3.5" />
-          </Button>
         </div>
       </div>
 
@@ -444,9 +433,18 @@ export function ReaderPanel() {
         </div>
       )}
 
-      {/* Lesson word nav — icon buttons row below verse (play, back, expand) */}
+      {/* Lesson word nav — prev / play / next */}
       {totalSlides > 0 && (
         <div className="flex items-center justify-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8 rounded-full cursor-pointer"
+            onClick={lessonPrev}
+            title={language === "ar" ? "السابق" : "Previous"}
+          >
+            <SkipBack className="h-4 w-4" />
+          </Button>
           <Button
             variant="outline"
             size="icon"
@@ -460,19 +458,10 @@ export function ReaderPanel() {
             variant="outline"
             size="icon"
             className="h-8 w-8 rounded-full cursor-pointer"
-            onClick={lessonPrev}
-            title={language === "ar" ? "الكلمة السابقة" : "Previous word"}
+            onClick={lessonNext}
+            title={language === "ar" ? "التالي" : "Next"}
           >
-            <SkipBack className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8 rounded-full cursor-pointer"
-            onClick={lessonShuffle}
-            title={language === "ar" ? "كلمة عشوائية" : "Random word"}
-          >
-            <Shuffle className="h-4 w-4" />
+            <SkipForward className="h-4 w-4" />
           </Button>
         </div>
       )}

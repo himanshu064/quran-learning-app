@@ -74,7 +74,8 @@ export function UserSidebar({
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isMobile } = useSidebar();
+  const { isMobile, state } = useSidebar();
+  const isCollapsed = state === "collapsed";
   const { t, direction } = useLanguage();
 
   const isActive = (href: string) => {
@@ -173,15 +174,17 @@ export function UserSidebar({
 
         <SidebarSeparator className="mx-0" />
 
-        {/* Lesson selector */}
-        <SidebarGroup>
-          <SidebarGroupLabel>{t("nav.lessonLabel")}</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <div className="px-2">
-              <LessonSelector />
-            </div>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {/* Lesson selector — hidden when sidebar is collapsed (no room for dropdown) */}
+        {!isCollapsed && (
+          <SidebarGroup>
+            <SidebarGroupLabel>{t("nav.lessonLabel")}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <div className="px-2">
+                <LessonSelector />
+              </div>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       <SidebarSeparator className="mx-0" />
       <SidebarFooter>

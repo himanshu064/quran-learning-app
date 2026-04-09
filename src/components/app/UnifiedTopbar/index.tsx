@@ -1,7 +1,8 @@
 "use client";
 
-import { Sun, Moon, PanelLeft } from "lucide-react";
+import { Sun, Moon, PanelLeft, Menu } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useSidebar } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { PillTabNav, type TabKey } from "@/components/app/PillTabNav";
 import { LessonSelector } from "@/components/app/LessonSelector";
@@ -19,6 +20,7 @@ export function UnifiedTopbar({
   disabledTabs?: TabKey[];
 }) {
   const { language } = useLanguage();
+  const { toggleSidebar } = useSidebar();
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -26,12 +28,22 @@ export function UnifiedTopbar({
 
   return (
     <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      {/* Left: surah/verse toggle + title */}
-      <div className="flex min-w-0 items-center gap-2">
+      {/* Left: sidebar trigger + surah/verse toggle + title */}
+      <div className="flex min-w-0 items-center gap-1">
         <Button
           variant="ghost"
           size="icon"
           className="-ms-1 h-8 w-8 shrink-0 cursor-pointer rounded-full text-foreground hover:bg-accent"
+          onClick={toggleSidebar}
+          aria-label="Toggle sidebar"
+          title="Toggle sidebar"
+        >
+          <PanelLeft className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 shrink-0 cursor-pointer rounded-full text-foreground hover:bg-accent"
           onClick={() => {
             const target: TabKey = activeTab === "home" ? "reader" : "home";
             if (disabledTabs?.includes(target)) return;
@@ -40,7 +52,7 @@ export function UnifiedTopbar({
           aria-label={activeTab === "home" ? "Go to Verse" : "Go to Surahs"}
           title={activeTab === "home" ? "Verse" : "Surahs"}
         >
-          <PanelLeft className="h-4 w-4" />
+          <Menu className="h-4 w-4" />
         </Button>
         <span className="truncate text-sm font-semibold tracking-wide">
           {language === "ar" ? "صراط المستقيم" : "Straight Path"}
