@@ -9,11 +9,43 @@ import { Badge } from "@/components/ui/badge";
 // Card replaced with client-style divs
 import { ProgressIndicator } from "@/components/lesson";
 import { VercelTabs } from "@/components/common";
-import { useLanguage, useAudioContext } from "@/providers";
+import { useLanguage, useAudioContext, useLessonContext } from "@/providers";
 import { useProgress } from "@/hooks";
 import { useSelectedWord } from "../selected-word-context";
 
 const LESSON_ID = "lesson2";
+
+// Display names for the 28 alphabet letters (hamza ء excluded per client spec).
+const LETTER_NAMES: Record<string, { ar: string; en: string }> = {
+  ا: { ar: "ألف", en: "Alif" },
+  ب: { ar: "باء", en: "Ba" },
+  ت: { ar: "تاء", en: "Ta" },
+  ث: { ar: "ثاء", en: "Tha" },
+  ج: { ar: "جيم", en: "Jeem" },
+  ح: { ar: "حاء", en: "Ha" },
+  خ: { ar: "خاء", en: "Kha" },
+  د: { ar: "دال", en: "Dal" },
+  ذ: { ar: "ذال", en: "Dhal" },
+  ر: { ar: "راء", en: "Ra" },
+  ز: { ar: "زاي", en: "Zay" },
+  س: { ar: "سين", en: "Seen" },
+  ش: { ar: "شين", en: "Sheen" },
+  ص: { ar: "صاد", en: "Saad" },
+  ض: { ar: "ضاد", en: "Daad" },
+  ط: { ar: "طاء", en: "Toa" },
+  ظ: { ar: "ظاء", en: "Dhaa" },
+  ع: { ar: "عين", en: "Ain" },
+  غ: { ar: "غين", en: "Ghain" },
+  ف: { ar: "فاء", en: "Fa" },
+  ق: { ar: "قاف", en: "Qaaf" },
+  ك: { ar: "كاف", en: "Kaaf" },
+  ل: { ar: "لام", en: "Laam" },
+  م: { ar: "ميم", en: "Meem" },
+  ن: { ar: "نون", en: "Noon" },
+  و: { ar: "واو", en: "Waw" },
+  ه: { ar: "هاء", en: "Ha" },
+  ي: { ar: "ياء", en: "Ya" },
+};
 
 type PositionData = {
   titleAr: string;
@@ -97,8 +129,14 @@ function extractLettersFromWord(word: string): string[] {
 
 export function LettersPanel() {
   const { language } = useLanguage();
+  const { lessonId } = useLessonContext();
   const { playUrl, playLetterAudio, stop, isPlaying } = useAudioContext();
   const { selectedWord } = useSelectedWord();
+
+  // Lesson 1 = the 28-letter Arabic alphabet grid.
+  if (lessonId === "lesson1" && !selectedWord) {
+    return <AlphabetGrid language={language} playLetterAudio={playLetterAudio} stop={stop} />;
+  }
   const { saveProgress, saveLastLesson, completeLesson, getLessonProgress } =
     useProgress();
   const [letters, setLetters] = useState<LetterData[]>([]);
@@ -447,6 +485,77 @@ function SelectedWordLetters({
         >
           <SkipForward className="h-4 w-4" />
         </Button>
+      </div>
+    </div>
+  );
+}
+
+// Lesson 1 — 28 alphabet letters laid out in a Surahs-style 3-column grid.
+function AlphabetGrid({
+  language,
+  playLetterAudio,
+  stop,
+}: {
+  language: string;
+  playLetterAudio: (path: string) => void;
+  stop: () => void;
+}) {
+  const letters = Object.keys(LETTER_AUDIO);
+  const [playingGlyph, setPlayingGlyph] = useState<string | null>(null);
+
+  const handleClick = (glyph: string) => {
+    stop();
+    const audioPath = LETTER_AUDIO[glyph];
+    if (!audioPath) return;
+    setPlayingGlyph(glyph);
+    playLetterAudio(audioPath);
+    // visual cue is brief; clear after 700ms
+    window.setTimeout(() => setPlayingGlyph((g) => (g === glyph ? null : g)), 700);
+  };
+
+  return (
+    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-3">
+      <p className="text-sm text-muted-foreground">
+        {language === "ar" ? "الحروف الهجائية" : "Arabic Alphabet"}
+      </p>
+      <div className="surah-scroll grid max-h-[70vh] grid-cols-1 gap-2 overflow-y-auto pe-1 sm:grid-cols-2 lg:grid-cols-3">
+        {letters.map((glyph, i) => {
+          const name = LETTER_NAMES[glyph];
+          const isActive = playingGlyph === glyph;
+          return (
+            <div
+              key={glyph}
+              role="button"
+              tabIndex={0}
+              onClick={() => handleClick(glyph)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") handleClick(glyph);
+              }}
+              className={cn(
+                "grid cursor-pointer grid-cols-[auto_1fr_auto] items-center gap-3 rounded-[1.125rem] border border-border bg-card px-3 py-3 transition-all hover:-translate-y-px hover:border-primary/30 hover:bg-primary/5",
+                isActive && "border-primary bg-primary/10",
+              )}
+            >
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-border text-sm font-bold text-primary">
+                {i + 1}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">
+                  {language === "ar" ? name?.ar : name?.en}
+                </p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {language === "ar" ? "اضغط للاستماع" : "Tap to listen"}
+                </p>
+              </div>
+              <span
+                className="font-uthmani shrink-0 text-2xl font-semibold text-primary"
+                dir="rtl"
+              >
+                {glyph}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

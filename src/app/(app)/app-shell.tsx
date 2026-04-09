@@ -26,19 +26,19 @@ export function AppShell({
     <LanguageProvider defaultLanguage={defaultLanguage}>
       <LessonProvider>
         <AudioProvider>
-          <SidebarProvider>
+          <SidebarProvider className="h-svh min-h-0 overflow-hidden">
             <UserSidebar
               userName={userName}
               userEmail={userEmail}
               appName={appName}
             />
-            <SidebarInset>
+            <SidebarInset className="h-svh min-h-0 overflow-hidden">
               {!isDashboard && <UserTopbar />}
               <main
                 className={
                   isDashboard
-                    ? "flex overflow-auto bg-background p-3 md:p-5 lg:p-6"
-                    : "flex-1 overflow-auto p-4 md:p-6 lg:p-8"
+                    ? "flex min-h-0 overflow-hidden bg-background p-3 md:p-5 lg:p-6"
+                    : "flex min-h-0 flex-col overflow-auto p-4 md:p-6 lg:p-8"
                 }
               >
                 {children}

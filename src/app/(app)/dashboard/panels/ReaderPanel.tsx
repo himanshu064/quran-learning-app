@@ -331,19 +331,12 @@ export function ReaderPanel() {
         </div>
       )}
 
-      {/* Basmala */}
-      {showBasmala && (
-        <p className="text-center font-uthmani text-xl" dir="rtl">
-          بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ
-        </p>
-      )}
-
       {/* Ayah box */}
       {isTextLoading ? (
         <Skeleton className="h-56 rounded-2xl" />
       ) : (
         <div
-          className="relative flex min-h-55 cursor-default items-center justify-center overflow-hidden rounded-[1.125rem] border border-border bg-card p-6"
+          className="relative flex min-h-48 cursor-default items-center justify-center overflow-hidden rounded-[1.125rem] border border-border bg-card p-6"
           onClick={() => {
             if (activeSlide) setShowOverlay((p) => !p);
           }}
@@ -366,21 +359,15 @@ export function ReaderPanel() {
                   : "Select a surah and ayah to display"}
               </p>
             ) : (
-              verses.map((verse) => (
-                <div key={verse.verse_key}>
-                  {verses.length > 1 && (
-                    <div className="mb-2 flex items-center gap-2" dir="ltr">
-                      <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-                        {language === "ar"
-                          ? `آية ${verse.ayah}`
-                          : `Ayah ${verse.ayah}`}
-                      </span>
-                    </div>
-                  )}
-                  <p
-                    className="font-uthmani text-[2.3rem] leading-[5] text-center"
-                    style={{ wordSpacing: "0.75rem" }}
-                  >
+              <p
+                className="font-uthmani text-[2.3rem] leading-[5] text-center"
+                style={{ wordSpacing: "0.75rem" }}
+              >
+                {showBasmala && (
+                  <span className="block">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</span>
+                )}
+                {verses.map((verse) => (
+                  <span key={verse.verse_key}>
                     {verse.text.split(" ").map((word, i) => {
                       const wordIdx = i + 1;
                       const isAudioActive =
@@ -405,7 +392,7 @@ export function ReaderPanel() {
                             }
                           }}
                           className={cn(
-                            "inline-block cursor-pointer rounded-md border-2 border-transparent px-1.5 py-px mx-0.5 transition-colors duration-200",
+                            "inline-block cursor-pointer rounded-full border-2 border-transparent px-3 py-2 mx-2 leading-[1.4] transition-colors duration-200",
                             "hover:bg-emerald-500/15 hover:text-emerald-700 hover:border-emerald-500 dark:hover:bg-emerald-500/25 dark:hover:text-emerald-300 dark:hover:border-emerald-400",
                             isAudioActive &&
                               "bg-emerald-500/15 text-emerald-700 border-emerald-500 dark:bg-emerald-500/25 dark:text-emerald-300 dark:border-emerald-400",
@@ -427,9 +414,9 @@ export function ReaderPanel() {
                         </span>
                       );
                     })}
-                  </p>
-                </div>
-              ))
+                  </span>
+                ))}
+              </p>
             )}
           </div>
 
@@ -523,17 +510,17 @@ export function ReaderPanel() {
       {/* Player / Recitation card */}
       {verses.length > 0 && (
         <div className="space-y-1">
-          <div className="flex items-center justify-between rounded-[1.125rem] border border-border bg-card px-4 py-3">
-            <span className="text-sm text-muted-foreground">
+          <div className="flex items-center gap-3 rounded-[1.125rem] border border-border bg-card px-4 py-3">
+            <span className="shrink-0 text-sm text-muted-foreground">
               {language === "ar" ? "تلاوة" : "Recitation"}
             </span>
-            <div className="flex items-center gap-2">
-              <div className="inline-flex overflow-hidden rounded-full border border-border">
+            <div className="flex flex-1 items-center gap-2">
+              <div className="flex flex-1 items-center justify-center gap-1 rounded-full border border-border p-1">
                 <Button
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-auto rounded-none px-3 py-1 text-xs cursor-pointer",
+                    "h-auto rounded-full px-4 py-1 text-xs cursor-pointer",
                     mode === "wbw"
                       ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
                       : "text-muted-foreground",
@@ -546,7 +533,7 @@ export function ReaderPanel() {
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-auto rounded-none px-3 py-1 text-xs cursor-pointer",
+                    "h-auto rounded-full px-4 py-1 text-xs cursor-pointer",
                     mode === "verse"
                       ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
                       : "text-muted-foreground",

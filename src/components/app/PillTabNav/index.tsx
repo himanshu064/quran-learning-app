@@ -24,30 +24,39 @@ const TABS: { key: TabKey; ar: string; en: string }[] = [
 export function PillTabNav({
   activeTab,
   onTabChange,
+  disabledTabs,
 }: {
   activeTab: TabKey;
   onTabChange: (tab: TabKey) => void;
+  disabledTabs?: TabKey[];
 }) {
   const { language } = useLanguage();
+  const disabled = new Set(disabledTabs ?? []);
 
   return (
     <div className="inline-flex shrink-0 items-center gap-0 overflow-hidden rounded-full border border-border">
-      {TABS.map((tab) => (
-        <Button
-          key={tab.key}
-          variant="ghost"
-          size="sm"
-          onClick={() => onTabChange(tab.key)}
-          className={cn(
-            "h-auto rounded-none px-3 py-1.5 text-xs font-medium cursor-pointer",
-            "text-muted-foreground hover:text-foreground hover:bg-transparent",
-            activeTab === tab.key &&
-              "bg-primary/[0.16] text-primary hover:bg-primary/[0.16] hover:text-primary",
-          )}
-        >
-          {language === "ar" ? tab.ar : tab.en}
-        </Button>
-      ))}
+      {TABS.map((tab) => {
+        const isDisabled = disabled.has(tab.key);
+        return (
+          <Button
+            key={tab.key}
+            variant="ghost"
+            size="sm"
+            disabled={isDisabled}
+            onClick={() => !isDisabled && onTabChange(tab.key)}
+            className={cn(
+              "h-auto rounded-none px-3 py-1.5 text-xs font-medium cursor-pointer",
+              "text-muted-foreground hover:text-foreground hover:bg-transparent",
+              activeTab === tab.key &&
+                "bg-primary/[0.16] text-primary hover:bg-primary/[0.16] hover:text-primary",
+              isDisabled &&
+                "cursor-not-allowed opacity-40 hover:text-muted-foreground",
+            )}
+          >
+            {language === "ar" ? tab.ar : tab.en}
+          </Button>
+        );
+      })}
     </div>
   );
 }

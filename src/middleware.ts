@@ -22,26 +22,26 @@ export default async function authMiddleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Fetch site settings for maintenance_mode and registration_enabled
+  const isProtectedEarly = protectedPaths.some((p) => pathname.startsWith(p));
+  const isSignUp = pathname.startsWith("/auth/sign-up");
+
+  // Only fetch site settings when actually needed (sign-up gate or maintenance gate)
   let settings: Record<string, string> = {};
-  try {
-    const { data } = await betterFetch<Record<string, string>>(
-      "/api/settings",
-      { baseURL: request.nextUrl.origin },
-    );
-    if (data) settings = data;
-  } catch {
-    // If settings fetch fails, continue without blocking
+  if (isSignUp || isProtectedEarly) {
+    try {
+      const { data } = await betterFetch<Record<string, string>>(
+        "/api/settings",
+        { baseURL: request.nextUrl.origin },
+      );
+      if (data) settings = data;
+    } catch {
+      // If settings fetch fails, continue without blocking
+    }
   }
 
   // Block sign-up if registration is disabled
-  if (
-    pathname.startsWith("/auth/sign-up") &&
-    settings.registration_enabled === "false"
-  ) {
-    return NextResponse.redirect(
-      new URL("/auth/sign-in", request.url),
-    );
+  if (isSignUp && settings.registration_enabled === "false") {
+    return NextResponse.redirect(new URL("/auth/sign-in", request.url));
   }
 
   // Check for session token cookie
@@ -123,5 +123,7 @@ export default async function authMiddleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|css|js|woff|woff2|ttf|otf|json|mp3|mp4|webm)).*)",
+  ],
 };
