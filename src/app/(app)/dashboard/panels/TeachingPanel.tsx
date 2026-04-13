@@ -21,9 +21,21 @@ import {
 import { useLanguage, useLessonContext, useAudioContext } from "@/providers";
 import { useProgress } from "@/hooks";
 import { useSelectedWord } from "../selected-word-context";
+import { MoonSunGame } from "./MoonSunGame";
 import type { LetterSlide, LetterFormSlide, WordSlide } from "@/types";
 
 export function TeachingPanel() {
+  const { lessonId: lessonIdCheck } = useLessonContext();
+
+  // Lesson 16: show interactive Moon & Sun Letters game
+  if (lessonIdCheck === "lesson16") {
+    return <MoonSunGame />;
+  }
+
+  return <TeachingPanelInner />;
+}
+
+function TeachingPanelInner() {
   const { language } = useLanguage();
   const {
     lessonId,

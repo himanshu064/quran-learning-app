@@ -12,9 +12,11 @@ import { useTheme } from "next-themes";
 export function UnifiedTopbar({
   activeTab,
   onTabChange,
+  disabledTabs = [],
 }: {
   activeTab: TabKey;
   onTabChange: (tab: TabKey) => void;
+  disabledTabs?: TabKey[];
 }) {
   const { language } = useLanguage();
   const { theme, setTheme } = useTheme();
@@ -25,13 +27,13 @@ export function UnifiedTopbar({
       <div className="flex min-w-0 items-center gap-2">
         <SidebarTrigger className="-ms-1 shrink-0" />
         <span className="truncate text-sm font-semibold tracking-wide">
-          {language === "ar" ? "صراط المستقيم" : "Straight Path"}
+          {language === "ar" ? "صراط المستقيم في تعليم القرآن بالقرآن" : "Straight Path in Teaching Quran by Quran"}
         </span>
       </div>
 
       {/* Right: tabs + controls */}
       <div className="ms-auto flex shrink-0 items-center gap-2">
-        <PillTabNav activeTab={activeTab} onTabChange={onTabChange} />
+        <PillTabNav activeTab={activeTab} onTabChange={onTabChange} disabledTabs={disabledTabs} />
         <LanguageToggle />
         <LessonSelector />
         <Button

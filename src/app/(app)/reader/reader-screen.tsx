@@ -260,16 +260,6 @@ export function ReaderScreen() {
             <div className="space-y-6" dir="rtl">
               {verses.map((verse) => (
                 <div key={verse.verse_key}>
-                  {/* Ayah number badge (when showing range) */}
-                  {verses.length > 1 && (
-                    <div className="mb-2 flex items-center gap-2" dir="ltr">
-                      <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-                        {language === "ar"
-                          ? `آية ${verse.ayah}`
-                          : `Ayah ${verse.ayah}`}
-                      </span>
-                    </div>
-                  )}
                   <p className="font-uthmani text-[1.8rem] leading-12 sm:text-[2.3rem] sm:leading-14">
                     {verse.text.split(" ").map((word, i) => {
                       const isActive =

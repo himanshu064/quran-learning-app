@@ -56,15 +56,6 @@ function toWriteItem(slide: WordSlide | LetterSlide): WriteItem {
   return { text: slide.glyph, type: "letter", audio: slide.audio };
 }
 
-function shuffleArray<T>(arr: T[]): T[] {
-  const shuffled = [...arr];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
-
 function buildClusterString(c: LetterCluster): string {
   let result = c.base;
   if (c.shadda) result += HARAKAT_MAP.shadda;
@@ -76,18 +67,6 @@ function buildClusterString(c: LetterCluster): string {
 
 function getTypedWord(clusters: LetterCluster[]): string {
   return clusters.map(buildClusterString).join("");
-}
-
-function getBaseLetters(word: string): string[] {
-  const harakatRegex = /[\u064B-\u0652]/g;
-  const base = word.replace(harakatRegex, "");
-  const unique: string[] = [];
-  for (const ch of base) {
-    if (!unique.includes(ch) && ch.charCodeAt(0) >= 0x0600 && ch.charCodeAt(0) <= 0x06ff) {
-      unique.push(ch);
-    }
-  }
-  return unique;
 }
 
 function normalizeArabic(str: string): string {
@@ -165,15 +144,7 @@ export function WritingPanel() {
     ? `sw:${selectedWord.surah}:${selectedWord.ayah}:${selectedWord.wordIndex}`
     : `li:${wordIndex}`;
 
-  const [letterPool, setLetterPool] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (!currentItem) { setLetterPool([]); return; }
-    const base = getBaseLetters(currentItem.text);
-    const distractors = shuffleArray(ALL_ARABIC_LETTERS.filter((l) => !base.includes(l))).slice(0, 3);
-    setLetterPool(shuffleArray([...base, ...distractors]));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentItemKey]);
+  const letterPool = ALL_ARABIC_LETTERS;
 
   useEffect(() => {
     if (!instructionPlayed.current) {

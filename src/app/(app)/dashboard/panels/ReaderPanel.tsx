@@ -6,10 +6,8 @@ import {
   Play,
   Pause,
   SkipBack,
-  Shuffle,
+  SkipForward,
   BookOpen,
-  Search,
-
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -60,7 +58,6 @@ export function ReaderPanel() {
     totalSlides,
     prev: lessonPrev,
     next: lessonNext,
-    shuffle: lessonShuffle,
     goTo: lessonGoTo,
   } = useLessonContext();
   const { selectedWord, setSelectedWord } = useSelectedWord();
@@ -283,15 +280,6 @@ export function ReaderPanel() {
             dir="ltr"
             placeholder="—"
           />
-          <Button
-            size="icon"
-            className="h-8 w-8 shrink-0 rounded-full bg-primary cursor-pointer"
-            onClick={() => {
-              /* trigger re-render with current values — already reactive via nuqs */
-            }}
-          >
-            <Search className="h-3.5 w-3.5" />
-          </Button>
         </div>
       </div>
 
@@ -368,15 +356,6 @@ export function ReaderPanel() {
             ) : (
               verses.map((verse) => (
                 <div key={verse.verse_key}>
-                  {verses.length > 1 && (
-                    <div className="mb-2 flex items-center gap-2" dir="ltr">
-                      <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-                        {language === "ar"
-                          ? `آية ${verse.ayah}`
-                          : `Ayah ${verse.ayah}`}
-                      </span>
-                    </div>
-                  )}
                   <p
                     className="font-uthmani text-[2.3rem] leading-[5] text-center"
                     style={{ wordSpacing: "0.75rem" }}
@@ -405,7 +384,7 @@ export function ReaderPanel() {
                             }
                           }}
                           className={cn(
-                            "inline-block cursor-pointer rounded-md border-2 border-transparent px-1.5 py-px mx-0.5 transition-colors duration-200",
+                            "inline-block cursor-pointer rounded-full border-2 border-transparent px-2.5 py-1 mx-0.5 transition-colors duration-200",
                             "hover:bg-emerald-500/15 hover:text-emerald-700 hover:border-emerald-500 dark:hover:bg-emerald-500/25 dark:hover:text-emerald-300 dark:hover:border-emerald-400",
                             isAudioActive &&
                               "bg-emerald-500/15 text-emerald-700 border-emerald-500 dark:bg-emerald-500/25 dark:text-emerald-300 dark:border-emerald-400",
@@ -457,18 +436,9 @@ export function ReaderPanel() {
         </div>
       )}
 
-      {/* Lesson word nav — icon buttons row below verse (play, back, expand) */}
+      {/* Lesson word nav — previous/next only */}
       {totalSlides > 0 && (
         <div className="flex items-center justify-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8 rounded-full cursor-pointer"
-            onClick={isPlaying ? stop : handlePlay}
-            title={language === "ar" ? "تشغيل" : "Play"}
-          >
-            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-          </Button>
           <Button
             variant="outline"
             size="icon"
@@ -482,10 +452,10 @@ export function ReaderPanel() {
             variant="outline"
             size="icon"
             className="h-8 w-8 rounded-full cursor-pointer"
-            onClick={lessonShuffle}
-            title={language === "ar" ? "كلمة عشوائية" : "Random word"}
+            onClick={lessonNext}
+            title={language === "ar" ? "الكلمة التالية" : "Next word"}
           >
-            <Shuffle className="h-4 w-4" />
+            <SkipForward className="h-4 w-4" />
           </Button>
         </div>
       )}

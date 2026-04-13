@@ -195,13 +195,6 @@
       "name_ar": "ياء",
       "name_en": "yaa",
       "audio": "audio/letters/028-yaa.mp3"
-    },
-    {
-      "id": 29,
-      "glyph": "ء",
-      "name_ar": "همزة",
-      "name_en": "hamza",
-      "audio": "audio/letters/029-hamza.mp3"
     }
   ]
 }

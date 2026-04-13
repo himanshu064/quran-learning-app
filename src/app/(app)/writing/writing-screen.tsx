@@ -165,15 +165,7 @@ export function WritingScreen() {
     }
   }, [wordIndex, total, config.id]);
 
-  // Letter pool: base letters from word + 3 distractors
-  const letterPool = useMemo(() => {
-    if (!currentWord) return [];
-    const base = getBaseLetters(currentWord.word);
-    const distractors = shuffleArray(
-      ALL_ARABIC_LETTERS.filter((l) => !base.includes(l)),
-    ).slice(0, 3);
-    return shuffleArray([...base, ...distractors]);
-  }, [currentWord]);
+  const letterPool = ALL_ARABIC_LETTERS;
 
   // Play instruction every time the module is visited
   useEffect(() => {
