@@ -2,13 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { parseAsInteger, useQueryState } from "nuqs";
-import {
-  Play,
-  Pause,
-  SkipBack,
-  SkipForward,
-  BookOpen,
-} from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -319,19 +313,12 @@ export function ReaderPanel() {
         </div>
       )}
 
-      {/* Basmala */}
-      {showBasmala && (
-        <p className="text-center font-uthmani text-xl" dir="rtl">
-          بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ
-        </p>
-      )}
-
       {/* Ayah box */}
       {isTextLoading ? (
         <Skeleton className="h-56 rounded-2xl" />
       ) : (
         <div
-          className="relative flex min-h-55 cursor-default items-center justify-center overflow-hidden rounded-[1.125rem] border border-border bg-card p-6"
+          className="relative flex min-h-48 cursor-default items-center justify-center overflow-hidden rounded-[1.125rem] border border-border bg-card p-6"
           onClick={() => {
             if (activeSlide) setShowOverlay((p) => !p);
           }}
@@ -354,12 +341,17 @@ export function ReaderPanel() {
                   : "Select a surah and ayah to display"}
               </p>
             ) : (
-              verses.map((verse) => (
-                <div key={verse.verse_key}>
-                  <p
-                    className="font-uthmani text-[2.3rem] leading-[5] text-center"
-                    style={{ wordSpacing: "0.75rem" }}
-                  >
+              <p
+                className="font-uthmani text-[2.3rem] leading-[5] text-center"
+                style={{ wordSpacing: "0.75rem" }}
+              >
+                {showBasmala && (
+                  <span className="block">
+                    بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ
+                  </span>
+                )}
+                {verses.map((verse) => (
+                  <span key={verse.verse_key}>
                     {verse.text.split(" ").map((word, i) => {
                       const wordIdx = i + 1;
                       const isAudioActive =
@@ -380,7 +372,12 @@ export function ReaderPanel() {
                           onKeyDown={(e) => {
                             if (e.key === "Enter" || e.key === " ") {
                               e.preventDefault();
-                              handleWordClick(verse.surah, verse.ayah, wordIdx, word);
+                              handleWordClick(
+                                verse.surah,
+                                verse.ayah,
+                                wordIdx,
+                                word,
+                              );
                             }
                           }}
                           className={cn(
@@ -406,9 +403,9 @@ export function ReaderPanel() {
                         </span>
                       );
                     })}
-                  </p>
-                </div>
-              ))
+                  </span>
+                ))}
+              </p>
             )}
           </div>
 
@@ -423,7 +420,9 @@ export function ReaderPanel() {
               </div>
               {letterSlide && (
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {language === "ar" ? letterSlide.name_ar : letterSlide.name_en}
+                  {language === "ar"
+                    ? letterSlide.name_ar
+                    : letterSlide.name_en}
                 </p>
               )}
               <p className="mt-4 text-xs text-muted-foreground">
@@ -444,7 +443,7 @@ export function ReaderPanel() {
             size="icon"
             className="h-8 w-8 rounded-full cursor-pointer"
             onClick={lessonPrev}
-            title={language === "ar" ? "الكلمة السابقة" : "Previous word"}
+            title={language === "ar" ? "السابق" : "Previous"}
           >
             <SkipBack className="h-4 w-4" />
           </Button>
@@ -452,8 +451,21 @@ export function ReaderPanel() {
             variant="outline"
             size="icon"
             className="h-8 w-8 rounded-full cursor-pointer"
+            onClick={isPlaying ? stop : handlePlay}
+            title={language === "ar" ? "تشغيل" : "Play"}
+          >
+            {isPlaying ? (
+              <Pause className="h-4 w-4" />
+            ) : (
+              <Play className="h-4 w-4" />
+            )}
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8 rounded-full cursor-pointer"
             onClick={lessonNext}
-            title={language === "ar" ? "الكلمة التالية" : "Next word"}
+            title={language === "ar" ? "التالي" : "Next"}
           >
             <SkipForward className="h-4 w-4" />
           </Button>
@@ -466,8 +478,12 @@ export function ReaderPanel() {
           <div className="flex items-center gap-1.5 text-sm">
             <BookOpen className="h-4 w-4 text-primary" />
             {letterSlide
-              ? (language === "ar" ? "حرف من الأبجدية" : "Arabic Alphabet")
-              : (language === "ar" ? "كلمة من القرآن" : "Word from Quran")}
+              ? language === "ar"
+                ? "حرف من الأبجدية"
+                : "Arabic Alphabet"
+              : language === "ar"
+                ? "كلمة من القرآن"
+                : "Word from Quran"}
           </div>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             {wordSlide && wordSlide.count > 0 && (
@@ -483,8 +499,8 @@ export function ReaderPanel() {
               </span>
             )}
             <span>
-              {language === "ar" ? "التقدم:" : "Progress:"}{" "}
-              {slideIndex + 1} / {totalSlides}
+              {language === "ar" ? "التقدم:" : "Progress:"} {slideIndex + 1} /{" "}
+              {totalSlides}
             </span>
           </div>
         </div>
@@ -493,17 +509,17 @@ export function ReaderPanel() {
       {/* Player / Recitation card */}
       {verses.length > 0 && (
         <div className="space-y-1">
-          <div className="flex items-center justify-between rounded-[1.125rem] border border-border bg-card px-4 py-3">
-            <span className="text-sm text-muted-foreground">
+          <div className="flex items-center gap-3 rounded-[1.125rem] border border-border bg-card px-4 py-3">
+            <span className="shrink-0 text-sm text-muted-foreground">
               {language === "ar" ? "تلاوة" : "Recitation"}
             </span>
-            <div className="flex items-center gap-2">
-              <div className="inline-flex overflow-hidden rounded-full border border-border">
+            <div className="flex flex-1 items-center gap-2">
+              <div className="flex flex-1 items-center justify-center gap-1 rounded-full border border-border p-1">
                 <Button
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-auto rounded-none px-3 py-1 text-xs cursor-pointer",
+                    "h-auto rounded-full px-4 py-1 text-xs cursor-pointer",
                     mode === "wbw"
                       ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
                       : "text-muted-foreground",
@@ -516,7 +532,7 @@ export function ReaderPanel() {
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-auto rounded-none px-3 py-1 text-xs cursor-pointer",
+                    "h-auto rounded-full px-4 py-1 text-xs cursor-pointer",
                     mode === "verse"
                       ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
                       : "text-muted-foreground",
@@ -546,7 +562,6 @@ export function ReaderPanel() {
           </p>
         </div>
       )}
-
     </div>
   );
 }

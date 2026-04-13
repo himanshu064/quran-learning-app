@@ -130,3 +130,11 @@ export function getLessonConfig(id: string): LessonConfig | undefined {
 export function getAvailableLessons(): LessonConfig[] {
   return LESSON_CONFIG.filter((l) => l.file !== "");
 }
+
+/**
+ * Lessons 1 & 2 are alphabet lessons that live under the Letters tab.
+ * They disable Surahs / Verse / Word and only allow Letters / Choose / Write.
+ */
+export function isLetterLesson(lessonId: string): boolean {
+  return lessonId === "lesson1" || lessonId === "lesson2";
+}

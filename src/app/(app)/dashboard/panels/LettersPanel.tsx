@@ -62,15 +62,21 @@ function extractLettersFromWord(word: string): string[] {
 }
 
 export function LettersPanel() {
-  const { language } = useLanguage();
-  const { playLetterAudio, stop, isPlaying } = useAudioContext();
   const { lessonId } = useLessonContext();
-  const { selectedWord } = useSelectedWord();
 
   // Lesson 2: show interactive letter forms game
   if (lessonId === "lesson2") {
     return <LetterFormsGame />;
   }
+
+  return <AlphabetGrid />;
+}
+
+// Lesson 1 — 28 alphabet letters in a Surahs-style 3-column grid
+function AlphabetGrid() {
+  const { language } = useLanguage();
+  const { playLetterAudio, stop, isPlaying } = useAudioContext();
+  const { selectedWord } = useSelectedWord();
   const [letters, setLetters] = useState<LetterEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [playingId, setPlayingId] = useState<number | null>(null);
@@ -130,7 +136,9 @@ export function LettersPanel() {
       <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
         <BookOpen className="h-12 w-12 text-muted-foreground/40" />
         <p className="text-sm text-muted-foreground">
-          {language === "ar" ? "لا توجد بيانات للحروف" : "No letter data available"}
+          {language === "ar"
+            ? "لا توجد بيانات للحروف"
+            : "No letter data available"}
         </p>
       </div>
     );
@@ -170,7 +178,10 @@ export function LettersPanel() {
                 {language === "ar" ? letter.name_en : letter.name_ar}
               </p>
             </div>
-            <span className="font-uthmani shrink-0 text-2xl font-semibold" dir="rtl">
+            <span
+              className="font-uthmani shrink-0 text-2xl font-semibold"
+              dir="rtl"
+            >
               {letter.glyph}
             </span>
           </div>
@@ -225,7 +236,9 @@ function SelectedWordLetters({
     <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4">
       <div className="flex w-full items-center justify-between rounded-[1.125rem] border border-border bg-card px-4 py-3">
         <span className="text-sm font-medium">
-          {language === "ar" ? "حروف الكلمة المختارة" : "Letters of Selected Word"}
+          {language === "ar"
+            ? "حروف الكلمة المختارة"
+            : "Letters of Selected Word"}
         </span>
         <Badge variant="outline" className="text-xs">
           {language === "ar"

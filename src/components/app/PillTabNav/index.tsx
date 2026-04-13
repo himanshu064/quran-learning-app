@@ -31,6 +31,7 @@ export function PillTabNav({
   disabledTabs?: TabKey[];
 }) {
   const { language } = useLanguage();
+  const disabled = new Set(disabledTabs ?? []);
 
   return (
     <div className="inline-flex shrink-0 items-center gap-0 overflow-hidden rounded-full border border-border">
@@ -47,7 +48,7 @@ export function PillTabNav({
               "h-auto rounded-none px-3 py-1.5 text-xs font-medium cursor-pointer",
               "text-muted-foreground hover:text-foreground hover:bg-transparent",
               activeTab === tab.key &&
-                "bg-primary/[0.16] text-primary hover:bg-primary/[0.16] hover:text-primary",
+                "bg-primary/16 text-primary hover:bg-primary/16 hover:text-primary",
               isDisabled && "opacity-30 cursor-not-allowed",
             )}
           >

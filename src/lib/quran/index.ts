@@ -2,6 +2,7 @@ export {
   LESSON_CONFIG,
   getLessonConfig,
   getAvailableLessons,
+  isLetterLesson,
 } from "./lesson-config";
 export type { LessonConfig, LessonType } from "./lesson-config";
 

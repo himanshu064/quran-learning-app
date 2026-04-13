@@ -14,11 +14,10 @@ export default async function AuthLayout({
 }) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (session?.user) {
-    const status = (session.user as { status?: string }).status;
+    const user = session.user as { status?: string; role?: string };
     // Let suspended/banned users stay on auth pages (e.g. /auth/suspended)
-    if (status === "active") {
-      // redirect(session.user.role === "admin" ? "/admin" : "/dashboard");
-      redirect("/dashboard");
+    if (user.status === "active") {
+      redirect(user.role === "admin" ? "/admin" : "/dashboard");
     }
   }
   return <>{children}</>;

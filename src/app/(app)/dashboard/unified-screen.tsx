@@ -6,6 +6,7 @@ import { UnifiedTopbar } from "@/components/app/UnifiedTopbar";
 import type { TabKey } from "@/components/app/PillTabNav";
 import { SelectedWordProvider } from "./selected-word-context";
 import { useAudioContext, useLessonContext } from "@/providers";
+import { isLetterLesson } from "@/lib/quran";
 import {
   SurahsPanel,
   ReaderPanel,
@@ -36,6 +37,7 @@ export function UnifiedScreen() {
 
   const handleTabChange = useCallback(
     (newTab: TabKey) => {
+      if (disabledTabs.includes(newTab)) return;
       stop();
       if (newTab === "letters") {
         setLesson("lesson1");
@@ -67,13 +69,15 @@ export function UnifiedScreen() {
   return (
     <SelectedWordProvider>
       {/* Main app card — matches client's single-card shell */}
-      <div className="mx-auto flex w-full max-w-7xl flex-col overflow-hidden rounded-[1.125rem] border border-border bg-card">
-        <UnifiedTopbar activeTab={activeTab} onTabChange={handleTabChange} disabledTabs={disabledTabs} />
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-7xl flex-1 flex-col overflow-hidden rounded-[1.125rem] border border-border bg-card">
+        <UnifiedTopbar
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          disabledTabs={disabledTabs}
+        />
 
-        <div className="overflow-auto p-4">
-          {activeTab === "home" && (
-            <SurahsPanel onNavigate={handleNavigate} />
-          )}
+        <div className="min-h-0 flex-1 overflow-auto p-4">
+          {activeTab === "home" && <SurahsPanel onNavigate={handleNavigate} />}
           {activeTab === "reader" && <ReaderPanel />}
           {activeTab === "teaching" && <TeachingPanel />}
           {activeTab === "letters" && <LettersPanel />}
