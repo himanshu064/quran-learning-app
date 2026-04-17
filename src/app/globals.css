@@ -175,3 +175,14 @@
   max-height: 21.75rem;
   overflow-y: auto;
 }
+
+/* Verse word entrance animation with stagger */
+@keyframes verseWordIn {
+  0% { opacity: 0; transform: translateY(0.4rem); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.verse-word {
+  opacity: 0;
+  animation: verseWordIn 260ms ease-out forwards;
+}

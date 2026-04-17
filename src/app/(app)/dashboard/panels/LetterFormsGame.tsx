@@ -339,36 +339,34 @@ export function LetterFormsGame() {
 
         {/* Word display with clickable letters */}
         {currentPosition ? (
-          <div className="mb-4">
-            <div
-              className="flex flex-wrap items-center justify-center gap-2 font-uthmani text-[3rem] leading-relaxed sm:text-[4rem]"
-              dir="rtl"
-            >
-              {currentPosition.letters.map((letter, i) => (
-                <span
-                  key={i}
-                  role="button"
-                  tabIndex={0}
-                  className={cn(
-                    "inline-block cursor-pointer rounded-lg px-2 py-1 transition-all duration-200",
-                    "border-2 border-transparent",
-                    "hover:bg-muted/50",
-                    highlightIdx === i && [
-                      "text-red-600 dark:text-red-400 scale-110",
-                      "border-yellow-400 bg-yellow-50 dark:bg-yellow-900/30",
-                      "shadow-[0_0_16px_rgba(250,204,21,0.4)]",
-                    ],
-                  )}
-                  onClick={() => handleLetterClick(letter, i)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ")
-                      handleLetterClick(letter, i);
-                  }}
-                >
-                  {letter}
-                </span>
-              ))}
-            </div>
+          <div className="mb-4 text-center font-uthmani text-[4rem] leading-[1.5] sm:text-[4.5rem]" dir="rtl">
+            {currentPosition.letters.map((letter, i) => (
+              <span
+                key={i}
+                role="button"
+                tabIndex={0}
+                className={cn(
+                  "inline cursor-pointer rounded-[0.4rem] px-[0.05em] transition-all duration-150",
+                  "hover:text-emerald-400",
+                  highlightIdx === i && [
+                    "text-red-600 dark:text-red-400",
+                    "shadow-[0_0_6px_rgba(0,0,0,0.35)]",
+                    "scale-[1.12]",
+                    "rounded-full px-[0.25em] py-[0.15em]",
+                    "bg-amber-50/95 dark:bg-yellow-900/30",
+                    "shadow-[0_0_0_4px_rgba(234,179,8,0.9)]",
+                    "text-slate-900 dark:text-red-400",
+                  ],
+                )}
+                onClick={() => handleLetterClick(letter, i)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ")
+                    handleLetterClick(letter, i);
+                }}
+              >
+                {letter}
+              </span>
+            ))}
           </div>
         ) : (
           <div className="py-12 text-center text-sm text-muted-foreground">

@@ -1,0 +1,128 @@
+{
+  "80:26": [
+    {
+      "word": "ٱلۡأَرۡضَ",
+      "wordIndex": 3,
+      "quranWord": "ٱلۡأَرۡضَ",
+      "letter": "ا",
+      "count": 45
+    }
+  ],
+  "52:39": [
+    {
+      "word": "ٱلۡبَنُونَ",
+      "wordIndex": 5,
+      "quranWord": "ٱلۡبَنُونَ",
+      "letter": "ب",
+      "count": 2
+    }
+  ],
+  "68:17": [
+    {
+      "word": "ٱلۡجَنَّةِ",
+      "wordIndex": 6,
+      "quranWord": "ٱلۡجَنَّةِ",
+      "letter": "ج",
+      "count": 27
+    }
+  ],
+  "61:9": [
+    {
+      "word": "ٱلۡحَقِّ",
+      "wordIndex": 7,
+      "quranWord": "ٱلۡحَقِّ",
+      "letter": "ح",
+      "count": 37
+    }
+  ],
+  "22:77": [
+    {
+      "word": "ٱلۡخَيۡرَ",
+      "wordIndex": 9,
+      "quranWord": "ٱلۡخَيۡرَ",
+      "letter": "خ",
+      "count": 1
+    }
+  ],
+  "88:24": [
+    {
+      "word": "ٱلۡعَذَابَ",
+      "wordIndex": 3,
+      "quranWord": "ٱلۡعَذَابَ",
+      "letter": "ع",
+      "count": 28
+    }
+  ],
+  "81:24": [
+    {
+      "word": "ٱلۡغَيۡبِ",
+      "wordIndex": 4,
+      "quranWord": "ٱلۡغَيۡبِ",
+      "letter": "غ",
+      "count": 19
+    }
+  ],
+  "85:11": [
+    {
+      "word": "ٱلۡفَوۡزُ",
+      "wordIndex": 13,
+      "quranWord": "ٱلۡفَوۡزُ",
+      "letter": "ف",
+      "count": 16
+    }
+  ],
+  "69:7": [
+    {
+      "word": "ٱلۡقَوۡمَ",
+      "wordIndex": 9,
+      "quranWord": "ٱلۡقَوۡمَ",
+      "letter": "ق",
+      "count": 26
+    }
+  ],
+  "98:4": [
+    {
+      "word": "ٱلۡكِتَٰبَ",
+      "wordIndex": 5,
+      "quranWord": "ٱلۡكِتَٰبَ",
+      "letter": "ك",
+      "count": 78
+    }
+  ],
+  "85:10": [
+    {
+      "word": "ٱلۡمُؤۡمِنِينَ",
+      "wordIndex": 4,
+      "quranWord": "ٱلۡمُؤۡمِنِينَ",
+      "letter": "م",
+      "count": 78
+    }
+  ],
+  "47:32": [
+    {
+      "word": "ٱلۡهُدَىٰ",
+      "wordIndex": 15,
+      "quranWord": "ٱلۡهُدَىٰ",
+      "letter": "ه",
+      "count": 15
+    }
+  ],
+  "67:25": [
+    {
+      "word": "ٱلۡوَعۡدُ",
+      "wordIndex": 4,
+      "quranWord": "ٱلۡوَعۡدُ",
+      "letter": "و",
+      "count": 7
+    }
+  ],
+  "69:35": [
+    {
+      "word": "ٱلۡيَوۡمَ",
+      "wordIndex": 3,
+      "quranWord": "ٱلۡيَوۡمَ",
+      "letter": "ي",
+      "count": 38
+    }
+  ]
+}

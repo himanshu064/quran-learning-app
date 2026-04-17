@@ -89,6 +89,7 @@ export function McqPanel() {
   const [selectedBtns, setSelectedBtns] = useState<Record<number, "correct" | "incorrect">>({});
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [showResults, setShowResults] = useState(false);
   const instructionPlayed = useRef(false);
 
   // Support both word AND letter slides
@@ -192,17 +193,13 @@ export function McqPanel() {
         playUrl(praiseAudioUrl());
         fireConfetti();
       } else {
-        const newAttempts = attempts + 1;
-        setAttempts(newAttempts);
+        // Single-attempt MCQ: reveal correct answer immediately on first wrong click
+        setAttempts(1);
+        setAnsweredCorrectly(true);
         setSelectedBtns((prev) => ({ ...prev, [idx]: "incorrect" }));
-        if (newAttempts >= 2) {
-          setAnsweredCorrectly(true);
-          const correctIdx = options.findIndex((o) => o === currentItem.text);
-          if (correctIdx !== -1) setSelectedBtns((prev) => ({ ...prev, [correctIdx]: "correct" }));
-          playUrl(revealAudioUrl());
-        } else {
-          playUrl(retryAudioUrl());
-        }
+        const correctIdx = options.findIndex((o) => o === currentItem.text);
+        if (correctIdx !== -1) setSelectedBtns((prev) => ({ ...prev, [correctIdx]: "correct" }));
+        playUrl(revealAudioUrl());
       }
     },
     [answeredCorrectly, currentItem, attempts, options, playUrl],
@@ -251,8 +248,102 @@ export function McqPanel() {
 
   const isLetterQuiz = currentItem?.type === "letter";
 
+  const attempted = questionIndex + (answeredCorrectly ? 1 : 0);
+  const progressPct = totalQuestions > 0 ? Math.round((attempted / totalQuestions) * 100) : 0;
+  const accuracy = attempted > 0 ? Math.round((score / attempted) * 100) : 0;
+
+  const handleReset = () => {
+    setQuestionIndex(0);
+    setScore(0);
+    setFinished(false);
+    setAttempts(0);
+    setAnsweredCorrectly(false);
+    setSelectedBtns({});
+    setHasListened(false);
+    setShowResults(false);
+  };
+
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4">
+      {/* Session tracking panel */}
+      <div className="rounded-[1.125rem] border border-border bg-card px-4 py-3">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <span className="font-medium">
+            {language === "ar" ? "تقدّم الجلسة" : "Session progress"}
+          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-muted-foreground">
+              {language === "ar"
+                ? `${attempted} من ${totalQuestions} كلمات مجرّبة`
+                : `${attempted} of ${totalQuestions} words attempted`}
+            </span>
+            <span className="rounded-full bg-primary/12 px-2 py-0.5 font-semibold text-primary">
+              {language === "ar" ? "النتيجة:" : "Score:"} {score} / {attempted || 0}
+            </span>
+            <Button variant="ghost" size="sm" className="h-7 cursor-pointer text-xs" onClick={() => setShowResults((s) => !s)}>
+              {language === "ar" ? "عرض النتائج" : "View Results"}
+            </Button>
+            <Button variant="ghost" size="sm" className="h-7 cursor-pointer text-xs" onClick={handleReset}>
+              {language === "ar" ? "إعادة" : "Reset"}
+            </Button>
+          </div>
+        </div>
+        <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-primary transition-all duration-300"
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+        {attempted > 0 && (
+          <p className="mt-1 text-xs text-muted-foreground">
+            {language === "ar" ? "الدقّة:" : "Accuracy:"} {accuracy}%
+          </p>
+        )}
+      </div>
+
+      {/* Detailed results panel */}
+      {showResults && (
+        <div className="rounded-[1.125rem] border border-border bg-card px-5 py-4">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold">
+                {language === "ar" ? "ملخّص الجلسة" : "Session summary"}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {attempted === 0
+                  ? language === "ar"
+                    ? "لم تبدأ الجلسة بعد. اضغط استمع للبدء."
+                    : "Session not started. Press listen to begin."
+                  : language === "ar"
+                    ? `حاولت ${attempted} كلمات من أصل ${totalQuestions}، أجبت بشكل صحيح عن ${score} منها.`
+                    : `Attempted ${attempted} of ${totalQuestions} words, answered ${score} correctly.`}
+              </p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                {language === "ar" ? "التغطية:" : "Coverage:"} {attempted}/{totalQuestions}
+              </p>
+            </div>
+            {/* Accuracy ring */}
+            <div className="relative h-20 w-20 shrink-0">
+              <svg className="h-20 w-20 -rotate-90" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="34" fill="none" className="stroke-muted" strokeWidth="6" />
+                <circle
+                  cx="40" cy="40" r="34"
+                  fill="none"
+                  className="stroke-primary transition-all duration-500"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeDasharray={2 * Math.PI * 34}
+                  strokeDashoffset={2 * Math.PI * 34 * (1 - accuracy / 100)}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center text-sm font-bold">
+                {accuracy}%
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="rounded-[1.125rem] border border-border bg-card p-6 sm:p-8">
         <h2 className="mb-2 text-center text-lg font-semibold">
           {language === "ar"
@@ -316,9 +407,8 @@ export function McqPanel() {
           "mt-4 min-h-5 text-center text-sm",
           answeredCorrectly && attempts === 0 ? "text-emerald-500" : attempts > 0 ? "text-red-500" : "text-muted-foreground",
         )}>
-          {answeredCorrectly && attempts === 0 && (language === "ar" ? "أحسنت! اخترت الإجابة الصحيحة" : "Correct! You chose the right answer")}
-          {!answeredCorrectly && attempts === 1 && (language === "ar" ? "ليست هذه الإجابة، جرّب خيارًا آخر" : "Not this one, try another option")}
-          {answeredCorrectly && attempts >= 2 && (language === "ar" ? "هذا هو الجواب الصحيح" : "This is the correct answer")}
+          {answeredCorrectly && attempts === 0 && (language === "ar" ? "صحيح!" : "Correct!")}
+          {answeredCorrectly && attempts >= 1 && (language === "ar" ? "أُظهرت الإجابة الصحيحة. يمكنك المتابعة." : "The correct answer is shown. You may continue.")}
         </p>
       </div>
     </div>

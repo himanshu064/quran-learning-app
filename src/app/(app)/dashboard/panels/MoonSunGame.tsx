@@ -143,28 +143,54 @@ export function MoonSunGame() {
   const sequenceRef = useRef<{ cancel: () => void } | null>(null);
 
   useEffect(() => {
-    fetch("/data/lessons/lesson16_moon_sun_letters.json")
-      .then((r) => r.json())
-      .then((data: Record<string, MoonSunEntry[]>) => {
-        const slides: MoonSunSlide[] = [];
-        const seen = new Set<string>();
+    // Load moon letters (lesson 27 + 28) and sun letters (lesson 29 + 30),
+    // mark each entry with its type, and merge into a single slide list.
+    const sources: { url: string; type: "moon" | "sun" }[] = [
+      { url: "/data/lessons/lesson27_moon_letters.json", type: "moon" },
+      { url: "/data/lessons/lesson28_moon_letters_practice.json", type: "moon" },
+      { url: "/data/lessons/lesson29_sun_letters.json", type: "sun" },
+      { url: "/data/lessons/lesson30_sun_letters_practice.json", type: "sun" },
+    ];
+
+    Promise.all(
+      sources.map((src) =>
+        fetch(src.url)
+          .then((r) => r.json())
+          .then((data: Record<string, Array<Record<string, unknown>>>) => ({
+            data,
+            type: src.type,
+          }))
+          .catch(() => ({ data: {}, type: src.type })),
+      ),
+    ).then((results) => {
+      const slides: MoonSunSlide[] = [];
+      const seen = new Set<string>();
+      for (const { data, type } of results) {
         for (const [key, entries] of Object.entries(data)) {
           const [s, a] = key.split(":");
           for (const entry of entries) {
-            const dedup = `${entry.type}:${entry.baseLetter}`;
+            const baseLetter = (entry.letter as string) || (entry.baseLetter as string) || "";
+            if (!baseLetter) continue;
+            const dedup = `${type}:${baseLetter}`;
             if (seen.has(dedup)) continue;
             seen.add(dedup);
             slides.push({
-              ...entry,
+              word: entry.word as string,
+              wordIndex: entry.wordIndex as number,
+              exampleWord: (entry.quranWord as string) ?? (entry.word as string),
+              count: (entry.count as number) ?? null,
+              baseLetter,
+              displayLetter: (entry.displayLetter as string) ?? baseLetter,
+              type,
               surah: Number(s),
               ayah: Number(a),
             });
           }
         }
-        setRawData(slides);
-        setIsLoading(false);
-      })
-      .catch(() => setIsLoading(false));
+      }
+      setRawData(slides);
+      setIsLoading(false);
+    });
   }, []);
 
   // Filter and sort slides by mode

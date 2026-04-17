@@ -17,16 +17,46 @@ const HARAKAT_MAP: Record<string, string> = {
   damma: "\u064F",
   sukun: "\u0652",
   shadda: "\u0651",
-  silent: "\u0652",
+  fathatan: "\u064B",
+  kasratan: "\u064D",
+  dammatan: "\u064C",
+  superscript_alef: "\u0670",
+  quranic_sukun: "\u06E1",
+  madda: "\u0653",
+  hamza_above: "\u0654",
+  hamza_below: "\u0655",
+  subscript_alef: "\u0656",
+  inverted_damma: "\u0657",
+  fatha_two_dots: "\u065E",
+  small_waw: "\u06E5",
+  small_yeh: "\u06E6",
 };
 
-const HARAKAT_BUTTONS = [
+const HARAKAT_BASIC = [
   { key: "fatha", display: "ـَ", label: "فتحة", labelEn: "Fatha" },
   { key: "kasra", display: "ـِ", label: "كسرة", labelEn: "Kasra" },
   { key: "damma", display: "ـُ", label: "ضمة", labelEn: "Damma" },
   { key: "sukun", display: "ـْ", label: "سكون", labelEn: "Sukun" },
   { key: "shadda", display: "ـّ", label: "شدة", labelEn: "Shadda" },
-  { key: "silent", display: "ـْ", label: "صامت", labelEn: "Silent" },
+];
+
+const HARAKAT_TANWIN = [
+  { key: "fathatan", display: "ـً", label: "فتحتان", labelEn: "Fathatan" },
+  { key: "kasratan", display: "ـٍ", label: "كسرتان", labelEn: "Kasratan" },
+  { key: "dammatan", display: "ـٌ", label: "ضمتان", labelEn: "Dammatan" },
+];
+
+const HARAKAT_QURANIC = [
+  { key: "quranic_sukun", display: "ـۡ", label: "سكون قرآني", labelEn: "Q. Sukun" },
+  { key: "superscript_alef", display: "ـٰ", label: "ألف خنجرية", labelEn: "Sup. Alef" },
+  { key: "madda", display: "ـٓ", label: "مدة", labelEn: "Madda" },
+  { key: "hamza_above", display: "ـٔ", label: "همزة فوق", labelEn: "Hamza ↑" },
+  { key: "hamza_below", display: "ـٕ", label: "همزة تحت", labelEn: "Hamza ↓" },
+  { key: "subscript_alef", display: "ـٖ", label: "ألف صغيرة سفلية", labelEn: "Sub. Alef" },
+  { key: "inverted_damma", display: "ـٗ", label: "ضمة مقلوبة", labelEn: "Inv. Damma" },
+  { key: "fatha_two_dots", display: "ـٞ", label: "فتحة بنقطتين", labelEn: "Fatha 2-dots" },
+  { key: "small_waw", display: "ـۥ", label: "واو صغيرة", labelEn: "Small Waw" },
+  { key: "small_yeh", display: "ـۦ", label: "ياء صغيرة", labelEn: "Small Yeh" },
 ];
 
 const ALL_ARABIC_LETTERS = "ابتثجحخدذرزسشصضطظعغفقكلمنهوي".split("");
@@ -36,7 +66,6 @@ type LetterCluster = {
   vowel: string | null;
   shadda: boolean;
   sukun: boolean;
-  silent: boolean;
 };
 
 // Unified write item for both word and letter slides
@@ -56,12 +85,32 @@ function toWriteItem(slide: WordSlide | LetterSlide): WriteItem {
   return { text: slide.glyph, type: "letter", audio: slide.audio };
 }
 
+function shuffleArray<T>(arr: T[]): T[] {
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+function getBaseLetters(word: string): string[] {
+  const harakatRegex = /[\u064B-\u0652]/g;
+  const base = word.replace(harakatRegex, "");
+  const unique: string[] = [];
+  for (const ch of base) {
+    if (!unique.includes(ch) && ch.charCodeAt(0) >= 0x0600 && ch.charCodeAt(0) <= 0x06ff) {
+      unique.push(ch);
+    }
+  }
+  return unique;
+}
+
 function buildClusterString(c: LetterCluster): string {
   let result = c.base;
   if (c.shadda) result += HARAKAT_MAP.shadda;
   if (c.vowel) result += HARAKAT_MAP[c.vowel];
   if (c.sukun) result += HARAKAT_MAP.sukun;
-  if (c.silent) result += HARAKAT_MAP.silent;
   return result;
 }
 
@@ -106,6 +155,9 @@ export function WritingPanel() {
   const [attempts, setAttempts] = useState(0);
   const [feedback, setFeedback] = useState<{ text: string; type: "ok" | "error" | "" }>({ text: "", type: "" });
   const [revealed, setRevealed] = useState(false);
+  const [sessionAttempted, setSessionAttempted] = useState(0);
+  const [sessionCorrect, setSessionCorrect] = useState(0);
+  const [showResults, setShowResults] = useState(false);
   const instructionPlayed = useRef(false);
   const { selectedWord } = useSelectedWord();
 
@@ -144,7 +196,15 @@ export function WritingPanel() {
     ? `sw:${selectedWord.surah}:${selectedWord.ayah}:${selectedWord.wordIndex}`
     : `li:${wordIndex}`;
 
-  const letterPool = ALL_ARABIC_LETTERS;
+  const [letterPool, setLetterPool] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!currentItem) { setLetterPool([]); return; }
+    const base = getBaseLetters(currentItem.text);
+    const distractors = shuffleArray(ALL_ARABIC_LETTERS.filter((l) => !base.includes(l))).slice(0, 3);
+    setLetterPool(shuffleArray([...base, ...distractors]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentItemKey]);
 
   useEffect(() => {
     if (!instructionPlayed.current) {
@@ -169,7 +229,7 @@ export function WritingPanel() {
 
   const appendLetter = useCallback((ch: string) => {
     if (revealed) return;
-    setTypedLetters((prev) => [...prev, { base: ch, vowel: null, shadda: false, sukun: false, silent: false }]);
+    setTypedLetters((prev) => [...prev, { base: ch, vowel: null, shadda: false, sukun: false }]);
     setFeedback({ text: "", type: "" });
   }, [revealed]);
 
@@ -179,10 +239,14 @@ export function WritingPanel() {
       if (prev.length === 0) return prev;
       const updated = [...prev];
       const last = { ...updated[updated.length - 1] };
-      if (type === "fatha" || type === "kasra" || type === "damma") { last.vowel = type; last.sukun = false; last.silent = false; }
-      else if (type === "shadda") { last.shadda = !last.shadda; if (last.shadda) { last.sukun = false; last.silent = false; } }
-      else if (type === "sukun") { last.sukun = true; last.vowel = null; last.silent = false; }
-      else if (type === "silent") { last.silent = true; last.vowel = null; last.sukun = false; }
+      if (type === "shadda") {
+        last.shadda = !last.shadda;
+      } else if (type === "sukun") {
+        last.sukun = true; last.vowel = null;
+      } else {
+        // All vowels, tanwin, and quranic marks go in the vowel slot (exclusive)
+        last.vowel = type; last.sukun = false;
+      }
       updated[updated.length - 1] = last;
       return updated;
     });
@@ -194,8 +258,7 @@ export function WritingPanel() {
       if (prev.length === 0) return prev;
       const updated = [...prev];
       const last = { ...updated[updated.length - 1] };
-      if (last.silent) { last.silent = false; updated[updated.length - 1] = last; }
-      else if (last.sukun) { last.sukun = false; updated[updated.length - 1] = last; }
+      if (last.sukun) { last.sukun = false; updated[updated.length - 1] = last; }
       else if (last.vowel) { last.vowel = null; updated[updated.length - 1] = last; }
       else if (last.shadda) { last.shadda = false; updated[updated.length - 1] = last; }
       else { updated.pop(); }
@@ -225,14 +288,18 @@ export function WritingPanel() {
     const typedNorm = normalizeArabic(typedWord);
     const targetNorm = normalizeArabic(currentItem.text);
     if (typedNorm === targetNorm) {
-      setFeedback({ text: language === "ar" ? "أحسنت! الإجابة صحيحة." : "Correct! Well done.", type: "ok" });
+      setFeedback({ text: language === "ar" ? "صحيح!" : "Correct!", type: "ok" });
       playUrl(praiseAudioUrl()); fireConfetti();
+      // Count correct on first-attempt win
+      if (attempts === 0) setSessionCorrect((c) => c + 1);
+      setSessionAttempted((a) => a + 1);
       setTimeout(advanceToNext, 1500);
     } else {
       const newAttempts = attempts + 1; setAttempts(newAttempts);
       setFeedback({ text: language === "ar" ? "ليست مطابقة تمامًا، حاول مرة أخرى." : "Not quite right, try again.", type: "error" });
       if (newAttempts >= 3) {
         setRevealed(true); playUrl(revealAudioUrl());
+        setSessionAttempted((a) => a + 1);
         setTimeout(advanceToNext, 2500);
       } else { playUrl(retryAudioUrl()); }
     }
@@ -251,8 +318,102 @@ export function WritingPanel() {
     );
   }
 
+  const progressPct = total > 0 ? Math.round((sessionAttempted / total) * 100) : 0;
+  const accuracy = sessionAttempted > 0 ? Math.round((sessionCorrect / sessionAttempted) * 100) : 0;
+
+  const handleResetSession = () => {
+    setWordIndex(0);
+    setTypedLetters([]);
+    setAttempts(0);
+    setFeedback({ text: "", type: "" });
+    setRevealed(false);
+    setHasListened(false);
+    setSessionAttempted(0);
+    setSessionCorrect(0);
+    setShowResults(false);
+  };
+
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4">
+      {/* Session tracking panel */}
+      <div className="rounded-[1.125rem] border border-border bg-card px-4 py-3">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <span className="font-medium">
+            {language === "ar" ? "تقدّم الجلسة" : "Session progress"}
+          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-muted-foreground">
+              {language === "ar"
+                ? `${sessionAttempted} من ${total} كلمات مجرّبة`
+                : `${sessionAttempted} of ${total} words attempted`}
+            </span>
+            <span className="rounded-full bg-primary/12 px-2 py-0.5 font-semibold text-primary">
+              {language === "ar" ? "النتيجة:" : "Score:"} {sessionCorrect} / {sessionAttempted || 0}
+            </span>
+            <Button variant="ghost" size="sm" className="h-7 cursor-pointer text-xs" onClick={() => setShowResults((s) => !s)}>
+              {language === "ar" ? "عرض النتائج" : "View Results"}
+            </Button>
+            <Button variant="ghost" size="sm" className="h-7 cursor-pointer text-xs" onClick={handleResetSession}>
+              {language === "ar" ? "إعادة" : "Reset"}
+            </Button>
+          </div>
+        </div>
+        <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-primary transition-all duration-300"
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+        {sessionAttempted > 0 && (
+          <p className="mt-1 text-xs text-muted-foreground">
+            {language === "ar" ? "الدقّة:" : "Accuracy:"} {accuracy}%
+          </p>
+        )}
+      </div>
+
+      {/* Detailed results panel */}
+      {showResults && (
+        <div className="rounded-[1.125rem] border border-border bg-card px-5 py-4">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold">
+                {language === "ar" ? "ملخّص الجلسة" : "Session summary"}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {sessionAttempted === 0
+                  ? language === "ar"
+                    ? "لم تبدأ الجلسة بعد. اضغط استمع للبدء."
+                    : "Session not started. Press listen to begin."
+                  : language === "ar"
+                    ? `حاولت ${sessionAttempted} كلمات من أصل ${total}، أجبت بشكل صحيح عن ${sessionCorrect} منها.`
+                    : `Attempted ${sessionAttempted} of ${total} words, answered ${sessionCorrect} correctly.`}
+              </p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                {language === "ar" ? "التغطية:" : "Coverage:"} {sessionAttempted}/{total}
+              </p>
+            </div>
+            {/* Accuracy ring */}
+            <div className="relative h-20 w-20 shrink-0">
+              <svg className="h-20 w-20 -rotate-90" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="34" fill="none" className="stroke-muted" strokeWidth="6" />
+                <circle
+                  cx="40" cy="40" r="34"
+                  fill="none"
+                  className="stroke-primary transition-all duration-500"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeDasharray={2 * Math.PI * 34}
+                  strokeDashoffset={2 * Math.PI * 34 * (1 - accuracy / 100)}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center text-sm font-bold">
+                {accuracy}%
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="rounded-[1.125rem] border border-border bg-card p-6 sm:p-8">
         <h2 className="mb-2 text-center text-lg font-semibold">
           {language === "ar"
@@ -322,8 +483,9 @@ export function WritingPanel() {
               onClick={() => appendLetter(letter)}
               disabled={!hasListened || isPlaying || revealed}
               className={cn(
-                "flex items-center justify-center rounded-full bg-emerald-500 font-uthmani text-white transition-all hover:bg-emerald-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40",
-                isLetterMode ? "h-14 w-14 text-2xl" : "h-12 w-12 text-xl",
+                "flex items-center justify-center rounded-xl bg-emerald-500 font-uthmani text-white transition-all hover:bg-emerald-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40",
+                "min-w-[3.5rem] px-4 py-3",
+                isLetterMode ? "text-3xl" : "text-[2rem]",
               )}
               dir="rtl"
             >
@@ -332,20 +494,28 @@ export function WritingPanel() {
           ))}
         </div>
 
-        {/* Harakat toolbar — orange circles */}
+        {/* Harakat toolbar — 3 groups: Basic, Tanwin, Quranic */}
         {!isLetterMode && (
-          <div className="mb-4 flex items-center justify-center gap-2 rounded-[1.125rem] border border-border bg-muted px-3 py-2.5">
-            <span className="me-1 text-xs text-muted-foreground">{language === "ar" ? "الحركات:" : "Diacritics:"}</span>
-            {HARAKAT_BUTTONS.map((h) => (
-              <button
-                key={h.key}
-                onClick={() => applyHaraka(h.key)}
-                disabled={!hasListened || isPlaying || revealed || typedLetters.length === 0}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500 font-uthmani text-lg text-white transition-all hover:bg-orange-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
-                title={language === "ar" ? h.label : h.labelEn}
-              >
-                {h.display}
-              </button>
+          <div className="mb-4 space-y-2">
+            {[
+              { label: language === "ar" ? "أساسية:" : "Basic:", items: HARAKAT_BASIC },
+              { label: language === "ar" ? "تنوين:" : "Tanwin:", items: HARAKAT_TANWIN },
+              { label: language === "ar" ? "قرآنية:" : "Quranic:", items: HARAKAT_QURANIC },
+            ].map((group) => (
+              <div key={group.label} className="flex items-center justify-center gap-2 rounded-[1.125rem] border border-border bg-muted px-3 py-2">
+                <span className="me-1 shrink-0 text-xs text-muted-foreground">{group.label}</span>
+                {group.items.map((h) => (
+                  <button
+                    key={h.key}
+                    onClick={() => applyHaraka(h.key)}
+                    disabled={!hasListened || isPlaying || revealed || typedLetters.length === 0}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500 font-uthmani text-lg text-white transition-all hover:bg-orange-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+                    title={language === "ar" ? h.label : h.labelEn}
+                  >
+                    {h.display}
+                  </button>
+                ))}
+              </div>
             ))}
           </div>
         )}

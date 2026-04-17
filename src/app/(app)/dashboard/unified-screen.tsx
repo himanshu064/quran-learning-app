@@ -6,7 +6,6 @@ import { UnifiedTopbar } from "@/components/app/UnifiedTopbar";
 import type { TabKey } from "@/components/app/PillTabNav";
 import { SelectedWordProvider } from "./selected-word-context";
 import { useAudioContext, useLessonContext } from "@/providers";
-import { isLetterLesson } from "@/lib/quran";
 import {
   SurahsPanel,
   ReaderPanel,
@@ -16,8 +15,25 @@ import {
   WritingPanel,
 } from "./panels";
 
-// Tabs to disable when Lesson 1 or 2 is selected (letter-based lessons)
-const LETTER_LESSON_DISABLED_TABS: TabKey[] = ["home", "reader", "teaching"];
+// Per-lesson tab disable rules.
+// L1: Letter (Word tab) enabled, plus Letters/Choose/Write. Surahs/Verse disabled.
+// L2: only Letters, Choose, Write active. Surahs, Verse, Word disabled.
+// L3+: Letters tab disabled; all other tabs active.
+function getDisabledTabs(lessonId: string): TabKey[] {
+  if (lessonId === "lesson1") {
+    return ["home", "reader"];
+  }
+  if (lessonId === "lesson2") {
+    return ["home", "reader", "teaching"];
+  }
+  return ["letters"];
+}
+
+// Default tab to redirect to when current tab becomes disabled
+function getDefaultTab(lessonId: string): TabKey {
+  if (lessonId === "lesson1" || lessonId === "lesson2") return "letters";
+  return "home";
+}
 
 export function UnifiedScreen() {
   const [tab, setTab] = useQueryState("tab", { defaultValue: "home" });
@@ -25,26 +41,22 @@ export function UnifiedScreen() {
   const [, setAyah] = useQueryState("ayah", parseAsInteger.withDefault(1));
   const [, setAyahTo] = useQueryState("to", parseAsInteger.withDefault(0));
   const { stop } = useAudioContext();
-  const { lessonId, setLesson } = useLessonContext();
+  const { lessonId } = useLessonContext();
 
   const activeTab = (tab as TabKey) || "home";
 
-  const isLetterLesson = lessonId === "lesson1" || lessonId === "lesson2";
   const disabledTabs = useMemo<TabKey[]>(
-    () => (isLetterLesson ? LETTER_LESSON_DISABLED_TABS : []),
-    [isLetterLesson],
+    () => getDisabledTabs(lessonId),
+    [lessonId],
   );
 
   const handleTabChange = useCallback(
     (newTab: TabKey) => {
       if (disabledTabs.includes(newTab)) return;
       stop();
-      if (newTab === "letters") {
-        setLesson("lesson1");
-      }
       setTab(newTab);
     },
-    [setTab, setLesson, stop],
+    [setTab, stop, disabledTabs],
   );
 
   // Navigate to a tab with optional surah/ayah params — all via nuqs
@@ -59,24 +71,25 @@ export function UnifiedScreen() {
     [setTab, setSurah, setAyah, setAyahTo, stop],
   );
 
-  // If user switches to lesson 1/2 while on a disabled tab, redirect to "letters"
+  // If current tab becomes disabled due to lesson change, redirect to safe default
   useEffect(() => {
-    if (isLetterLesson && LETTER_LESSON_DISABLED_TABS.includes(activeTab)) {
-      setTab("letters");
+    if (disabledTabs.includes(activeTab)) {
+      setTab(getDefaultTab(lessonId));
     }
-  }, [isLetterLesson, activeTab, setTab]);
+  }, [disabledTabs, activeTab, lessonId, setTab]);
 
   return (
     <SelectedWordProvider>
       {/* Main app card — matches client's single-card shell */}
-      <div className="mx-auto flex h-full min-h-0 w-full max-w-7xl flex-1 flex-col overflow-hidden rounded-[1.125rem] border border-border bg-card">
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-[90rem] flex-1 flex-col overflow-hidden rounded-[1.125rem] border border-border bg-card">
         <UnifiedTopbar
           activeTab={activeTab}
           onTabChange={handleTabChange}
           disabledTabs={disabledTabs}
+          lessonId={lessonId}
         />
 
-        <div className="min-h-0 flex-1 overflow-auto p-4">
+        <div className="min-h-0 flex-1 overflow-auto p-4 pb-24 sm:pb-4">
           {activeTab === "home" && <SurahsPanel onNavigate={handleNavigate} />}
           {activeTab === "reader" && <ReaderPanel />}
           {activeTab === "teaching" && <TeachingPanel />}

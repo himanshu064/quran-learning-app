@@ -22,6 +22,15 @@ type QuranVerse = {
   text: string;
 };
 
+// Convert a number to Arabic-Indic digits (٠١٢٣٤٥٦٧٨٩)
+function toArabicIndic(n: number): string {
+  const map = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+  return String(n)
+    .split("")
+    .map((d) => map[parseInt(d, 10)] ?? d)
+    .join("");
+}
+
 type SurahMeta = {
   id: number;
   name_arabic: string;
@@ -216,16 +225,28 @@ export function ReaderPanel() {
     }
   }, [mode, verseSpecs, playVerseSequence, playWbwSequence]);
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts: arrows navigate lesson when lesson-active, else ayah
+  const lessonModeActive = totalSlides > 0;
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return;
-      if (e.key === "ArrowRight") goToAyah(1);
-      if (e.key === "ArrowLeft") goToAyah(-1);
+      if (e.key === "ArrowRight") {
+        if (lessonModeActive) lessonNext();
+        else goToAyah(1);
+      }
+      if (e.key === "ArrowLeft") {
+        if (lessonModeActive) lessonPrev();
+        else goToAyah(-1);
+      }
+      if (e.key === " " || e.code === "Space") {
+        e.preventDefault();
+        if (isPlaying) stop();
+        else handlePlay();
+      }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [goToAyah]);
+  }, [goToAyah, isPlaying, stop, handlePlay, lessonModeActive, lessonNext, lessonPrev]);
 
   const showBasmala =
     ayahFrom === 1 &&
@@ -234,7 +255,7 @@ export function ReaderPanel() {
     currentSurah?.bismillah_pre !== false;
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-2.5">
+    <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-2.5">
       {/* Location card */}
       <div className="rounded-[1.125rem] border border-border bg-card px-3 py-2.5">
         <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -280,14 +301,13 @@ export function ReaderPanel() {
       {/* Surah header ornament */}
       {currentSurah && (
         <div
-          className="relative mx-auto grid w-full max-w-2xl grid-cols-[1fr_2fr_1fr] items-center overflow-hidden"
+          className="relative mx-auto grid h-[3.5rem] w-full grid-cols-[1fr_2fr_1fr] items-center overflow-hidden sm:h-[4.25rem]"
           dir="ltr"
           style={{
             backgroundImage: "url(/surah_header.png)",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center",
             backgroundSize: "100% 100%",
-            height: "4.25rem",
             filter: "drop-shadow(0 0.75rem 1.25rem rgba(0, 0, 0, 0.45))",
           }}
         >
@@ -318,7 +338,10 @@ export function ReaderPanel() {
         <Skeleton className="h-56 rounded-2xl" />
       ) : (
         <div
-          className="relative flex min-h-48 cursor-default items-center justify-center overflow-hidden rounded-[1.125rem] border border-border bg-card p-6"
+          className={cn(
+            "relative flex min-h-48 cursor-default items-center justify-center overflow-hidden rounded-[1.125rem] border border-border bg-card p-6",
+            "dark:bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.18),rgba(15,23,42,0.98)_45%)]",
+          )}
           onClick={() => {
             if (activeSlide) setShowOverlay((p) => !p);
           }}
@@ -342,8 +365,8 @@ export function ReaderPanel() {
               </p>
             ) : (
               <p
-                className="font-uthmani text-[2.3rem] leading-[5] text-center"
-                style={{ wordSpacing: "0.75rem" }}
+                className="font-uthmani text-[2.2rem] sm:text-[2.6rem] md:text-[3rem] leading-[2.35] text-center"
+                style={{ wordSpacing: "0.5rem" }}
               >
                 {showBasmala && (
                   <span className="block">
@@ -352,7 +375,8 @@ export function ReaderPanel() {
                 )}
                 {verses.map((verse) => (
                   <span key={verse.verse_key}>
-                    {verse.text.split(" ").map((word, i) => {
+                    {verse.text.split(" ").map((word, i, arr) => {
+                      const isLastWord = i === arr.length - 1;
                       const wordIdx = i + 1;
                       const isAudioActive =
                         currentWordIndex === wordIdx &&
@@ -369,6 +393,9 @@ export function ReaderPanel() {
                           key={i}
                           role="button"
                           tabIndex={0}
+                          style={{
+                            animationDelay: `${i * 40}ms`,
+                          }}
                           onKeyDown={(e) => {
                             if (e.key === "Enter" || e.key === " ") {
                               e.preventDefault();
@@ -381,13 +408,13 @@ export function ReaderPanel() {
                             }
                           }}
                           className={cn(
-                            "inline-block cursor-pointer rounded-full border-2 border-transparent px-2.5 py-1 mx-0.5 transition-colors duration-200",
-                            "hover:bg-emerald-500/15 hover:text-emerald-700 hover:border-emerald-500 dark:hover:bg-emerald-500/25 dark:hover:text-emerald-300 dark:hover:border-emerald-400",
+                            "verse-word inline-block cursor-pointer rounded-md px-1.5 py-0.5 mx-0.5 transition-all duration-200",
+                            "hover:bg-slate-400/18",
                             isAudioActive &&
-                              "bg-emerald-500/15 text-emerald-700 border-emerald-500 dark:bg-emerald-500/25 dark:text-emerald-300 dark:border-emerald-400",
+                              "bg-blue-500/14 text-blue-500 outline outline-2 outline-blue-500/70 scale-[1.04]",
                             !isAudioActive &&
                               isLessonWord &&
-                              "border-primary bg-primary/10 text-primary",
+                              "bg-primary/10 text-primary",
                           )}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -399,7 +426,13 @@ export function ReaderPanel() {
                             );
                           }}
                         >
-                          {word}{" "}
+                          {word}
+                          {isLastWord && (
+                            <span className="mx-1 inline-flex h-10 w-10 items-center justify-center rounded-full border border-primary/50 bg-primary/10 align-middle font-uthmani text-sm font-semibold text-primary">
+                              {toArabicIndic(verse.ayah)}
+                            </span>
+                          )}
+                          {" "}
                         </span>
                       );
                     })}
@@ -555,12 +588,37 @@ export function ReaderPanel() {
               </Button>
             </div>
           </div>
-          <p className="text-center text-xs text-muted-foreground">
+          <p className="text-start text-xs text-muted-foreground">
             {language === "ar"
               ? "القارئ: محمود خليل الحصري (المعلّم)"
               : "Reciter: Mahmoud Khalil Al-Husary (Teacher)"}
           </p>
         </div>
+      )}
+
+      {/* Floating play/pause bubble — fixed bottom-right for quick control */}
+      {verses.length > 0 && (
+        <Button
+          size="icon"
+          className={cn(
+            "fixed bottom-6 end-6 z-40 h-14 w-14 rounded-full shadow-play cursor-pointer",
+            isPlaying
+              ? "bg-emerald-500 hover:bg-emerald-600"
+              : "bg-primary hover:bg-primary/90",
+          )}
+          onClick={isPlaying ? stop : handlePlay}
+          title={
+            language === "ar"
+              ? isPlaying ? "إيقاف" : "تشغيل"
+              : isPlaying ? "Pause" : "Play"
+          }
+        >
+          {isPlaying ? (
+            <Pause className="h-6 w-6 text-white" />
+          ) : (
+            <Play className="h-6 w-6 text-white" />
+          )}
+        </Button>
       )}
     </div>
   );

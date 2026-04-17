@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BookOpen, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -80,6 +80,7 @@ function AlphabetGrid() {
   const [letters, setLetters] = useState<LetterEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [playingId, setPlayingId] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("/data/lessons/lesson01_arabic_alphabet.json")
@@ -91,13 +92,36 @@ function AlphabetGrid() {
       .catch(() => setIsLoading(false));
   }, []);
 
+  // Auto-play the Lesson 1 Letters instruction on each visit to the tab.
+  // Letters are locked until the intro finishes (or errors).
+  const instructionAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [introDone, setIntroDone] = useState(false);
+  useEffect(() => {
+    setIntroDone(false);
+    const audio = new Audio("/audio/lesson1_letters_instruction_en.mp3");
+    instructionAudioRef.current = audio;
+    audio.addEventListener("ended", () => setIntroDone(true));
+    audio.addEventListener("error", () => setIntroDone(true));
+    audio.play().catch(() => setIntroDone(true));
+    return () => {
+      // Stop ONLY our instruction audio on unmount (tab switch)
+      if (instructionAudioRef.current) {
+        instructionAudioRef.current.pause();
+        instructionAudioRef.current.src = "";
+        instructionAudioRef.current = null;
+      }
+    };
+  }, []);
+
   // Reset playing indicator when audio stops
   useEffect(() => {
     if (!isPlaying) setPlayingId(null);
   }, [isPlaying]);
 
   const handleLetterClick = (letter: LetterEntry) => {
+    if (!introDone) return;
     stop();
+    setSelectedId(letter.id);
     setPlayingId(letter.id);
     const audioPath = `/${letter.audio}`;
     playLetterAudio(audioPath);
@@ -146,45 +170,50 @@ function AlphabetGrid() {
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
-      {/* Title */}
-      <h3 className="text-sm font-semibold text-primary">
-        {language === "ar" ? "الحروف الهجائية" : "Arabic Alphabet"}
-      </h3>
+      {/* Title + intro notice */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-primary">
+          {language === "ar" ? "الحروف الهجائية" : "Arabic Alphabet"}
+        </h3>
+        {!introDone && (
+          <span className="text-xs text-muted-foreground">
+            {language === "ar"
+              ? "انتظر حتى تنتهي التعليمات…"
+              : "Please wait until the instructions finish…"}
+          </span>
+        )}
+      </div>
 
-      {/* Letters grid — same layout as Surahs */}
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Letters grid — 28 letters shown as 4 rows of 7 (glyph-centric) */}
+      <div
+        className={cn(
+          "grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7",
+          !introDone && "pointer-events-none opacity-60",
+        )}
+        dir="rtl"
+      >
         {letters.map((letter) => (
-          <div
+          <button
             key={letter.id}
-            role="button"
-            tabIndex={0}
+            disabled={!introDone}
             className={cn(
-              "grid cursor-pointer grid-cols-[auto_1fr_auto] items-center gap-3 rounded-[1.125rem] border border-border bg-card px-3 py-3 transition-all hover:-translate-y-px hover:border-primary/30 hover:bg-primary/5",
-              playingId === letter.id && "border-primary/50 bg-primary/10",
+              "flex aspect-square flex-col items-center justify-center gap-2 rounded-[1.35rem] border border-border bg-card px-2 py-3 cursor-pointer transition-all hover:-translate-y-[1px] hover:border-primary/40",
+              "dark:bg-gradient-to-b dark:from-[#0a1530] dark:to-[#061027]",
+              selectedId === letter.id &&
+                "border-primary shadow-[0_0_0_2px_rgba(15,118,110,0.2)]",
+              playingId === letter.id &&
+                "border-blue-500/80 shadow-[0_0_0_2px_rgba(37,99,235,0.18),0_0_20px_rgba(37,99,235,0.35)] scale-[1.02]",
             )}
             onClick={() => handleLetterClick(letter)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") handleLetterClick(letter);
-            }}
+            title={language === "ar" ? letter.name_ar : letter.name_en}
           >
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-border text-sm font-bold text-primary">
-              {letter.id}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">
-                {language === "ar" ? letter.name_ar : letter.name_en}
-              </p>
-              <p className="truncate text-xs text-muted-foreground">
-                {language === "ar" ? letter.name_en : letter.name_ar}
-              </p>
-            </div>
-            <span
-              className="font-uthmani shrink-0 text-2xl font-semibold"
-              dir="rtl"
-            >
+            <span className="font-uthmani text-5xl font-semibold leading-none text-foreground" dir="rtl">
               {letter.glyph}
             </span>
-          </div>
+            <span className="text-xs text-muted-foreground">
+              {language === "ar" ? letter.name_ar : letter.name_en}
+            </span>
+          </button>
         ))}
       </div>
     </div>

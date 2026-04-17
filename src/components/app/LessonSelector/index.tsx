@@ -12,7 +12,9 @@ import { useLanguage } from "@/providers";
 import { getAvailableLessons } from "@/lib/quran";
 import type { TabKey } from "@/components/app/PillTabNav";
 
-export function LessonSelector({ activeTab: _activeTab }: { activeTab?: TabKey } = {}) {
+export function LessonSelector({
+  activeTab: _activeTab,
+}: { activeTab?: TabKey } = {}) {
   void _activeTab;
   const { lessonId, setLesson } = useLessonContext();
   const { language } = useLanguage();
@@ -22,12 +24,16 @@ export function LessonSelector({ activeTab: _activeTab }: { activeTab?: TabKey }
 
   return (
     <Select value={lessonId} onValueChange={setLesson}>
-      <SelectTrigger className="h-8 w-auto max-w-48 rounded-full border-border px-3 text-xs">
+      <SelectTrigger className="h-8 w-auto max-w-64 rounded-full border-border px-3 text-xs cursor-pointer">
         <SelectValue />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent
+        position="popper"
+        sideOffset={4}
+        style={{ maxHeight: "20rem" }}
+      >
         {lessons.map((l) => (
-          <SelectItem key={l.id} value={l.id}>
+          <SelectItem key={l.id} value={l.id} className="cursor-pointer">
             {language === "ar" ? l.labelAr : l.labelEn}
           </SelectItem>
         ))}
