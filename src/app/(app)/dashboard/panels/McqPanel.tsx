@@ -408,7 +408,7 @@ export function McqPanel() {
           answeredCorrectly && attempts === 0 ? "text-emerald-500" : attempts > 0 ? "text-red-500" : "text-muted-foreground",
         )}>
           {answeredCorrectly && attempts === 0 && (language === "ar" ? "صحيح!" : "Correct!")}
-          {answeredCorrectly && attempts >= 1 && (language === "ar" ? "أُظهرت الإجابة الصحيحة. يمكنك المتابعة." : "The correct answer is shown. You may continue.")}
+          {answeredCorrectly && attempts >= 1 && (language === "ar" ? "أُظهرت الإجابة الصحيحة. يمكنك المتابعة أو عرض النتائج." : "The correct answer is shown. You can continue or view results.")}
         </p>
       </div>
     </div>

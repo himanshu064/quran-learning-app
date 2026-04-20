@@ -288,7 +288,7 @@ export function WritingPanel() {
     const typedNorm = normalizeArabic(typedWord);
     const targetNorm = normalizeArabic(currentItem.text);
     if (typedNorm === targetNorm) {
-      setFeedback({ text: language === "ar" ? "صحيح!" : "Correct!", type: "ok" });
+      setFeedback({ text: language === "ar" ? "أحسنت! الإجابة صحيحة." : "Excellent! Correct answer.", type: "ok" });
       playUrl(praiseAudioUrl()); fireConfetti();
       // Count correct on first-attempt win
       if (attempts === 0) setSessionCorrect((c) => c + 1);
@@ -296,7 +296,7 @@ export function WritingPanel() {
       setTimeout(advanceToNext, 1500);
     } else {
       const newAttempts = attempts + 1; setAttempts(newAttempts);
-      setFeedback({ text: language === "ar" ? "ليست مطابقة تمامًا، حاول مرة أخرى." : "Not quite right, try again.", type: "error" });
+      setFeedback({ text: language === "ar" ? "ليست مطابقة تمامًا، حاول مرة أخرى." : "Not exactly matching, try again.", type: "error" });
       if (newAttempts >= 3) {
         setRevealed(true); playUrl(revealAudioUrl());
         setSessionAttempted((a) => a + 1);
@@ -484,8 +484,7 @@ export function WritingPanel() {
               disabled={!hasListened || isPlaying || revealed}
               className={cn(
                 "flex items-center justify-center rounded-xl bg-emerald-500 font-uthmani text-white transition-all hover:bg-emerald-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40",
-                "min-w-[3.5rem] px-4 py-3",
-                isLetterMode ? "text-3xl" : "text-[2rem]",
+                "min-w-[3.5rem] px-[1.4rem] py-4 text-[2rem]",
               )}
               dir="rtl"
             >

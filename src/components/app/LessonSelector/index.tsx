@@ -22,10 +22,16 @@ export function LessonSelector({
   // selected lesson, not the other way around.
   const lessons = getAvailableLessons();
 
+  // Show only the short lesson number part (before em-dash) to match client
+  const shortLabel = (l: { labelAr: string; labelEn: string }) =>
+    (language === "ar" ? l.labelAr : l.labelEn).split("—")[0].trim();
+
+  const current = lessons.find((l) => l.id === lessonId);
+
   return (
     <Select value={lessonId} onValueChange={setLesson}>
       <SelectTrigger className="h-8 w-auto max-w-64 rounded-full border-border px-3 text-xs cursor-pointer">
-        <SelectValue />
+        <SelectValue>{current ? shortLabel(current) : ""}</SelectValue>
       </SelectTrigger>
       <SelectContent
         position="popper"
@@ -34,7 +40,7 @@ export function LessonSelector({
       >
         {lessons.map((l) => (
           <SelectItem key={l.id} value={l.id} className="cursor-pointer">
-            {language === "ar" ? l.labelAr : l.labelEn}
+            {shortLabel(l)}
           </SelectItem>
         ))}
       </SelectContent>

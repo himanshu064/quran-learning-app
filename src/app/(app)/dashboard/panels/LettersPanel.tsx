@@ -93,18 +93,12 @@ function AlphabetGrid() {
   }, []);
 
   // Auto-play the Lesson 1 Letters instruction on each visit to the tab.
-  // Letters are locked until the intro finishes (or errors).
   const instructionAudioRef = useRef<HTMLAudioElement | null>(null);
-  const [introDone, setIntroDone] = useState(false);
   useEffect(() => {
-    setIntroDone(false);
     const audio = new Audio("/audio/lesson1_letters_instruction_en.mp3");
     instructionAudioRef.current = audio;
-    audio.addEventListener("ended", () => setIntroDone(true));
-    audio.addEventListener("error", () => setIntroDone(true));
-    audio.play().catch(() => setIntroDone(true));
+    audio.play().catch(() => {});
     return () => {
-      // Stop ONLY our instruction audio on unmount (tab switch)
       if (instructionAudioRef.current) {
         instructionAudioRef.current.pause();
         instructionAudioRef.current.src = "";
@@ -119,7 +113,6 @@ function AlphabetGrid() {
   }, [isPlaying]);
 
   const handleLetterClick = (letter: LetterEntry) => {
-    if (!introDone) return;
     stop();
     setSelectedId(letter.id);
     setPlayingId(letter.id);
@@ -170,32 +163,18 @@ function AlphabetGrid() {
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
-      {/* Title + intro notice */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-primary">
-          {language === "ar" ? "الحروف الهجائية" : "Arabic Alphabet"}
-        </h3>
-        {!introDone && (
-          <span className="text-xs text-muted-foreground">
-            {language === "ar"
-              ? "انتظر حتى تنتهي التعليمات…"
-              : "Please wait until the instructions finish…"}
-          </span>
-        )}
-      </div>
+      <h3 className="text-sm font-semibold text-primary">
+        {language === "ar" ? "الحروف الهجائية" : "Arabic Alphabet"}
+      </h3>
 
       {/* Letters grid — 28 letters shown as 4 rows of 7 (glyph-centric) */}
       <div
-        className={cn(
-          "grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7",
-          !introDone && "pointer-events-none opacity-60",
-        )}
+        className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7"
         dir="rtl"
       >
         {letters.map((letter) => (
           <button
             key={letter.id}
-            disabled={!introDone}
             className={cn(
               "flex aspect-square flex-col items-center justify-center gap-2 rounded-[1.35rem] border border-border bg-card px-2 py-3 cursor-pointer transition-all hover:-translate-y-[1px] hover:border-primary/40",
               "dark:bg-gradient-to-b dark:from-[#0a1530] dark:to-[#061027]",

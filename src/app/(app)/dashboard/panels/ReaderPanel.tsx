@@ -22,15 +22,6 @@ type QuranVerse = {
   text: string;
 };
 
-// Convert a number to Arabic-Indic digits (٠١٢٣٤٥٦٧٨٩)
-function toArabicIndic(n: number): string {
-  const map = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
-  return String(n)
-    .split("")
-    .map((d) => map[parseInt(d, 10)] ?? d)
-    .join("");
-}
-
 type SurahMeta = {
   id: number;
   name_arabic: string;
@@ -366,7 +357,6 @@ export function ReaderPanel() {
             ) : (
               <p
                 className="font-uthmani text-[2.2rem] sm:text-[2.6rem] md:text-[3rem] leading-[2.35] text-center"
-                style={{ wordSpacing: "0.5rem" }}
               >
                 {showBasmala && (
                   <span className="block">
@@ -375,8 +365,7 @@ export function ReaderPanel() {
                 )}
                 {verses.map((verse) => (
                   <span key={verse.verse_key}>
-                    {verse.text.split(" ").map((word, i, arr) => {
-                      const isLastWord = i === arr.length - 1;
+                    {verse.text.split(" ").map((word, i) => {
                       const wordIdx = i + 1;
                       const isAudioActive =
                         currentWordIndex === wordIdx &&
@@ -395,6 +384,8 @@ export function ReaderPanel() {
                           tabIndex={0}
                           style={{
                             animationDelay: `${i * 40}ms`,
+                            padding: "0.1875rem 0.625rem",
+                            margin: "0.25rem 0.1875rem",
                           }}
                           onKeyDown={(e) => {
                             if (e.key === "Enter" || e.key === " ") {
@@ -408,7 +399,7 @@ export function ReaderPanel() {
                             }
                           }}
                           className={cn(
-                            "verse-word inline-block cursor-pointer rounded-md px-1.5 py-0.5 mx-0.5 transition-all duration-200",
+                            "verse-word inline-block cursor-pointer rounded-full transition-all duration-200",
                             "hover:bg-slate-400/18",
                             isAudioActive &&
                               "bg-blue-500/14 text-blue-500 outline outline-2 outline-blue-500/70 scale-[1.04]",
@@ -427,11 +418,6 @@ export function ReaderPanel() {
                           }}
                         >
                           {word}
-                          {isLastWord && (
-                            <span className="mx-1 inline-flex h-10 w-10 items-center justify-center rounded-full border border-primary/50 bg-primary/10 align-middle font-uthmani text-sm font-semibold text-primary">
-                              {toArabicIndic(verse.ayah)}
-                            </span>
-                          )}
                           {" "}
                         </span>
                       );
@@ -601,10 +587,10 @@ export function ReaderPanel() {
         <Button
           size="icon"
           className={cn(
-            "fixed bottom-6 end-6 z-40 h-14 w-14 rounded-full shadow-play cursor-pointer",
+            "fixed bottom-6 end-6 z-40 h-12 w-12 rounded-full shadow-play cursor-pointer",
             isPlaying
               ? "bg-emerald-500 hover:bg-emerald-600"
-              : "bg-primary hover:bg-primary/90",
+              : "bg-[rgba(15,23,42,0.96)] hover:bg-[rgba(15,23,42,0.96)]/90",
           )}
           onClick={isPlaying ? stop : handlePlay}
           title={
@@ -614,9 +600,9 @@ export function ReaderPanel() {
           }
         >
           {isPlaying ? (
-            <Pause className="h-6 w-6 text-white" />
+            <Pause className="h-5 w-5 text-white" />
           ) : (
-            <Play className="h-6 w-6 text-white" />
+            <Play className="h-5 w-5 text-white" />
           )}
         </Button>
       )}

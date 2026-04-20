@@ -7,7 +7,6 @@ import {
   Pause,
   SkipBack,
   SkipForward,
-  Dice5,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -18,19 +17,9 @@ import { LetterFormsDisplay } from "@/components/lesson";
 import { useLanguage, useLessonContext, useAudioContext } from "@/providers";
 import { useProgress } from "@/hooks";
 import { useSelectedWord } from "../selected-word-context";
-import { MoonSunGame } from "./MoonSunGame";
 import type { LetterSlide, LetterFormSlide, WordSlide } from "@/types";
 
-const MOON_SUN_LESSONS = new Set(["lesson27", "lesson28", "lesson29", "lesson30"]);
-
 export function TeachingPanel() {
-  const { lessonId: lid } = useLessonContext();
-
-  // Moon/Sun letter lessons (27-30) — interactive game per client's exception
-  if (MOON_SUN_LESSONS.has(lid)) {
-    return <MoonSunGame />;
-  }
-
   return <TeachingPanelInner />;
 }
 
@@ -264,8 +253,7 @@ function TeachingPanelInner() {
             className="gap-1.5 rounded-full cursor-pointer"
             onClick={() => { clearSelectedWord(); shuffle(); }}
           >
-            <Dice5 className="h-4 w-4" />
-            {language === "ar" ? "عشوائي" : "Random"}
+            {language === "ar" ? "🔀 عشوائي" : "🔀 Random"}
           </Button>
         </div>
       </div>
@@ -314,7 +302,7 @@ function TeachingNav({
         className="h-8 w-8 rounded-full cursor-pointer"
         onClick={shuffle}
       >
-        <Dice5 className="h-4 w-4" />
+        <span aria-hidden>🔀</span>
       </Button>
     </div>
   );
@@ -349,24 +337,17 @@ function LetterCard({
   next: () => void;
   shuffle: () => void;
 }) {
-  const [introDone, setIntroDone] = useState(false);
-
   const playLetterSound = useCallback(() => {
-    if (!introDone) return;
     stop();
     if (letterSlide.audio) playLetterAudio(`/${letterSlide.audio}`);
-  }, [letterSlide.audio, playLetterAudio, stop, introDone]);
+  }, [letterSlide.audio, playLetterAudio, stop]);
 
   // Auto-play the introductory instruction audio when landing on the Letter tab.
-  // Letter buttons are locked until the intro completes.
   const introAudioRef = useRef<HTMLAudioElement | null>(null);
   useEffect(() => {
-    setIntroDone(false);
     const audio = new Audio("/audio/lesson1_letters_instruction_en.mp3");
     introAudioRef.current = audio;
-    audio.addEventListener("ended", () => setIntroDone(true));
-    audio.addEventListener("error", () => setIntroDone(true));
-    audio.play().catch(() => setIntroDone(true));
+    audio.play().catch(() => {});
     return () => {
       if (introAudioRef.current) {
         introAudioRef.current.pause();
@@ -392,15 +373,6 @@ function LetterCard({
         </Badge>
       </div>
 
-      {/* Intro audio notice */}
-      {!introDone && (
-        <p className="text-center text-xs text-muted-foreground">
-          {language === "ar"
-            ? "انتظر حتى تنتهي التعليمات…"
-            : "Please wait until the instructions finish…"}
-        </p>
-      )}
-
       {/* Main focused card */}
       <div className="flex flex-col items-center rounded-[1.125rem] border border-border bg-card p-6 sm:p-8">
         {/* Name pill: "ألف · alif" */}
@@ -413,8 +385,7 @@ function LetterCard({
         {/* Large glyph */}
         <div
           className={cn(
-            "font-uthmani text-[10rem] sm:text-[14rem] md:text-[16rem] leading-none transition-all duration-300",
-            introDone ? "cursor-pointer" : "cursor-not-allowed opacity-60",
+            "font-uthmani text-[10rem] sm:text-[14rem] md:text-[16rem] leading-none transition-all duration-300 cursor-pointer",
             isPlaying &&
               "text-emerald-400 drop-shadow-[0_0_16px_rgba(16,185,129,0.4)]",
           )}
@@ -428,9 +399,8 @@ function LetterCard({
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <Button
             size="icon"
-            disabled={!introDone}
             className={cn(
-              "h-12 w-12 rounded-full bg-primary shadow-play cursor-pointer disabled:cursor-not-allowed disabled:opacity-50",
+              "h-12 w-12 rounded-full bg-primary shadow-play cursor-pointer",
               isPlaying && "bg-emerald-500 hover:bg-emerald-600",
             )}
             onClick={isPlaying ? stop : playLetterSound}
@@ -438,15 +408,14 @@ function LetterCard({
           >
             {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
           </Button>
-          <Button variant="outline" disabled={!introDone} className="gap-1.5 rounded-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" onClick={prev}>
+          <Button variant="outline" className="gap-1.5 rounded-full cursor-pointer" onClick={prev}>
             {language === "ar" ? "الحرف السابق" : "Previous letter"}
           </Button>
-          <Button variant="outline" disabled={!introDone} className="gap-1.5 rounded-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" onClick={next}>
+          <Button variant="outline" className="gap-1.5 rounded-full cursor-pointer" onClick={next}>
             {language === "ar" ? "الحرف التالي" : "Next letter"}
           </Button>
-          <Button variant="outline" disabled={!introDone} className="gap-1.5 rounded-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-50" onClick={shuffle}>
-            <Dice5 className="h-4 w-4" />
-            {language === "ar" ? "عشوائي" : "Random"}
+          <Button variant="outline" className="gap-1.5 rounded-full cursor-pointer" onClick={shuffle}>
+            {language === "ar" ? "🔀 عشوائي" : "🔀 Random"}
           </Button>
         </div>
       </div>
