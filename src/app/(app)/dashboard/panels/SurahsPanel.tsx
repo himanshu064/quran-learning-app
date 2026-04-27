@@ -55,7 +55,7 @@ export function SurahsPanel({
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-3">
+    <div className="flex w-full flex-1 flex-col gap-3">
       {/* Chips row */}
       <div className="flex flex-wrap gap-2">
         {lastSurahMeta && (
@@ -149,7 +149,7 @@ export function SurahsPanel({
           );
         }
         return (
-          <div className="surah-scroll grid max-h-[60vh] grid-cols-1 gap-2 overflow-y-auto pe-1 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((surah) => (
               <div
                 key={surah.id}

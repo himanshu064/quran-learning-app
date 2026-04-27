@@ -37,7 +37,7 @@ export function AppShell({
               <main
                 className={
                   isDashboard
-                    ? "flex min-h-0 overflow-hidden bg-background p-3 md:p-5 lg:p-6"
+                    ? "flex min-h-0 flex-1 overflow-hidden bg-background w-full"
                     : "flex min-h-0 flex-col overflow-auto p-4 md:p-6 lg:p-8"
                 }
               >

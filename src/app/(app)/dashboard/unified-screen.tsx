@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo } from "react";
 import { useQueryState, parseAsInteger } from "nuqs";
+import { cn } from "@/lib/utils";
 import { UnifiedTopbar } from "@/components/app/UnifiedTopbar";
 import type { TabKey } from "@/components/app/PillTabNav";
 import { SelectedWordProvider } from "./selected-word-context";
@@ -74,26 +75,43 @@ export function UnifiedScreen() {
     }
   }, [disabledTabs, activeTab, lessonId, setTab]);
 
+  const isHome = activeTab === "home";
+
   return (
     <SelectedWordProvider>
-      {/* Main app card — matches client's single-card shell */}
-      <div className="mx-auto flex h-full min-h-0 w-full max-w-[64rem] flex-1 flex-col overflow-hidden rounded-[1.125rem] border border-border bg-card">
-        <UnifiedTopbar
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          disabledTabs={disabledTabs}
-          lessonId={lessonId}
-        />
-
-        <div className="min-h-0 flex-1 overflow-auto p-4 pb-24 sm:pb-4">
-          {activeTab === "home" && <SurahsPanel onNavigate={handleNavigate} />}
-          {activeTab === "reader" && <ReaderPanel />}
-          {activeTab === "teaching" && <TeachingPanel />}
-          {activeTab === "letters" && <LettersPanel />}
-          {activeTab === "mcq" && <McqPanel />}
-          {activeTab === "writing" && <WritingPanel />}
+      {isHome ? (
+        /* Surahs — full page width, no padding, no card */
+        <div className="flex h-full min-h-0 w-full flex-1 flex-col">
+          <UnifiedTopbar
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            disabledTabs={disabledTabs}
+            lessonId={lessonId}
+          />
+          <div className="min-h-0 flex-1 overflow-auto p-4 pb-24 sm:pb-4">
+            <SurahsPanel onNavigate={handleNavigate} />
+          </div>
         </div>
-      </div>
+      ) : (
+        /* All other tabs — padded card container */
+        <div className="flex h-full min-h-0 w-full flex-1 flex-col p-3 md:p-5 lg:p-6">
+          <div className="mx-auto flex h-full min-h-0 w-full max-w-[64rem] flex-1 flex-col overflow-hidden rounded-[1.125rem] border border-border bg-card">
+            <UnifiedTopbar
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+              disabledTabs={disabledTabs}
+              lessonId={lessonId}
+            />
+            <div className="min-h-0 flex-1 overflow-auto p-4 pb-24 sm:pb-4">
+              {activeTab === "reader" && <ReaderPanel />}
+              {activeTab === "teaching" && <TeachingPanel />}
+              {activeTab === "letters" && <LettersPanel />}
+              {activeTab === "mcq" && <McqPanel />}
+              {activeTab === "writing" && <WritingPanel />}
+            </div>
+          </div>
+        </div>
+      )}
     </SelectedWordProvider>
   );
 }
