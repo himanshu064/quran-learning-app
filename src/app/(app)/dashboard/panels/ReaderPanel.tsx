@@ -2,11 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { Play, Pause, SkipBack, SkipForward, BookOpen } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage, useAudioContext, useLessonContext } from "@/providers";
 import { useProgress } from "@/hooks";
@@ -46,6 +44,7 @@ export function ReaderPanel() {
   } = useAudioContext();
   const { savePosition } = useProgress();
   const {
+    lessonId,
     currentSlide,
     slides,
     slideIndex,
@@ -56,8 +55,18 @@ export function ReaderPanel() {
   } = useLessonContext();
   const { selectedWord, setSelectedWord } = useSelectedWord();
 
-  // Lesson overlay state
+  // Flashcard overlay: show word card by default when a lesson slide is active,
+  // hide it (show full verse) after the user taps the card — matches reference behaviour.
   const [showOverlay, setShowOverlay] = useState(false);
+
+  // Floating bubble is only shown after user has triggered playback at least once.
+  const [hasPlayedOnce, setHasPlayedOnce] = useState(false);
+
+  // Local string states for the three inputs — allows the user to clear and retype freely.
+  // Synced FROM URL state when lesson navigation changes surah/ayah externally.
+  const [surahInput, setSurahInput] = useState(String(1));
+  const [ayahFromInput, setAyahFromInput] = useState(String(1));
+  const [ayahToInput, setAyahToInput] = useState("");
 
   // URL-bound state
   const [surah, setSurah] = useQueryState(
@@ -103,19 +112,37 @@ export function ReaderPanel() {
     currentSlide?.type === "letter" ? (currentSlide as LetterSlide) : null;
   const activeSlide = wordSlide ?? letterSlide;
 
-  // Auto-navigate to the verse only when lesson nav buttons change the slide
+  // Auto-navigate to the verse when the lesson changes or the slide index changes.
+  // Two separate refs so we can detect each trigger independently.
+  // We intentionally defer updating refs until wordSlide is available so the
+  // effect re-fires when the async slides finish loading after a lesson switch.
+  const prevLessonIdRef = useRef(lessonId);
   const prevSlideIndexRef = useRef(slideIndex);
   useEffect(() => {
-    if (prevSlideIndexRef.current === slideIndex) return;
+    const lessonChanged = prevLessonIdRef.current !== lessonId;
+    const slideChanged = prevSlideIndexRef.current !== slideIndex;
+    if (!lessonChanged && !slideChanged) return;
+    if (!wordSlide) return; // slides still loading — keep refs stale so effect re-runs on load
+    prevLessonIdRef.current = lessonId;
     prevSlideIndexRef.current = slideIndex;
-    if (!wordSlide) return;
     if (wordSlide.surah !== surah || wordSlide.ayah !== ayahFrom) {
       setSurah(wordSlide.surah);
       setAyahFrom(wordSlide.ayah);
       setAyahTo(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slideIndex]);
+  }, [lessonId, slideIndex, slides]);
+
+  // Reset to flashcard view on every slide/lesson change — reference shows word card first
+  useEffect(() => {
+    if (activeSlide) setShowOverlay(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSlide]);
+
+  // Keep local input strings in sync when URL state changes externally (lesson nav)
+  useEffect(() => { setSurahInput(String(surah)); }, [surah]);
+  useEffect(() => { setAyahFromInput(String(ayahFrom)); }, [ayahFrom]);
+  useEffect(() => { setAyahToInput(ayahTo > 0 ? String(ayahTo) : ""); }, [ayahTo]);
 
   const verses = useMemo(() => {
     if (!quranText || !surah || !ayahFrom) return [];
@@ -209,6 +236,7 @@ export function ReaderPanel() {
 
   const handlePlay = useCallback(() => {
     if (verseSpecs.length === 0) return;
+    setHasPlayedOnce(true);
     if (mode === "verse") {
       playVerseSequence(verseSpecs);
     } else {
@@ -247,46 +275,77 @@ export function ReaderPanel() {
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-2.5">
-      {/* Location card */}
-      <div className="rounded-[1.125rem] border border-border bg-card px-3 py-2.5">
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <label className="text-muted-foreground">
-            {language === "ar" ? "سورة" : "Surah"}
-          </label>
-          <Input
-            type="number"
-            min={1}
-            max={114}
-            value={surah}
-            onChange={(e) => setSurah(Number(e.target.value) || 1)}
-            className="w-16 rounded-lg text-sm"
-            dir="ltr"
-          />
-          <span className="text-muted-foreground/70">|</span>
-          <label className="text-muted-foreground">
-            {language === "ar" ? "آية" : "Ayah"}
-          </label>
-          <Input
-            type="number"
-            min={1}
-            max={maxAyah}
-            value={ayahFrom}
-            onChange={(e) => setAyahFrom(Number(e.target.value) || 1)}
-            className="w-16 rounded-lg text-sm"
-            dir="ltr"
-          />
-          <span className="text-muted-foreground/70">–</span>
-          <Input
-            type="number"
-            min={0}
-            max={maxAyah}
-            value={ayahTo || ""}
-            onChange={(e) => setAyahTo(Number(e.target.value) || 0)}
-            className="w-16 rounded-lg text-sm"
-            dir="ltr"
-            placeholder="—"
-          />
-        </div>
+      {/* Surah / Ayah selector */}
+      <div
+        className="flex items-center gap-3 rounded-[1.125rem] border border-border bg-card px-4 py-2.5"
+        dir="ltr"
+      >
+        <span className="text-sm text-muted-foreground">
+          {language === "ar" ? "سورة" : "Surah"}
+        </span>
+        <input
+          type="number"
+          min={1}
+          max={114}
+          value={surahInput}
+          onChange={(e) => {
+            setSurahInput(e.target.value);
+            const v = parseInt(e.target.value, 10);
+            if (!isNaN(v) && v >= 1 && v <= 114) {
+              setSurah(v);
+              setAyahFrom(1);
+              setAyahTo(0);
+            }
+          }}
+          onBlur={() => {
+            const v = parseInt(surahInput, 10);
+            if (isNaN(v) || v < 1 || v > 114) setSurahInput(String(surah));
+          }}
+          className="w-16 rounded-lg border border-border bg-transparent px-2 py-1 text-center text-sm outline-none focus:border-primary"
+        />
+        <span className="text-sm text-muted-foreground">|</span>
+        <span className="text-sm text-muted-foreground">
+          {language === "ar" ? "آية" : "Ayah"}
+        </span>
+        <input
+          type="number"
+          min={1}
+          max={maxAyah}
+          value={ayahFromInput}
+          onChange={(e) => {
+            setAyahFromInput(e.target.value);
+            const v = parseInt(e.target.value, 10);
+            if (!isNaN(v) && v >= 1 && v <= maxAyah) setAyahFrom(v);
+          }}
+          onBlur={() => {
+            const v = parseInt(ayahFromInput, 10);
+            if (isNaN(v) || v < 1 || v > maxAyah) setAyahFromInput(String(ayahFrom));
+          }}
+          className="w-16 rounded-lg border border-border bg-transparent px-2 py-1 text-center text-sm outline-none focus:border-primary"
+        />
+        <span className="text-sm text-muted-foreground">–</span>
+        <input
+          type="number"
+          min={ayahFrom}
+          max={maxAyah}
+          value={ayahToInput}
+          placeholder={String(ayahFrom)}
+          onChange={(e) => {
+            setAyahToInput(e.target.value);
+            if (e.target.value === "") { setAyahTo(0); return; }
+            const v = parseInt(e.target.value, 10);
+            if (!isNaN(v) && v >= ayahFrom && v <= maxAyah) setAyahTo(v);
+          }}
+          onBlur={() => {
+            if (ayahToInput === "") return;
+            const v = parseInt(ayahToInput, 10);
+            if (isNaN(v) || v < ayahFrom || v > maxAyah) {
+              setAyahToInput("");
+              setAyahTo(0);
+            }
+          }}
+          className="w-16 rounded-lg border border-border bg-transparent px-2 py-1 text-center text-sm outline-none focus:border-primary"
+        />
       </div>
 
       {/* Surah header ornament */}
@@ -330,8 +389,9 @@ export function ReaderPanel() {
       ) : (
         <div
           className={cn(
-            "relative flex min-h-48 cursor-default items-center justify-center overflow-hidden rounded-[1.125rem] border border-border bg-card p-6",
+            "relative flex min-h-48 items-center justify-center overflow-hidden rounded-[1.125rem] border border-border bg-card p-6",
             "dark:bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.18),rgba(15,23,42,0.98)_45%)]",
+            activeSlide ? "cursor-pointer" : "cursor-default",
           )}
           onClick={() => {
             if (activeSlide) setShowOverlay((p) => !p);
@@ -495,7 +555,7 @@ export function ReaderPanel() {
       {activeSlide && (
         <div className="flex items-center justify-between rounded-[1.125rem] border border-border bg-card px-4 py-3">
           <div className="flex items-center gap-1.5 text-sm">
-            <BookOpen className="h-4 w-4 text-primary" />
+            📘{" "}
             {letterSlide
               ? language === "ar"
                 ? "حرف من الأبجدية"
@@ -520,6 +580,24 @@ export function ReaderPanel() {
             <span>
               {language === "ar" ? "التقدم:" : "Progress:"} {slideIndex + 1} /{" "}
               {totalSlides}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Pulsing status chip during playback — matches reference pulse-dot chip */}
+      {isPlaying && (
+        <div className="flex items-center justify-center">
+          <div className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5">
+            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
+            <span className="text-xs text-muted-foreground">
+              {mode === "wbw" && currentWordIndex !== null
+                ? language === "ar"
+                  ? `الكلمة ${currentWordIndex} / ${verses[0]?.text.split(" ").length ?? 0}`
+                  : `Word ${currentWordIndex} / ${verses[0]?.text.split(" ").length ?? 0}`
+                : language === "ar"
+                  ? "جاري التشغيل..."
+                  : "Playing..."}
             </span>
           </div>
         </div>
@@ -574,7 +652,7 @@ export function ReaderPanel() {
               </Button>
             </div>
           </div>
-          <p className="text-start text-xs text-muted-foreground">
+          <p className="text-left text-xs text-muted-foreground">
             {language === "ar"
               ? "القارئ: محمود خليل الحصري (المعلّم)"
               : "Reciter: Mahmoud Khalil Al-Husary (Teacher)"}
@@ -582,8 +660,8 @@ export function ReaderPanel() {
         </div>
       )}
 
-      {/* Floating play/pause bubble — fixed bottom-right for quick control */}
-      {verses.length > 0 && (
+      {/* Floating play/pause bubble — only after first play, matches reference currentMode !== null */}
+      {verses.length > 0 && hasPlayedOnce && (
         <Button
           size="icon"
           className={cn(

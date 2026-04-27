@@ -32,12 +32,12 @@ export function UnifiedTopbar({
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 px-3 backdrop-blur",
+        "sticky top-0 z-30 flex min-h-14 shrink-0 flex-wrap items-center gap-2 border-b bg-background/95 px-3 py-2 backdrop-blur",
         "dark:bg-[linear-gradient(120deg,rgba(15,23,42,0.98),rgba(15,23,42,0.9))]",
       )}
     >
       {/* Left: sidebar trigger + surah/verse toggle + title */}
-      <div className="flex min-w-0 items-center gap-1">
+      <div className="flex min-w-[15rem] flex-1 items-center gap-1">
         <Button
           variant="ghost"
           size="icon"
@@ -48,13 +48,13 @@ export function UnifiedTopbar({
         >
           <PanelLeft className="h-4 w-4" />
         </Button>
-        <span className="whitespace-nowrap text-sm font-semibold tracking-wide">
+        <span className="text-sm font-semibold leading-tight tracking-wide">
           {language === "ar" ? "صراط المستقيم في تعليم القرآن بالقرآن" : "Straight Path in Teaching Quran by Quran"}
         </span>
       </div>
 
       {/* Right: tabs + controls */}
-      <div className="ms-auto flex shrink-0 items-center gap-2">
+      <div className="ms-auto flex shrink-0 flex-wrap items-center justify-end gap-2">
         <PillTabNav activeTab={activeTab} onTabChange={onTabChange} disabledTabs={disabledTabs} lessonId={lessonId} />
         <LanguageToggle />
         <LessonSelector activeTab={activeTab} />

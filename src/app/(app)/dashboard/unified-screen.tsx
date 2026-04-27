@@ -15,24 +15,19 @@ import {
   WritingPanel,
 } from "./panels";
 
-// Per-lesson tab disable rules — matches client's isLettersTabAllowed and
-// isHomeReaderAllowed from Omar App Final.
-// L1: Home/Reader disabled. Word, Letters, MCQ, Writing all active.
-// L2: All tabs active (Letters tab available, Home/Reader also available).
-// L3+: Letters tab disabled; all other tabs active.
+// Per-lesson tab disable rules from the client's PDF/meeting feedback.
+// L1/L2: Surahs, Verse, and Word disabled; Letters, Listening, Writing active.
+// L3+: Letters disabled; Surahs, Verse, Word, Listening, Writing active.
 function getDisabledTabs(lessonId: string): TabKey[] {
-  if (lessonId === "lesson1") {
-    return ["home", "reader"];
-  }
-  if (lessonId === "lesson2") {
-    return [];
+  if (lessonId === "lesson1" || lessonId === "lesson2") {
+    return ["home", "reader", "teaching"];
   }
   return ["letters"];
 }
 
 // Default tab to redirect to when current tab becomes disabled
 function getDefaultTab(lessonId: string): TabKey {
-  if (lessonId === "lesson1") return "letters";
+  if (lessonId === "lesson1" || lessonId === "lesson2") return "letters";
   return "home";
 }
 
@@ -82,7 +77,7 @@ export function UnifiedScreen() {
   return (
     <SelectedWordProvider>
       {/* Main app card — matches client's single-card shell */}
-      <div className="mx-auto flex h-full min-h-0 w-full max-w-[53rem] flex-1 flex-col overflow-hidden rounded-[1.125rem] border border-border bg-card">
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-[64rem] flex-1 flex-col overflow-hidden rounded-[1.125rem] border border-border bg-card">
         <UnifiedTopbar
           activeTab={activeTab}
           onTabChange={handleTabChange}

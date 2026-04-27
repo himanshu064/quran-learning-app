@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import confetti from "canvas-confetti";
-import { Volume2, ArrowRight, BookOpen } from "lucide-react";
+import { Volume2, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useLanguage, useLessonContext, useAudioContext } from "@/providers";
@@ -373,8 +373,7 @@ export function McqPanel() {
             onClick={answeredCorrectly ? handleNext : undefined}
             disabled={!answeredCorrectly}
           >
-            <ArrowRight className="h-4 w-4" />
-            {language === "ar" ? "الكلمة التالية" : "Next word"}
+            ⬅ {language === "ar" ? "الكلمة التالية" : "Next word"}
           </Button>
         </div>
 
@@ -402,11 +401,15 @@ export function McqPanel() {
           })}
         </div>
 
-        {/* Feedback */}
+        {/* Feedback / status — matches reference mcqHeardFirstPlayback gate messages */}
         <p className={cn(
           "mt-4 min-h-5 text-center text-sm",
-          answeredCorrectly && attempts === 0 ? "text-emerald-500" : attempts > 0 ? "text-red-500" : "text-muted-foreground",
+          answeredCorrectly && attempts === 0 ? "text-emerald-500"
+            : attempts > 0 ? "text-red-500"
+            : "text-muted-foreground",
         )}>
+          {!hasListened && !answeredCorrectly && (language === "ar" ? "استمع إلى الكلمة أولًا." : "Listen to the word first.")}
+          {hasListened && !answeredCorrectly && (language === "ar" ? "يمكنك الآن اختيار الإجابة." : "You can answer now.")}
           {answeredCorrectly && attempts === 0 && (language === "ar" ? "صحيح!" : "Correct!")}
           {answeredCorrectly && attempts >= 1 && (language === "ar" ? "أُظهرت الإجابة الصحيحة. يمكنك المتابعة أو عرض النتائج." : "The correct answer is shown. You can continue or view results.")}
         </p>

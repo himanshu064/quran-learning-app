@@ -38,20 +38,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LessonSelector } from "@/components/app/LessonSelector";
-import { useLanguage } from "@/providers";
+import { useLanguage, useLessonContext } from "@/providers";
 
 const mainNav = [
   { key: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard },
 ];
 
 const learningNav = [
-  { key: "nav.surahs", href: "/dashboard?tab=home", icon: BookOpen },
-  { key: "nav.reader", href: "/dashboard?tab=reader", icon: BookText },
-  { key: "nav.teaching", href: "/dashboard?tab=teaching", icon: GraduationCap },
-  { key: "nav.letters", href: "/dashboard?tab=letters", icon: Languages },
-  { key: "nav.mcq", href: "/dashboard?tab=mcq", icon: ListChecks },
-  { key: "nav.writing", href: "/dashboard?tab=writing", icon: PenLine },
+  { key: "nav.surahs",   href: "/dashboard?tab=home",     icon: BookOpen,    tabKey: "home"     },
+  { key: "nav.reader",   href: "/dashboard?tab=reader",   icon: BookText,    tabKey: "reader"   },
+  { key: "nav.teaching", href: "/dashboard?tab=teaching", icon: GraduationCap, tabKey: "teaching" },
+  { key: "nav.letters",  href: "/dashboard?tab=letters",  icon: Languages,   tabKey: "letters"  },
+  { key: "nav.mcq",      href: "/dashboard?tab=mcq",      icon: ListChecks,  tabKey: "mcq"      },
+  { key: "nav.writing",  href: "/dashboard?tab=writing",  icon: PenLine,     tabKey: "writing"  },
 ];
+
+function getDisabledTabs(lessonId: string): string[] {
+  if (lessonId === "lesson1" || lessonId === "lesson2") return ["home", "reader", "teaching"];
+  return ["letters"];
+}
 
 function getInitials(name: string) {
   return name
@@ -77,6 +82,8 @@ export function UserSidebar({
   const { isMobile, state } = useSidebar();
   const isCollapsed = state === "collapsed";
   const { t, direction } = useLanguage();
+  const { lessonId } = useLessonContext();
+  const disabledTabs = getDisabledTabs(lessonId);
 
   const isActive = (href: string) => {
     if (href === "/dashboard") {
@@ -153,18 +160,30 @@ export function UserSidebar({
             <SidebarMenu>
               {learningNav.map((item) => {
                 const label = t(item.key);
+                const isItemDisabled = disabledTabs.includes(item.tabKey);
                 return (
                   <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive(item.href)}
-                      tooltip={label}
-                    >
-                      <Link href={item.href}>
+                    {isItemDisabled ? (
+                      <SidebarMenuButton
+                        tooltip={label}
+                        disabled
+                        className="opacity-30 cursor-not-allowed"
+                      >
                         <item.icon />
                         <span>{label}</span>
-                      </Link>
-                    </SidebarMenuButton>
+                      </SidebarMenuButton>
+                    ) : (
+                      <SidebarMenuButton
+                        asChild
+                        isActive={isActive(item.href)}
+                        tooltip={label}
+                      >
+                        <Link href={item.href}>
+                          <item.icon />
+                          <span>{label}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    )}
                   </SidebarMenuItem>
                 );
               })}

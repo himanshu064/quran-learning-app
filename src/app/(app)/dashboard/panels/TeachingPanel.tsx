@@ -199,9 +199,9 @@ function TeachingPanelInner() {
 
       {/* Main teaching card */}
       <div className="flex flex-col items-center rounded-[1.125rem] border border-border bg-card p-6 sm:p-8">
-        {/* Source tag */}
+        {/* Source tag — matches reference .teaching-tag font-size 1.5rem */}
         {activeWord && (
-          <Badge variant="outline" className="mb-4 text-xs">
+          <Badge variant="outline" className="mb-4 text-[1.5rem] leading-tight px-4 py-1.5">
             {language === "ar"
               ? `من سورة ${activeWord.surah} · آية ${activeWord.ayah}`
               : `From surah ${activeWord.surah} · Ayah ${activeWord.ayah}`}
@@ -382,10 +382,10 @@ function LetterCard({
           <span>{letterSlide.name_en}</span>
         </Badge>
 
-        {/* Large glyph */}
+        {/* Large glyph — matches reference .big-word 10rem */}
         <div
           className={cn(
-            "font-uthmani text-[10rem] sm:text-[14rem] md:text-[16rem] leading-none transition-all duration-300 cursor-pointer",
+            "font-uthmani text-[10rem] leading-none transition-all duration-300 cursor-pointer",
             isPlaying &&
               "text-emerald-400 drop-shadow-[0_0_16px_rgba(16,185,129,0.4)]",
           )}
