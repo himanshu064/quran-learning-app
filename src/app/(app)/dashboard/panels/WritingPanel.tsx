@@ -232,17 +232,42 @@ export function WritingPanel() {
 
   // On mount: play instruction once (per page load), then auto-play the first item.
   // On subsequent visits to this tab: skip instruction, auto-play immediately.
+  //
+  // The flag is set ONLY after play() resolves, so that React 18 StrictMode's
+  // double-invoke (mount → cleanup → mount) doesn't burn the single-shot before
+  // the audio can actually start. A `cancelled` flag ensures the aborted first
+  // attempt doesn't leak setState calls or mark the instruction as "played".
   useEffect(() => {
     if (writingInstructionHasPlayed) {
       setPendingAutoPlay(true);
       return;
     }
-    writingInstructionHasPlayed = true;
+
+    let cancelled = false;
     const audio = new Audio(writingInstructionUrl());
-    audio.onended = () => setPendingAutoPlay(true);
-    audio.play().catch(() => setPendingAutoPlay(true));
+
+    audio.addEventListener("ended", () => {
+      if (cancelled) return;
+      writingInstructionHasPlayed = true;
+      setPendingAutoPlay(true);
+    });
+
+    audio.play().then(
+      () => {
+        if (cancelled) {
+          audio.pause();
+          audio.src = "";
+        }
+      },
+      () => {
+        if (cancelled) return;
+        writingInstructionHasPlayed = true;
+        setPendingAutoPlay(true);
+      },
+    );
+
     return () => {
-      audio.onended = null;
+      cancelled = true;
       audio.pause();
       audio.src = "";
     };

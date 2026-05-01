@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo } from "react";
-import { useQueryState, parseAsInteger } from "nuqs";
+import { useQueryState, parseAsInteger, parseAsString } from "nuqs";
 import { UnifiedTopbar } from "@/components/app/UnifiedTopbar";
 import type { TabKey } from "@/components/app/PillTabNav";
 import { SelectedWordProvider } from "./selected-word-context";
@@ -25,21 +25,48 @@ function getDisabledTabs(lessonId: string): TabKey[] {
   return ["letters"];
 }
 
-// Default tab to redirect to when current tab becomes disabled
+// Tab walk order — same order they appear in the pill nav. Used to pick the
+// "first enabled" tab when the requested/current tab is disabled.
+const TAB_ORDER: TabKey[] = [
+  "reader",
+  "home",
+  "teaching",
+  "letters",
+  "mcq",
+  "writing",
+];
+
+// Reference defaults to the Verse (reader) tab on every fresh load
+// (Omar App Final/index.html:2226 marks data-nav="reader" with class="active").
+// We mirror that: prefer "reader"; if reader is disabled for the current
+// lesson, walk TAB_ORDER and pick the first enabled one.
 function getDefaultTab(lessonId: string): TabKey {
-  if (lessonId === "lesson1") return "reader";
-  return "home";
+  const disabled = getDisabledTabs(lessonId);
+  return TAB_ORDER.find((t) => !disabled.includes(t)) ?? "reader";
 }
 
 export function UnifiedScreen() {
-  const [tab, setTab] = useQueryState("tab", { defaultValue: "home" });
-  const [, setSurah] = useQueryState("surah", parseAsInteger.withDefault(1));
-  const [, setAyah] = useQueryState("ayah", parseAsInteger.withDefault(1));
-  const [, setAyahTo] = useQueryState("to", parseAsInteger.withDefault(0));
   const { stop } = useAudioContext();
   const { lessonId } = useLessonContext();
 
-  const activeTab = (tab as TabKey) || "home";
+  // Pre-compute the lesson-aware default so we can both:
+  //  (a) feed it into useQueryState as the parser default (used when the URL has no ?tab=)
+  //  (b) re-use it in the redirect effect below when the URL tab becomes disabled.
+  const lessonDefaultTab = useMemo(() => getDefaultTab(lessonId), [lessonId]);
+
+  // Verse (reader) tab is preferred on a fresh load with no ?tab= in the URL.
+  // Using parseAsString.withDefault — the canonical nuqs v2 syntax for string params.
+  const [tab, setTab] = useQueryState(
+    "tab",
+    parseAsString.withDefault(lessonDefaultTab),
+  );
+  const [, setSurah] = useQueryState("surah", parseAsInteger.withDefault(1));
+  const [, setAyah] = useQueryState("ayah", parseAsInteger.withDefault(1));
+  const [, setAyahTo] = useQueryState("to", parseAsInteger.withDefault(0));
+
+  // Fall back to the lesson default if the parser ever yields an empty string —
+  // never silently revert to "home" (the previous fallback was masking the new default).
+  const activeTab = ((tab || lessonDefaultTab) as TabKey);
 
   const disabledTabs = useMemo<TabKey[]>(
     () => getDisabledTabs(lessonId),
@@ -69,11 +96,10 @@ export function UnifiedScreen() {
 
   // If current tab becomes disabled due to lesson change, redirect to safe default
   useEffect(() => {
-    const defaultTab = getDefaultTab(lessonId);
-    if (disabledTabs.includes(activeTab) && activeTab !== defaultTab) {
-      setTab(defaultTab);
+    if (disabledTabs.includes(activeTab) && activeTab !== lessonDefaultTab) {
+      setTab(lessonDefaultTab);
     }
-  }, [disabledTabs, activeTab, lessonId, setTab]);
+  }, [disabledTabs, activeTab, lessonDefaultTab, setTab]);
 
   return (
     <SelectedWordProvider>

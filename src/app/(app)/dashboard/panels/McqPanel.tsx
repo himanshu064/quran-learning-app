@@ -189,17 +189,44 @@ export function McqPanel() {
 
   // On mount: play instruction once (per page load), then auto-play the first item.
   // On subsequent visits to this tab: skip instruction, auto-play immediately.
+  //
+  // The flag is set ONLY after play() resolves, so that React 18 StrictMode's
+  // double-invoke (mount → cleanup → mount) doesn't burn the single-shot before
+  // the audio can actually start. A `cancelled` ref ensures the aborted first
+  // attempt doesn't leak setState calls or mark the instruction as "played".
   useEffect(() => {
     if (mcqInstructionHasPlayed) {
       setPendingAutoPlay(true);
       return;
     }
-    mcqInstructionHasPlayed = true;
+
+    let cancelled = false;
     const audio = new Audio(listeningInstructionUrl());
-    audio.onended = () => setPendingAutoPlay(true);
-    audio.play().catch(() => setPendingAutoPlay(true));
+
+    audio.addEventListener("ended", () => {
+      if (cancelled) return;
+      mcqInstructionHasPlayed = true;
+      setPendingAutoPlay(true);
+    });
+
+    audio.play().then(
+      () => {
+        if (cancelled) {
+          audio.pause();
+          audio.src = "";
+        }
+      },
+      () => {
+        // play() rejected — autoplay blocked OR cleanup paused it. If we were
+        // cancelled, leave the flag false so the next mount can retry.
+        if (cancelled) return;
+        mcqInstructionHasPlayed = true;
+        setPendingAutoPlay(true);
+      },
+    );
+
     return () => {
-      audio.onended = null;
+      cancelled = true;
       audio.pause();
       audio.src = "";
     };

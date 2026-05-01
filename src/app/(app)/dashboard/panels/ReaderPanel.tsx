@@ -29,6 +29,36 @@ type SurahMeta = {
   bismillah_pre: boolean;
 };
 
+// Quranic letter range — anything outside this is treated as an ornament/stop-sign token
+// (verse-end numbers ١-٩, Rub el Hizb ۞, sajdah signs, pause marks, etc.) and rendered
+// non-clickable, non-highlightable, and excluded from the word index counter so word-by-word
+// audio aligns to actual words. Mirrors the reference's `isStopSignToken` at
+// Omar App Final/index.html:4153-4157.
+const QURAN_LETTER_REGEX = /[ء-يٮ-ۓ]/;
+
+type VerseToken =
+  | { kind: "word"; text: string; wordIdx: number }
+  | { kind: "symbol"; text: string };
+
+function parseVerseTokens(text: string): VerseToken[] {
+  const out: VerseToken[] = [];
+  let counter = 0;
+  // Split on ANY whitespace (regular space, non-breaking space U+00A0, tab, etc.) —
+  // the Uthmani JSON glues some symbols to adjacent words with NBSP, e.g.
+  // "بَصِيرٞ ٢٧" and "۞ وَلَوۡ". Plain split(" ") would leave those as a
+  // single token and the highlight ring would wrap the symbol along with the word.
+  for (const piece of text.split(/\s+/)) {
+    if (!piece) continue;
+    if (QURAN_LETTER_REGEX.test(piece)) {
+      counter += 1;
+      out.push({ kind: "word", text: piece, wordIdx: counter });
+    } else {
+      out.push({ kind: "symbol", text: piece });
+    }
+  }
+  return out;
+}
+
 export function ReaderPanel() {
   const { language } = useLanguage();
   const {
@@ -234,14 +264,19 @@ export function ReaderPanel() {
     [playWordAudio, setSelectedWord, slides, lessonGoTo],
   );
 
-  // Build verse specs for sequence playback
+  // Build verse specs for sequence playback. wordCount counts only real words
+  // (excluding ornaments/stop-signs/verse-end numbers) so word-by-word audio
+  // sequencing doesn't overshoot past the actual word count.
   const verseSpecs = useMemo(
     () =>
-      verses.map((v) => ({
-        surah: v.surah,
-        ayah: v.ayah,
-        wordCount: v.text.split(" ").length,
-      })),
+      verses.map((v) => {
+        const tokens = parseVerseTokens(v.text);
+        const wordCount = tokens.reduce(
+          (n, t) => (t.kind === "word" ? n + 1 : n),
+          0,
+        );
+        return { surah: v.surah, ayah: v.ayah, wordCount };
+      }),
     [verses],
   );
 
@@ -434,84 +469,125 @@ export function ReaderPanel() {
                     بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ
                   </span>
                 )}
-                {verses.map((verse) => (
-                  <span key={verse.verse_key}>
-                    {verse.text.split(" ").map((word, i) => {
-                      const wordIdx = i + 1;
-                      const isAudioActive =
-                        currentWordIndex === wordIdx &&
-                        currentAyah === verse.ayah;
-                      const highlightSource = selectedWord || wordSlide;
-                      const isLessonWord =
-                        highlightSource &&
-                        highlightSource.surah === verse.surah &&
-                        highlightSource.ayah === verse.ayah &&
-                        highlightSource.wordIndex === wordIdx;
+                {verses.map((verse) => {
+                  const tokens = parseVerseTokens(verse.text);
+                  return (
+                    <span key={verse.verse_key}>
+                      {tokens.map((tok, i) => {
+                        // Symbol tokens (verse-end numbers, Rub el Hizb, sajdah signs,
+                        // pause marks, etc.) render as plain non-interactive spans —
+                        // never highlighted, never clickable. Matches the reference.
+                        if (tok.kind === "symbol") {
+                          return (
+                            <span
+                              key={i}
+                              className="inline-block select-none text-muted-foreground/80"
+                              style={{ margin: "0.25rem 0.1875rem" }}
+                            >
+                              {tok.text}
+                              {" "}
+                            </span>
+                          );
+                        }
 
-                      return (
-                        <span
-                          key={i}
-                          role="button"
-                          tabIndex={0}
-                          style={{
-                            animationDelay: `${i * 40}ms`,
-                            padding: "0.1875rem 0.625rem",
-                            margin: "0.25rem 0.1875rem",
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              e.preventDefault();
+                        const wordIdx = tok.wordIdx;
+                        const isAudioActive =
+                          currentWordIndex === wordIdx &&
+                          currentAyah === verse.ayah;
+                        const highlightSource = selectedWord || wordSlide;
+                        const isLessonWord =
+                          highlightSource &&
+                          highlightSource.surah === verse.surah &&
+                          highlightSource.ayah === verse.ayah &&
+                          highlightSource.wordIndex === wordIdx;
+
+                        return (
+                          <span
+                            key={i}
+                            role="button"
+                            tabIndex={0}
+                            style={{
+                              animationDelay: `${i * 40}ms`,
+                              padding: "0.1875rem 0.625rem",
+                              margin: "0.25rem 0.1875rem",
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                handleWordClick(
+                                  verse.surah,
+                                  verse.ayah,
+                                  wordIdx,
+                                  tok.text,
+                                );
+                              }
+                            }}
+                            className={cn(
+                              "verse-word inline-block cursor-pointer rounded-full transition-all duration-200",
+                              "hover:bg-slate-400/18",
+                              isAudioActive &&
+                                "bg-blue-500/14 text-blue-500 outline outline-2 outline-blue-500/70 scale-[1.04]",
+                              !isAudioActive &&
+                                isLessonWord &&
+                                "font-bold ring-1 ring-primary/80 scale-[1.04]",
+                            )}
+                            onClick={(e) => {
+                              e.stopPropagation();
                               handleWordClick(
                                 verse.surah,
                                 verse.ayah,
                                 wordIdx,
-                                word,
+                                tok.text,
                               );
-                            }
-                          }}
-                          className={cn(
-                            "verse-word inline-block cursor-pointer rounded-full transition-all duration-200",
-                            "hover:bg-slate-400/18",
-                            isAudioActive &&
-                              "bg-blue-500/14 text-blue-500 outline outline-2 outline-blue-500/70 scale-[1.04]",
-                            !isAudioActive &&
-                              isLessonWord &&
-                              "font-bold ring-1 ring-primary/80 scale-[1.04]",
-                          )}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleWordClick(
-                              verse.surah,
-                              verse.ayah,
-                              wordIdx,
-                              word,
-                            );
-                          }}
-                        >
-                          {word}
-                          {" "}
-                        </span>
-                      );
-                    })}
-                  </span>
-                ))}
+                            }}
+                          >
+                            {tok.text}
+                            {" "}
+                          </span>
+                        );
+                      })}
+                    </span>
+                  );
+                })}
               </p>
             )}
           </div>
 
-          {/* Lesson overlay (flash card) — word slides only, not letter slides */}
+          {/* Lesson overlay (flash card) — word slides only, not letter slides.
+              Clicking the WORD plays its audio (and highlights it on hover);
+              clicking outside the word still toggles the overlay back to the verse. */}
           {showOverlay && wordSlide && (
             <div
               className="absolute inset-0 z-20 flex flex-col items-center justify-center overflow-hidden bg-card/95 p-6 text-center backdrop-blur-sm"
               dir="rtl"
             >
-              <div className="font-uthmani text-[4rem] sm:text-[4.5rem] leading-[1.5] truncate max-w-full px-4">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  playWordAudio(
+                    wordSlide.surah,
+                    wordSlide.ayah,
+                    wordSlide.wordIndex,
+                  );
+                }}
+                className={cn(
+                  "font-uthmani text-[4rem] sm:text-[4.5rem] leading-[1.5] truncate max-w-full px-6 py-2 rounded-2xl",
+                  "cursor-pointer transition-all duration-200",
+                  "hover:bg-primary/10 hover:text-primary hover:scale-[1.04]",
+                  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/70",
+                  isPlaying &&
+                    currentAyah === wordSlide.ayah &&
+                    currentWordIndex === wordSlide.wordIndex &&
+                    "bg-blue-500/14 text-blue-500 outline outline-2 outline-blue-500/70",
+                )}
+              >
                 {wordSlide.word}
-              </div>
+              </button>
               <p className="mt-3 text-xs text-muted-foreground">
                 {language === "ar"
-                  ? "اضغط على البطاقة لإظهار الآية الكاملة"
-                  : "Tap card to show full verse"}
+                  ? "اضغط على الكلمة للاستماع، أو على البطاقة لإظهار الآية"
+                  : "Tap the word to hear it, or tap the card for the full verse"}
               </p>
             </div>
           )}
@@ -597,8 +673,8 @@ export function ReaderPanel() {
             <span className="text-xs text-muted-foreground">
               {mode === "wbw" && currentWordIndex !== null
                 ? language === "ar"
-                  ? `الكلمة ${currentWordIndex} / ${verses[0]?.text.split(" ").length ?? 0}`
-                  : `Word ${currentWordIndex} / ${verses[0]?.text.split(" ").length ?? 0}`
+                  ? `الكلمة ${currentWordIndex} / ${verseSpecs[0]?.wordCount ?? 0}`
+                  : `Word ${currentWordIndex} / ${verseSpecs[0]?.wordCount ?? 0}`
                 : language === "ar"
                   ? "جاري التشغيل..."
                   : "Playing..."}
