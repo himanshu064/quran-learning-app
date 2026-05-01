@@ -70,6 +70,9 @@ function fireConfetti() {
   } catch { /* graceful degradation if confetti not supported */ }
 }
 
+// Module-level flag so the instruction plays once per page load, not on every tab switch.
+let mcqInstructionHasPlayed = false;
+
 export function McqPanel() {
   const { language } = useLanguage();
   const { slides, isLoading, config } = useLessonContext();
@@ -90,7 +93,9 @@ export function McqPanel() {
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const instructionPlayed = useRef(false);
+  // Pending flag: set to true whenever we want to auto-play the current item
+  // (after instruction audio, after advancing to next question).
+  const [pendingAutoPlay, setPendingAutoPlay] = useState(false);
 
   // Support both word AND letter slides
   const quizItems = useMemo(
@@ -166,12 +171,8 @@ export function McqPanel() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [questionIndex, selectedWordKey, quizItems.length, quranText]);
 
-  useEffect(() => {
-    if (!instructionPlayed.current) {
-      playUrl(listeningInstructionUrl());
-      instructionPlayed.current = true;
-    }
-  }, [playUrl]);
+  // Always-current ref so the auto-play effect below never captures a stale closure.
+  const playCurrentItemRef = useRef<() => void>(() => {});
 
   const playCurrentItem = useCallback(() => {
     if (!currentItem) return;
@@ -182,6 +183,35 @@ export function McqPanel() {
     }
     setHasListened(true);
   }, [currentItem, playWordAudio, playLetterAudio]);
+
+  // Keep ref current so the mount effect never stales.
+  playCurrentItemRef.current = playCurrentItem;
+
+  // On mount: play instruction once (per page load), then auto-play the first item.
+  // On subsequent visits to this tab: skip instruction, auto-play immediately.
+  useEffect(() => {
+    if (mcqInstructionHasPlayed) {
+      setPendingAutoPlay(true);
+      return;
+    }
+    mcqInstructionHasPlayed = true;
+    const audio = new Audio(listeningInstructionUrl());
+    audio.onended = () => setPendingAutoPlay(true);
+    audio.play().catch(() => setPendingAutoPlay(true));
+    return () => {
+      audio.onended = null;
+      audio.pause();
+      audio.src = "";
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Fire auto-play as soon as the current item is ready.
+  useEffect(() => {
+    if (!pendingAutoPlay || !currentItem) return;
+    setPendingAutoPlay(false);
+    playCurrentItemRef.current();
+  }, [pendingAutoPlay, currentItem]);
 
   const handleChoice = useCallback(
     (idx: number, chosenText: string) => {
@@ -216,6 +246,7 @@ export function McqPanel() {
     setAnsweredCorrectly(false);
     setSelectedBtns({});
     setHasListened(false);
+    setPendingAutoPlay(true);
   }, [questionIndex, totalQuestions, score, config.id, saveMcqScore]);
 
   if (isLoading) {

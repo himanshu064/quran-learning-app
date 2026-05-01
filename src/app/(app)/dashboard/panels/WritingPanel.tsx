@@ -135,6 +135,9 @@ function fireConfetti() {
   } catch { /* graceful degradation if confetti not supported */ }
 }
 
+// Module-level flag so the instruction plays once per page load, not on every tab switch.
+let writingInstructionHasPlayed = false;
+
 export function WritingPanel() {
   const { language } = useLanguage();
   const { slides, isLoading, config } = useLessonContext();
@@ -158,7 +161,8 @@ export function WritingPanel() {
   const [sessionAttempted, setSessionAttempted] = useState(0);
   const [sessionCorrect, setSessionCorrect] = useState(0);
   const [showResults, setShowResults] = useState(false);
-  const instructionPlayed = useRef(false);
+  // Pending flag: set to true whenever we want to auto-play the current item.
+  const [pendingAutoPlay, setPendingAutoPlay] = useState(false);
   const { selectedWord } = useSelectedWord();
 
   // Support both word AND letter slides
@@ -206,12 +210,8 @@ export function WritingPanel() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentItemKey]);
 
-  useEffect(() => {
-    if (!instructionPlayed.current) {
-      playUrl(writingInstructionUrl());
-      instructionPlayed.current = true;
-    }
-  }, [playUrl]);
+  // Always-current ref so the mount/auto-play effects never capture a stale closure.
+  const playCurrentItemRef = useRef<() => void>(() => {});
 
   const typedWord = useMemo(() => getTypedWord(typedLetters), [typedLetters]);
 
@@ -226,6 +226,35 @@ export function WritingPanel() {
     }
     setHasListened(true);
   }, [currentItem, playWordAudio, playLetterAudio]);
+
+  // Keep ref current so the mount effect never stales.
+  playCurrentItemRef.current = playCurrentItem;
+
+  // On mount: play instruction once (per page load), then auto-play the first item.
+  // On subsequent visits to this tab: skip instruction, auto-play immediately.
+  useEffect(() => {
+    if (writingInstructionHasPlayed) {
+      setPendingAutoPlay(true);
+      return;
+    }
+    writingInstructionHasPlayed = true;
+    const audio = new Audio(writingInstructionUrl());
+    audio.onended = () => setPendingAutoPlay(true);
+    audio.play().catch(() => setPendingAutoPlay(true));
+    return () => {
+      audio.onended = null;
+      audio.pause();
+      audio.src = "";
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Fire auto-play as soon as the current item is ready.
+  useEffect(() => {
+    if (!pendingAutoPlay || !currentItem) return;
+    setPendingAutoPlay(false);
+    playCurrentItemRef.current();
+  }, [pendingAutoPlay, currentItem]);
 
   const appendLetter = useCallback((ch: string) => {
     if (revealed) return;
@@ -277,6 +306,7 @@ export function WritingPanel() {
       setFeedback({ text: "", type: "" });
       setRevealed(false);
       setHasListened(false);
+      setPendingAutoPlay(true);
     }
   }, [wordIndex, total]);
 

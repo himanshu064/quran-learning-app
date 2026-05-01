@@ -257,13 +257,6 @@ function TeachingPanelInner() {
           </Button>
         </div>
       </div>
-
-      {/* Footer note */}
-      <p className="text-center text-xs text-primary/70">
-        {language === "ar"
-          ? 'هذه الشاشة تعرض نفس "الكلمة اليوم" لكن في بطاقة كبيرة ومركّزة.'
-          : 'This screen shows the same "Word of the day" but in a large, focused card.'}
-      </p>
     </div>
   );
 }
@@ -309,7 +302,7 @@ function TeachingNav({
 }
 
 // Focused "Letter of the day" card for Lesson 1 in the Word tab.
-// Auto-plays the letter sound whenever the user navigates to it or changes letter.
+// Auto-plays instruction on first entry, then the letter audio. On navigation: auto-plays letter audio.
 function LetterCard({
   letterSlide,
   slideIndex,
@@ -337,25 +330,57 @@ function LetterCard({
   next: () => void;
   shuffle: () => void;
 }) {
+  const introAudioRef = useRef<HTMLAudioElement | null>(null);
+  // Always-current refs so effects never capture stale closures
+  const playLetterAudioRef = useRef(playLetterAudio);
+  playLetterAudioRef.current = playLetterAudio;
+  const letterAudioPathRef = useRef(letterSlide.audio ? `/${letterSlide.audio}` : "");
+  letterAudioPathRef.current = letterSlide.audio ? `/${letterSlide.audio}` : "";
+
+  const stopIntro = useCallback(() => {
+    if (introAudioRef.current) {
+      introAudioRef.current.onended = null;
+      introAudioRef.current.pause();
+      introAudioRef.current.src = "";
+      introAudioRef.current = null;
+    }
+  }, []);
+
   const playLetterSound = useCallback(() => {
+    stopIntro();
     stop();
     if (letterSlide.audio) playLetterAudio(`/${letterSlide.audio}`);
-  }, [letterSlide.audio, playLetterAudio, stop]);
+  }, [letterSlide.audio, playLetterAudio, stop, stopIntro]);
 
-  // Auto-play the introductory instruction audio when landing on the Letter tab.
-  const introAudioRef = useRef<HTMLAudioElement | null>(null);
+  // On mount: play instruction once, then auto-play the current letter audio.
   useEffect(() => {
     const audio = new Audio("/audio/lesson1_letters_instruction_en.mp3");
     introAudioRef.current = audio;
-    audio.play().catch(() => {});
+    const playLetter = () => {
+      introAudioRef.current = null;
+      const path = letterAudioPathRef.current;
+      if (path) playLetterAudioRef.current(path);
+    };
+    audio.onended = playLetter;
+    audio.play().catch(playLetter);
     return () => {
       if (introAudioRef.current) {
+        introAudioRef.current.onended = null;
         introAudioRef.current.pause();
         introAudioRef.current.src = "";
         introAudioRef.current = null;
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // When the letter changes (prev/next navigation): stop intro and auto-play new letter.
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return; }
+    stopIntro();
+    if (letterSlide.audio) playLetterAudio(`/${letterSlide.audio}`);
+  }, [letterSlide.audio, playLetterAudio, stopIntro]);
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-2.5">
@@ -419,12 +444,6 @@ function LetterCard({
           </Button>
         </div>
       </div>
-
-      <p className="text-center text-xs text-primary/70">
-        {language === "ar"
-          ? 'هذه الشاشة تعرض نفس "الكلمة اليوم" لكن في بطاقة كبيرة ومركّزة.'
-          : 'This screen shows the same "Word of the day" but in a large, focused card.'}
-      </p>
     </div>
   );
 }

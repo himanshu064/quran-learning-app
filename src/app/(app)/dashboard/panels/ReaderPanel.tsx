@@ -58,6 +58,9 @@ export function ReaderPanel() {
   // Flashcard overlay: show word card by default when a lesson slide is active,
   // hide it (show full verse) after the user taps the card — matches reference behaviour.
   const [showOverlay, setShowOverlay] = useState(false);
+  // When a word is clicked in the verse we navigate the lesson slide but must NOT
+  // flip to the flashcard — the user is already looking at the verse.
+  const skipNextOverlayRef = useRef(false);
 
   // Floating bubble is only shown after user has triggered playback at least once.
   const [hasPlayedOnce, setHasPlayedOnce] = useState(false);
@@ -133,11 +136,18 @@ export function ReaderPanel() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lessonId, slideIndex, slides]);
 
-  // Reset to flashcard view on every slide/lesson change — reference shows word card first
+  // Reset to flashcard view on every word slide change — reference shows word card first.
+  // Only applies to word slides (Lesson 3+). Letter slides (Lesson 1) never show an overlay.
+  // Suppressed when the change was triggered by a word click (user is viewing the verse).
   useEffect(() => {
-    if (activeSlide) setShowOverlay(true);
+    if (!wordSlide) return;
+    if (skipNextOverlayRef.current) {
+      skipNextOverlayRef.current = false;
+      return;
+    }
+    setShowOverlay(true);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSlide]);
+  }, [wordSlide]);
 
   // Keep local input strings in sync when URL state changes externally (lesson nav)
   useEffect(() => { setSurahInput(String(surah)); }, [surah]);
@@ -217,6 +227,7 @@ export function ReaderPanel() {
           (s as WordSlide).wordIndex === wordIdx,
       );
       if (matchIndex !== -1) {
+        skipNextOverlayRef.current = true; // don't flip to flashcard on word click
         lessonGoTo(matchIndex);
       }
     },
@@ -391,10 +402,10 @@ export function ReaderPanel() {
           className={cn(
             "relative flex min-h-48 items-center justify-center overflow-hidden rounded-[1.125rem] border border-border bg-card p-6",
             "dark:bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.18),rgba(15,23,42,0.98)_45%)]",
-            activeSlide ? "cursor-pointer" : "cursor-default",
+            wordSlide ? "cursor-pointer" : "cursor-default",
           )}
           onClick={() => {
-            if (activeSlide) setShowOverlay((p) => !p);
+            if (wordSlide) setShowOverlay((p) => !p);
           }}
         >
           {/* Halo glow — dark mode only */}
@@ -404,7 +415,7 @@ export function ReaderPanel() {
           <div
             className={cn(
               "relative z-10 space-y-6 transition-opacity duration-200",
-              showOverlay && activeSlide && "opacity-0",
+              showOverlay && wordSlide && "opacity-0",
             )}
             dir="rtl"
           >
@@ -465,7 +476,7 @@ export function ReaderPanel() {
                               "bg-blue-500/14 text-blue-500 outline outline-2 outline-blue-500/70 scale-[1.04]",
                             !isAudioActive &&
                               isLessonWord &&
-                              "bg-primary/10 text-primary",
+                              "font-bold ring-1 ring-primary/80 scale-[1.04]",
                           )}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -488,23 +499,16 @@ export function ReaderPanel() {
             )}
           </div>
 
-          {/* Lesson overlay (flash card) */}
-          {showOverlay && activeSlide && (
+          {/* Lesson overlay (flash card) — word slides only, not letter slides */}
+          {showOverlay && wordSlide && (
             <div
-              className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-card/95 p-8 text-center backdrop-blur-sm"
+              className="absolute inset-0 z-20 flex flex-col items-center justify-center overflow-hidden bg-card/95 p-6 text-center backdrop-blur-sm"
               dir="rtl"
             >
-              <div className="font-uthmani text-[2.4rem] leading-[2.3]">
-                {wordSlide?.word ?? letterSlide?.glyph}
+              <div className="font-uthmani text-[4rem] sm:text-[4.5rem] leading-[1.5] truncate max-w-full px-4">
+                {wordSlide.word}
               </div>
-              {letterSlide && (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {language === "ar"
-                    ? letterSlide.name_ar
-                    : letterSlide.name_en}
-                </p>
-              )}
-              <p className="mt-4 text-xs text-muted-foreground">
+              <p className="mt-3 text-xs text-muted-foreground">
                 {language === "ar"
                   ? "اضغط على البطاقة لإظهار الآية الكاملة"
                   : "Tap card to show full verse"}
