@@ -70,9 +70,6 @@ function fireConfetti() {
   } catch { /* graceful degradation if confetti not supported */ }
 }
 
-// Module-level flag so the instruction plays once per page load, not on every tab switch.
-let mcqInstructionHasPlayed = false;
-
 export function McqPanel() {
   const { language } = useLanguage();
   const { slides, isLoading, config } = useLessonContext();
@@ -85,8 +82,22 @@ export function McqPanel() {
   const saveLastLessonRef = useRef(saveLastLesson);
   saveLastLessonRef.current = saveLastLesson;
 
+  // Per-mount flag for the instruction audio. Component-scoped so the intro
+  // plays each time the user enters the Listening panel, instead of staying
+  // skipped after a single page-session play (which a module-level flag did).
+  const introHasPlayedRef = useRef(false);
+
   const [hasListened, setHasListened] = useState(false);
+  // Two-phase first-listen gate (question 0 only):
+  //   phase 1 — audio has genuinely started (isPlaying went true)
+  //   phase 2 — audio has ended (isPlaying went back to false after phase 1)
+  // Using two phases avoids the race where hasListened=true is set one render
+  // before AudioProvider sets isPlaying=true, which would otherwise cause the
+  // single-phase effect to fire prematurely.
+  const [firstAudioStarted, setFirstAudioStarted] = useState(false);
+  const [hasFinishedFirstListen, setHasFinishedFirstListen] = useState(false);
   const [questionIndex, setQuestionIndex] = useState(0);
+  const [questionOrder, setQuestionOrder] = useState<number[]>([]);
   const [attempts, setAttempts] = useState(0);
   const [answeredCorrectly, setAnsweredCorrectly] = useState(false);
   const [selectedBtns, setSelectedBtns] = useState<Record<number, "correct" | "incorrect">>({});
@@ -96,6 +107,10 @@ export function McqPanel() {
   // Pending flag: set to true whenever we want to auto-play the current item
   // (after instruction audio, after advancing to next question).
   const [pendingAutoPlay, setPendingAutoPlay] = useState(false);
+  // 4 options stored in state — only regenerated when question changes, NOT on audio state changes.
+  // Declared with the rest of the component state so the hook order stays at the top
+  // (avoids HMR hook-count mismatches on edits).
+  const [options, setOptions] = useState<string[]>([]);
 
   // Support both word AND letter slides
   const quizItems = useMemo(
@@ -106,6 +121,17 @@ export function McqPanel() {
     [slides],
   );
   const totalQuestions = quizItems.length;
+
+  // Rebuild a fresh shuffled order whenever the quiz item pool changes (new lesson).
+  // Mirrors the reference app's buildShuffledQuestionOrder() so questions don't
+  // always start at alif / index 0.
+  useEffect(() => {
+    if (quizItems.length > 0) {
+      setQuestionOrder(shuffleArray(Array.from({ length: quizItems.length }, (_, i) => i)));
+      setQuestionIndex(0);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quizItems.length]);
 
   // Load quran text for generating word distractors from verses
   const { data: quranText } = useQuery({
@@ -126,7 +152,9 @@ export function McqPanel() {
   const selectedQuizItem: QuizItem | null = selectedWord
     ? { text: selectedWord.word, type: "word", surah: selectedWord.surah, ayah: selectedWord.ayah, wordIndex: selectedWord.wordIndex }
     : null;
-  const currentItem = selectedQuizItem || quizItems[questionIndex];
+  // Resolve the actual quiz item index through the shuffled order
+  const currentQuestionIdx = questionOrder.length > 0 ? (questionOrder[questionIndex] ?? questionIndex) : questionIndex;
+  const currentItem = selectedQuizItem || quizItems[currentQuestionIdx];
 
   useEffect(() => {
     if (totalQuestions > 0) {
@@ -134,9 +162,6 @@ export function McqPanel() {
       saveLastLessonRef.current(config.id);
     }
   }, [questionIndex, totalQuestions, config.id]);
-
-  // 4 options stored in state — only regenerated when question changes, NOT on audio state changes
-  const [options, setOptions] = useState<string[]>([]);
 
   useEffect(() => {
     if (!currentItem) { setOptions([]); return; }
@@ -162,14 +187,14 @@ export function McqPanel() {
 
     // Normal lesson-based quiz
     if (quizItems.length < 4) { setOptions([]); return; }
-    const others = quizItems.filter((_, i) => i !== questionIndex);
+    const others = quizItems.filter((_, i) => i !== currentQuestionIdx);
     const uniqueTexts = Array.from(new Set(others.map((q) => q.text))).filter(
       (t) => t !== currentItem.text,
     );
     const distractors = shuffleArray(uniqueTexts).slice(0, 3);
     setOptions(shuffleArray([currentItem.text, ...distractors]));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [questionIndex, selectedWordKey, quizItems.length, quranText]);
+  }, [questionIndex, selectedWordKey, quizItems.length, quranText, questionOrder]);
 
   // Always-current ref so the auto-play effect below never captures a stale closure.
   const playCurrentItemRef = useRef<() => void>(() => {});
@@ -179,7 +204,7 @@ export function McqPanel() {
     if (currentItem.type === "word" && currentItem.surah && currentItem.ayah && currentItem.wordIndex) {
       playWordAudio(currentItem.surah, currentItem.ayah, currentItem.wordIndex);
     } else if (currentItem.type === "letter" && currentItem.audio) {
-      playLetterAudio(currentItem.audio);
+      playLetterAudio(`/${currentItem.audio}`);
     }
     setHasListened(true);
   }, [currentItem, playWordAudio, playLetterAudio]);
@@ -195,7 +220,7 @@ export function McqPanel() {
   // the audio can actually start. A `cancelled` ref ensures the aborted first
   // attempt doesn't leak setState calls or mark the instruction as "played".
   useEffect(() => {
-    if (mcqInstructionHasPlayed) {
+    if (introHasPlayedRef.current) {
       setPendingAutoPlay(true);
       return;
     }
@@ -205,7 +230,7 @@ export function McqPanel() {
 
     audio.addEventListener("ended", () => {
       if (cancelled) return;
-      mcqInstructionHasPlayed = true;
+      introHasPlayedRef.current = true;
       setPendingAutoPlay(true);
     });
 
@@ -220,7 +245,7 @@ export function McqPanel() {
         // play() rejected — autoplay blocked OR cleanup paused it. If we were
         // cancelled, leave the flag false so the next mount can retry.
         if (cancelled) return;
-        mcqInstructionHasPlayed = true;
+        introHasPlayedRef.current = true;
         setPendingAutoPlay(true);
       },
     );
@@ -239,6 +264,20 @@ export function McqPanel() {
     setPendingAutoPlay(false);
     playCurrentItemRef.current();
   }, [pendingAutoPlay, currentItem]);
+
+  // Phase 1: mark that audio has actually started playing (avoids premature trigger).
+  useEffect(() => {
+    if (hasListened && isPlaying && !firstAudioStarted) {
+      setFirstAudioStarted(true);
+    }
+  }, [hasListened, isPlaying, firstAudioStarted]);
+
+  // Phase 2: once audio has started AND stopped, reveal options for question 0.
+  useEffect(() => {
+    if (firstAudioStarted && !isPlaying && !hasFinishedFirstListen) {
+      setHasFinishedFirstListen(true);
+    }
+  }, [firstAudioStarted, isPlaying, hasFinishedFirstListen]);
 
   const handleChoice = useCallback(
     (idx: number, chosenText: string) => {
@@ -273,6 +312,8 @@ export function McqPanel() {
     setAnsweredCorrectly(false);
     setSelectedBtns({});
     setHasListened(false);
+    setFirstAudioStarted(false);
+    setHasFinishedFirstListen(false);
     setPendingAutoPlay(true);
   }, [questionIndex, totalQuestions, score, config.id, saveMcqScore]);
 
@@ -297,7 +338,7 @@ export function McqPanel() {
         <h2 className="text-2xl font-bold">{language === "ar" ? "أحسنت!" : "Well done!"}</h2>
         <p className="text-5xl font-bold text-primary">{score} / {totalQuestions}</p>
         <p className="text-muted-foreground">{language === "ar" ? "لقد أكملت الاختبار" : "You completed the quiz"}</p>
-        <Button onClick={() => { setQuestionIndex(0); setScore(0); setFinished(false); setAttempts(0); setAnsweredCorrectly(false); setSelectedBtns({}); setHasListened(false); }}>
+        <Button onClick={() => { setQuestionOrder(shuffleArray(Array.from({ length: quizItems.length }, (_, i) => i))); setQuestionIndex(0); setScore(0); setFinished(false); setAttempts(0); setAnsweredCorrectly(false); setSelectedBtns({}); setHasListened(false); setFirstAudioStarted(false); setHasFinishedFirstListen(false); }}>
           {language === "ar" ? "إعادة" : "Try Again"}
         </Button>
       </div>
@@ -311,6 +352,7 @@ export function McqPanel() {
   const accuracy = attempted > 0 ? Math.round((score / attempted) * 100) : 0;
 
   const handleReset = () => {
+    setQuestionOrder(shuffleArray(Array.from({ length: quizItems.length }, (_, i) => i)));
     setQuestionIndex(0);
     setScore(0);
     setFinished(false);
@@ -318,11 +360,15 @@ export function McqPanel() {
     setAnsweredCorrectly(false);
     setSelectedBtns({});
     setHasListened(false);
+    setFirstAudioStarted(false);
+    setHasFinishedFirstListen(false);
     setShowResults(false);
+    setPendingAutoPlay(true);
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4">
+    <div className="flex flex-1 items-start justify-center p-6">
+    <div className="flex w-full max-w-3xl flex-col gap-4 rounded-2xl border border-border bg-card p-4">
       {/* Session tracking panel */}
       <div className="rounded-[1.125rem] border border-border bg-card px-4 py-3">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs">
@@ -338,12 +384,6 @@ export function McqPanel() {
             <span className="rounded-full bg-primary/12 px-2 py-0.5 font-semibold text-primary">
               {language === "ar" ? "النتيجة:" : "Score:"} {score} / {attempted || 0}
             </span>
-            <Button variant="ghost" size="sm" className="h-7 cursor-pointer text-xs" onClick={() => setShowResults((s) => !s)}>
-              {language === "ar" ? "عرض النتائج" : "View Results"}
-            </Button>
-            <Button variant="ghost" size="sm" className="h-7 cursor-pointer text-xs" onClick={handleReset}>
-              {language === "ar" ? "إعادة" : "Reset"}
-            </Button>
           </div>
         </div>
         <div className="h-1.5 overflow-hidden rounded-full bg-muted">
@@ -358,49 +398,6 @@ export function McqPanel() {
           </p>
         )}
       </div>
-
-      {/* Detailed results panel */}
-      {showResults && (
-        <div className="rounded-[1.125rem] border border-border bg-card px-5 py-4">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold">
-                {language === "ar" ? "ملخّص الجلسة" : "Session summary"}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {attempted === 0
-                  ? language === "ar"
-                    ? "لم تبدأ الجلسة بعد. اضغط استمع للبدء."
-                    : "Session not started. Press listen to begin."
-                  : language === "ar"
-                    ? `حاولت ${attempted} كلمات من أصل ${totalQuestions}، أجبت بشكل صحيح عن ${score} منها.`
-                    : `Attempted ${attempted} of ${totalQuestions} words, answered ${score} correctly.`}
-              </p>
-              <p className="mt-2 text-xs text-muted-foreground">
-                {language === "ar" ? "التغطية:" : "Coverage:"} {attempted}/{totalQuestions}
-              </p>
-            </div>
-            {/* Accuracy ring */}
-            <div className="relative h-20 w-20 shrink-0">
-              <svg className="h-20 w-20 -rotate-90" viewBox="0 0 80 80">
-                <circle cx="40" cy="40" r="34" fill="none" className="stroke-muted" strokeWidth="6" />
-                <circle
-                  cx="40" cy="40" r="34"
-                  fill="none"
-                  className="stroke-primary transition-all duration-500"
-                  strokeWidth="6"
-                  strokeLinecap="round"
-                  strokeDasharray={2 * Math.PI * 34}
-                  strokeDashoffset={2 * Math.PI * 34 * (1 - accuracy / 100)}
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center text-sm font-bold">
-                {accuracy}%
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       <div className="rounded-[1.125rem] border border-border bg-card p-6 sm:p-8">
         <h2 className="mb-2 text-center text-lg font-semibold">
@@ -435,15 +432,15 @@ export function McqPanel() {
           </Button>
         </div>
 
-        {/* 2x2 grid — client style: large cards with rounded borders */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* 2x2 grid — hidden only on first question until its dictation ends; always visible for subsequent questions */}
+        {(questionIndex > 0 || hasFinishedFirstListen) && <div className="grid grid-cols-2 gap-3">
           {options.map((opt, idx) => {
             const state = selectedBtns[idx];
             return (
               <button
                 key={`${questionIndex}-${idx}`}
                 onClick={() => handleChoice(idx, opt)}
-                disabled={!hasListened || isPlaying || answeredCorrectly || state === "incorrect"}
+                disabled={isPlaying || answeredCorrectly || state === "incorrect"}
                 className={cn(
                   "h-auto rounded-[1.125rem] border border-border bg-card p-6 font-uthmani transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-50",
                   isLetterQuiz ? "text-[3.5rem] leading-[2]" : "text-[2.4rem] leading-[2.3]",
@@ -457,7 +454,7 @@ export function McqPanel() {
               </button>
             );
           })}
-        </div>
+        </div>}
 
         {/* Feedback / status — matches reference mcqHeardFirstPlayback gate messages */}
         <p className={cn(
@@ -472,6 +469,57 @@ export function McqPanel() {
           {answeredCorrectly && attempts >= 1 && (language === "ar" ? "أُظهرت الإجابة الصحيحة. يمكنك المتابعة أو عرض النتائج." : "The correct answer is shown. You can continue or view results.")}
         </p>
       </div>
+
+      {/* Action row at the bottom — matches reference session-action-row placement */}
+      <div className="flex items-center justify-center gap-3">
+        <Button variant="outline" className="gap-2 rounded-full cursor-pointer" onClick={() => setShowResults((s) => !s)}>
+          {language === "ar" ? "📊 عرض النتائج" : "📊 View Results"}
+        </Button>
+        <Button variant="outline" className="gap-2 rounded-full cursor-pointer" onClick={handleReset}>
+          {language === "ar" ? "↻ إعادة الجلسة" : "↻ Restart Session"}
+        </Button>
+      </div>
+
+      {/* Detailed results panel — toggled by View Results, lives at the bottom under the action row */}
+      {showResults && (
+        <div className="rounded-[1.125rem] border border-border bg-card px-5 py-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1">
+              <p className="text-sm font-semibold">
+                {language === "ar" ? "ملخّص الجلسة" : "Session Summary"}
+              </p>
+              <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+                {attempted === 0
+                  ? language === "ar"
+                    ? "لم يبدأ الطالب جلسة الاستماع بعد. يمكنه تجربة أي عدد من الكلمات وفتح النتائج في أي وقت."
+                    : "The student has not started the Listening session yet. They can try any number of words and open results at any time."
+                  : language === "ar"
+                    ? `في جلسة الاستماع، حاول الطالب ${attempted} كلمة وأجاب بشكل صحيح على ${score} منها. لقد غطّى ${attempted} من أصل ${totalQuestions} كلمة متاحة في هذا الدرس، وتبقّى ${totalQuestions - attempted} كلمة لم يجرّبها بعد. الدقة الحالية: ${accuracy}%.`
+                    : `In the Listening session, the student attempted ${attempted} word${attempted !== 1 ? "s" : ""} and answered ${score} correctly. They covered ${attempted} out of ${totalQuestions} available words in this lesson, with ${totalQuestions - attempted} still untouched. Current accuracy is ${accuracy}%.`}
+              </p>
+            </div>
+            {/* Accuracy ring */}
+            <div className="relative h-20 w-20 shrink-0">
+              <svg className="h-20 w-20 -rotate-90" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="34" fill="none" className="stroke-muted" strokeWidth="6" />
+                <circle
+                  cx="40" cy="40" r="34"
+                  fill="none"
+                  className="stroke-primary transition-all duration-500"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeDasharray={2 * Math.PI * 34}
+                  strokeDashoffset={2 * Math.PI * 34 * (1 - accuracy / 100)}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center text-sm font-bold">
+                {accuracy}%
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
     </div>
   );
 }

@@ -243,12 +243,14 @@ export function ReaderPanel() {
       wordText: string,
     ) => {
       playWordAudio(verseSurah, verseAyah, wordIdx);
-      setSelectedWord({
-        word: wordText.trim(),
-        surah: verseSurah,
-        ayah: verseAyah,
-        wordIndex: wordIdx,
-      });
+      if (lessonId !== "lesson1") {
+        setSelectedWord({
+          word: wordText.trim(),
+          surah: verseSurah,
+          ayah: verseAyah,
+          wordIndex: wordIdx,
+        });
+      }
       const matchIndex = slides.findIndex(
         (s) =>
           s.type === "word" &&
@@ -261,7 +263,7 @@ export function ReaderPanel() {
         lessonGoTo(matchIndex);
       }
     },
-    [playWordAudio, setSelectedWord, slides, lessonGoTo],
+    [playWordAudio, setSelectedWord, slides, lessonGoTo, lessonId],
   );
 
   // Build verse specs for sequence playback. wordCount counts only real words
@@ -320,7 +322,8 @@ export function ReaderPanel() {
     currentSurah?.bismillah_pre !== false;
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-2.5">
+    <div className="flex flex-1 items-start justify-center p-6">
+    <div className="flex w-full max-w-3xl flex-col gap-3 rounded-2xl border border-border bg-card p-4">
       {/* Surah / Ayah selector */}
       <div
         className="flex items-center gap-3 rounded-[1.125rem] border border-border bg-card px-4 py-2.5"
@@ -665,23 +668,6 @@ export function ReaderPanel() {
         </div>
       )}
 
-      {/* Pulsing status chip during playback — matches reference pulse-dot chip */}
-      {isPlaying && (
-        <div className="flex items-center justify-center">
-          <div className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
-            <span className="text-xs text-muted-foreground">
-              {mode === "wbw" && currentWordIndex !== null
-                ? language === "ar"
-                  ? `الكلمة ${currentWordIndex} / ${verseSpecs[0]?.wordCount ?? 0}`
-                  : `Word ${currentWordIndex} / ${verseSpecs[0]?.wordCount ?? 0}`
-                : language === "ar"
-                  ? "جاري التشغيل..."
-                  : "Playing..."}
-            </span>
-          </div>
-        </div>
-      )}
 
       {/* Player / Recitation card */}
       {verses.length > 0 && (
@@ -739,6 +725,8 @@ export function ReaderPanel() {
           </p>
         </div>
       )}
+
+    </div>
 
       {/* Floating play/pause bubble — only after first play, matches reference currentMode !== null */}
       {verses.length > 0 && hasPlayedOnce && (

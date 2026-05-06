@@ -135,9 +135,6 @@ function fireConfetti() {
   } catch { /* graceful degradation if confetti not supported */ }
 }
 
-// Module-level flag so the instruction plays once per page load, not on every tab switch.
-let writingInstructionHasPlayed = false;
-
 export function WritingPanel() {
   const { language } = useLanguage();
   const { slides, isLoading, config } = useLessonContext();
@@ -152,8 +149,14 @@ export function WritingPanel() {
   const saveLastLessonRef = useRef(saveLastLesson);
   saveLastLessonRef.current = saveLastLesson;
 
+  // Per-mount flag for instruction audio. Component-scoped so the intro plays
+  // each time the user enters the Writing panel (matches the MCQ panel fix).
+  const introHasPlayedRef = useRef(false);
+
   const [hasListened, setHasListened] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
+  // Shuffled order of indices into writeItems — mirrors reference's writingOrder.
+  const [wordOrder, setWordOrder] = useState<number[]>([]);
   const [typedLetters, setTypedLetters] = useState<LetterCluster[]>([]);
   const [attempts, setAttempts] = useState(0);
   const [feedback, setFeedback] = useState<{ text: string; type: "ok" | "error" | "" }>({ text: "", type: "" });
@@ -163,6 +166,9 @@ export function WritingPanel() {
   const [showResults, setShowResults] = useState(false);
   // Pending flag: set to true whenever we want to auto-play the current item.
   const [pendingAutoPlay, setPendingAutoPlay] = useState(false);
+  // Letter pool kept with the rest of the component state so the hook order
+  // stays at the top of the component (avoids HMR hook-count mismatches).
+  const [letterPool, setLetterPool] = useState<string[]>([]);
   const { selectedWord } = useSelectedWord();
 
   // Support both word AND letter slides
@@ -175,11 +181,23 @@ export function WritingPanel() {
   );
   const total = writeItems.length;
 
+  // Rebuild a fresh shuffled order whenever the item pool changes (lesson change).
+  // Mirrors reference `getWritingSlideIndex` / `resetWritingQuestionOrder` (index.html:5813–5854).
+  useEffect(() => {
+    if (writeItems.length > 0) {
+      setWordOrder(shuffleArray(Array.from({ length: writeItems.length }, (_, i) => i)));
+      setWordIndex(0);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [writeItems.length]);
+
   // If a word was selected from the Verse tab, use it as the current write item
   const selectedWriteItem: WriteItem | null = selectedWord
     ? { text: selectedWord.word, type: "word" as const, surah: selectedWord.surah, ayah: selectedWord.ayah, wordIndex: selectedWord.wordIndex }
     : null;
-  const currentItem: WriteItem | undefined = selectedWriteItem || writeItems[wordIndex];
+  // Resolve the actual item index through the shuffled order
+  const currentWordIdx = wordOrder.length > 0 ? (wordOrder[wordIndex] ?? wordIndex) : wordIndex;
+  const currentItem: WriteItem | undefined = selectedWriteItem || writeItems[currentWordIdx];
 
   useEffect(() => {
     if (restoredWriting.current || total === 0) return;
@@ -195,12 +213,11 @@ export function WritingPanel() {
     }
   }, [wordIndex, total, config.id]);
 
-  // Stable key for the current item to avoid reshuffling on unrelated re-renders
+  // Stable key for the current item — uses the resolved index so the letter
+  // pool regenerates when the shuffle re-orders items.
   const currentItemKey = selectedWord
     ? `sw:${selectedWord.surah}:${selectedWord.ayah}:${selectedWord.wordIndex}`
-    : `li:${wordIndex}`;
-
-  const [letterPool, setLetterPool] = useState<string[]>([]);
+    : `li:${currentWordIdx}`;
 
   useEffect(() => {
     if (!currentItem) { setLetterPool([]); return; }
@@ -238,7 +255,7 @@ export function WritingPanel() {
   // the audio can actually start. A `cancelled` flag ensures the aborted first
   // attempt doesn't leak setState calls or mark the instruction as "played".
   useEffect(() => {
-    if (writingInstructionHasPlayed) {
+    if (introHasPlayedRef.current) {
       setPendingAutoPlay(true);
       return;
     }
@@ -248,7 +265,7 @@ export function WritingPanel() {
 
     audio.addEventListener("ended", () => {
       if (cancelled) return;
-      writingInstructionHasPlayed = true;
+      introHasPlayedRef.current = true;
       setPendingAutoPlay(true);
     });
 
@@ -261,7 +278,7 @@ export function WritingPanel() {
       },
       () => {
         if (cancelled) return;
-        writingInstructionHasPlayed = true;
+        introHasPlayedRef.current = true;
         setPendingAutoPlay(true);
       },
     );
@@ -336,7 +353,13 @@ export function WritingPanel() {
   }, [wordIndex, total]);
 
   const checkAnswer = useCallback(() => {
-    if (!currentItem || !typedWord) {
+    if (!currentItem) return;
+    // Reference enforces this guard (index.html:6318): can't check before listening.
+    if (!hasListened) {
+      setFeedback({ text: language === "ar" ? "استمع إلى الكلمة أولاً." : "Listen to the word first.", type: "error" });
+      return;
+    }
+    if (!typedWord) {
       setFeedback({ text: language === "ar" ? "اكتب الإجابة أولاً." : "Type the answer first.", type: "error" });
       playUrl(retryAudioUrl()); return;
     }
@@ -353,12 +376,19 @@ export function WritingPanel() {
       const newAttempts = attempts + 1; setAttempts(newAttempts);
       setFeedback({ text: language === "ar" ? "ليست مطابقة تمامًا، حاول مرة أخرى." : "Not exactly matching, try again.", type: "error" });
       if (newAttempts >= 3) {
-        setRevealed(true); playUrl(revealAudioUrl());
+        setRevealed(true);
         setSessionAttempted((a) => a + 1);
-        setTimeout(advanceToNext, 2500);
+        // Play reveal audio, then replay the item audio so the student hears the
+        // correct pronunciation. Mirrors reference revealCorrectWord (index.html:6372–6390).
+        const revealAudio = new Audio(revealAudioUrl());
+        const playAnswer = () => playCurrentItemRef.current();
+        revealAudio.onended = playAnswer;
+        revealAudio.play().catch(playAnswer);
+        // Extend the auto-advance window to give the chained audio time to finish.
+        setTimeout(advanceToNext, 4500);
       } else { playUrl(retryAudioUrl()); }
     }
-  }, [typedWord, currentItem, attempts, language, playUrl, advanceToNext]);
+  }, [typedWord, currentItem, attempts, language, playUrl, advanceToNext, hasListened]);
 
   const skipWord = useCallback(() => advanceToNext(), [advanceToNext]);
 
@@ -377,6 +407,9 @@ export function WritingPanel() {
   const accuracy = sessionAttempted > 0 ? Math.round((sessionCorrect / sessionAttempted) * 100) : 0;
 
   const handleResetSession = () => {
+    // Reshuffle order + auto-play first item, mirroring reference Restart behaviour
+    // (index.html:6734–6754: writingOrder = []; reshuffle: true; autoplay: true).
+    setWordOrder(shuffleArray(Array.from({ length: writeItems.length }, (_, i) => i)));
     setWordIndex(0);
     setTypedLetters([]);
     setAttempts(0);
@@ -386,10 +419,12 @@ export function WritingPanel() {
     setSessionAttempted(0);
     setSessionCorrect(0);
     setShowResults(false);
+    setPendingAutoPlay(true);
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4">
+    <div className="flex flex-1 items-start justify-center p-6">
+    <div className="flex w-full max-w-3xl flex-col gap-4 rounded-2xl border border-border bg-card p-4">
       {/* Session tracking panel */}
       <div className="rounded-[1.125rem] border border-border bg-card px-4 py-3">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs">
@@ -405,12 +440,6 @@ export function WritingPanel() {
             <span className="rounded-full bg-primary/12 px-2 py-0.5 font-semibold text-primary">
               {language === "ar" ? "النتيجة:" : "Score:"} {sessionCorrect} / {sessionAttempted || 0}
             </span>
-            <Button variant="ghost" size="sm" className="h-7 cursor-pointer text-xs" onClick={() => setShowResults((s) => !s)}>
-              {language === "ar" ? "عرض النتائج" : "View Results"}
-            </Button>
-            <Button variant="ghost" size="sm" className="h-7 cursor-pointer text-xs" onClick={handleResetSession}>
-              {language === "ar" ? "إعادة" : "Reset"}
-            </Button>
           </div>
         </div>
         <div className="h-1.5 overflow-hidden rounded-full bg-muted">
@@ -425,49 +454,6 @@ export function WritingPanel() {
           </p>
         )}
       </div>
-
-      {/* Detailed results panel */}
-      {showResults && (
-        <div className="rounded-[1.125rem] border border-border bg-card px-5 py-4">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold">
-                {language === "ar" ? "ملخّص الجلسة" : "Session summary"}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {sessionAttempted === 0
-                  ? language === "ar"
-                    ? "لم تبدأ الجلسة بعد. اضغط استمع للبدء."
-                    : "Session not started. Press listen to begin."
-                  : language === "ar"
-                    ? `حاولت ${sessionAttempted} كلمات من أصل ${total}، أجبت بشكل صحيح عن ${sessionCorrect} منها.`
-                    : `Attempted ${sessionAttempted} of ${total} words, answered ${sessionCorrect} correctly.`}
-              </p>
-              <p className="mt-2 text-xs text-muted-foreground">
-                {language === "ar" ? "التغطية:" : "Coverage:"} {sessionAttempted}/{total}
-              </p>
-            </div>
-            {/* Accuracy ring */}
-            <div className="relative h-20 w-20 shrink-0">
-              <svg className="h-20 w-20 -rotate-90" viewBox="0 0 80 80">
-                <circle cx="40" cy="40" r="34" fill="none" className="stroke-muted" strokeWidth="6" />
-                <circle
-                  cx="40" cy="40" r="34"
-                  fill="none"
-                  className="stroke-primary transition-all duration-500"
-                  strokeWidth="6"
-                  strokeLinecap="round"
-                  strokeDasharray={2 * Math.PI * 34}
-                  strokeDashoffset={2 * Math.PI * 34 * (1 - accuracy / 100)}
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center text-sm font-bold">
-                {accuracy}%
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       <div className="rounded-[1.125rem] border border-border bg-card p-6 sm:p-8">
         <h2 className="mb-2 text-center text-lg font-semibold">
@@ -595,6 +581,57 @@ export function WritingPanel() {
           {feedback.text}
         </p>
       </div>
+
+      {/* Action row at the bottom — matches reference session-action-row placement */}
+      <div className="flex items-center justify-center gap-3">
+        <Button variant="outline" className="gap-2 rounded-full cursor-pointer" onClick={() => setShowResults((s) => !s)}>
+          {language === "ar" ? "📊 عرض النتائج" : "📊 View Results"}
+        </Button>
+        <Button variant="outline" className="gap-2 rounded-full cursor-pointer" onClick={handleResetSession}>
+          {language === "ar" ? "↻ إعادة الجلسة" : "↻ Restart Session"}
+        </Button>
+      </div>
+
+      {/* Detailed results panel — toggled by View Results, lives at the bottom under the action row */}
+      {showResults && (
+        <div className="rounded-[1.125rem] border border-border bg-card px-5 py-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1">
+              <p className="text-sm font-semibold">
+                {language === "ar" ? "ملخّص الجلسة" : "Session Summary"}
+              </p>
+              <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+                {sessionAttempted === 0
+                  ? language === "ar"
+                    ? "لم يبدأ الطالب جلسة الكتابة بعد. يمكنه تجربة أي عدد من الكلمات وفتح النتائج في أي وقت."
+                    : "The student has not started the Writing session yet. They can try any number of words and open results at any time."
+                  : language === "ar"
+                    ? `في جلسة الكتابة، حاول الطالب ${sessionAttempted} كلمة وأجاب بشكل صحيح على ${sessionCorrect} منها. لقد غطّى ${sessionAttempted} من أصل ${total} كلمة متاحة في هذا الدرس، وتبقّى ${total - sessionAttempted} كلمة لم يجرّبها بعد. الدقة الحالية: ${accuracy}%.`
+                    : `In the Writing session, the student attempted ${sessionAttempted} word${sessionAttempted !== 1 ? "s" : ""} and answered ${sessionCorrect} correctly. They covered ${sessionAttempted} out of ${total} available words in this lesson, with ${total - sessionAttempted} still untouched. Current accuracy is ${accuracy}%.`}
+              </p>
+            </div>
+            {/* Accuracy ring */}
+            <div className="relative h-20 w-20 shrink-0">
+              <svg className="h-20 w-20 -rotate-90" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="34" fill="none" className="stroke-muted" strokeWidth="6" />
+                <circle
+                  cx="40" cy="40" r="34"
+                  fill="none"
+                  className="stroke-primary transition-all duration-500"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeDasharray={2 * Math.PI * 34}
+                  strokeDashoffset={2 * Math.PI * 34 * (1 - accuracy / 100)}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center text-sm font-bold">
+                {accuracy}%
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
     </div>
   );
 }

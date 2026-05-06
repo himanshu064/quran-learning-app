@@ -53,8 +53,13 @@ const learningNav = [
   { key: "nav.writing",  href: "/dashboard?tab=writing",  icon: PenLine,     tabKey: "writing"  },
 ];
 
+// Per-lesson tab disable rules — must stay in sync with `unified-screen.tsx`.
+// L1: only Surahs (home) disabled. Verse, Teaching, Letters, Listening, Writing all enabled.
+// L2: all tabs enabled.
+// L3+: Letters disabled.
 function getDisabledTabs(lessonId: string): string[] {
-  if (lessonId === "lesson1" || lessonId === "lesson2") return ["home", "reader", "teaching"];
+  if (lessonId === "lesson1") return ["home"];
+  if (lessonId === "lesson2") return [];
   return ["letters"];
 }
 

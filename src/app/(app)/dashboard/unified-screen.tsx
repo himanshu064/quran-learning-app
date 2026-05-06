@@ -36,11 +36,13 @@ const TAB_ORDER: TabKey[] = [
   "writing",
 ];
 
-// Reference defaults to the Verse (reader) tab on every fresh load
-// (Omar App Final/index.html:2226 marks data-nav="reader" with class="active").
-// We mirror that: prefer "reader"; if reader is disabled for the current
-// lesson, walk TAB_ORDER and pick the first enabled one.
+// Default-tab rules:
+// - Lesson 1: "letters" (alphabet grid) — matches reference where home/reader
+//   redirect to letters on L1 (Omar App Final/index.html:6986–6994).
+// - Other lessons: prefer "reader"; if disabled, walk TAB_ORDER and pick the
+//   first enabled one.
 function getDefaultTab(lessonId: string): TabKey {
+  if (lessonId === "lesson1") return "letters";
   const disabled = getDisabledTabs(lessonId);
   return TAB_ORDER.find((t) => !disabled.includes(t)) ?? "reader";
 }

@@ -120,6 +120,8 @@ function TeachingPanelInner() {
   if (!selectedWord) {
     // Letter slides — focused "Letter of the day" card (client's reference)
     if (currentSlide?.type === "letter") {
+      const savedProgress = getLessonProgress(lessonId);
+      const skipIntro = !!(savedProgress && savedProgress.slideIndex > 0);
       return (
         <LetterCard
           letterSlide={currentSlide as LetterSlide}
@@ -134,6 +136,7 @@ function TeachingPanelInner() {
           prev={prev}
           next={next}
           shuffle={shuffle}
+          skipIntro={skipIntro}
         />
       );
     }
@@ -176,7 +179,8 @@ function TeachingPanelInner() {
   const isHighlighted = isPlaying && activeWord && currentWordIndex === activeWord.wordIndex;
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-2.5">
+    <div className="flex flex-1 items-start justify-center p-6">
+    <div className="flex w-full max-w-3xl flex-col gap-3 rounded-2xl border border-border bg-card p-4">
       {/* Headline card */}
       <div className="flex items-center justify-between rounded-[1.125rem] border border-border bg-card px-4 py-3">
         <span className="text-sm font-medium">
@@ -258,6 +262,7 @@ function TeachingPanelInner() {
         </div>
       </div>
     </div>
+    </div>
   );
 }
 
@@ -316,6 +321,7 @@ function LetterCard({
   prev,
   next,
   shuffle,
+  skipIntro,
 }: {
   letterSlide: LetterSlide;
   slideIndex: number;
@@ -329,6 +335,7 @@ function LetterCard({
   prev: () => void;
   next: () => void;
   shuffle: () => void;
+  skipIntro: boolean;
 }) {
   const introAudioRef = useRef<HTMLAudioElement | null>(null);
   // Always-current refs so effects never capture stale closures
@@ -352,8 +359,11 @@ function LetterCard({
     if (letterSlide.audio) playLetterAudio(`/${letterSlide.audio}`);
   }, [letterSlide.audio, playLetterAudio, stop, stopIntro]);
 
-  // On mount: play instruction once, then auto-play the current letter audio.
+  // On mount: if restoring to a saved position, skip intro — the navigation effect
+  // will play the correct letter after goTo fires. If starting fresh at letter 1,
+  // play the instruction audio then auto-play the first letter.
   useEffect(() => {
+    if (skipIntro) return;
     const audio = new Audio("/audio/lesson1_letters_instruction_en.mp3");
     introAudioRef.current = audio;
     const playLetter = () => {
@@ -383,7 +393,8 @@ function LetterCard({
   }, [letterSlide.audio, playLetterAudio, stopIntro]);
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-2.5">
+    <div className="flex flex-1 items-start justify-center p-6">
+    <div className="flex w-full max-w-3xl flex-col gap-3 rounded-2xl border border-border bg-card p-4">
       {/* Headline card */}
       <div className="flex items-center justify-between rounded-[1.125rem] border border-border bg-card px-4 py-3">
         <span className="text-sm font-medium">
@@ -444,6 +455,7 @@ function LetterCard({
           </Button>
         </div>
       </div>
+    </div>
     </div>
   );
 }
