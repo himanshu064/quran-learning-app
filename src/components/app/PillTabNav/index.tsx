@@ -44,6 +44,28 @@ export function PillTabNav({
     return { ar, en };
   };
 
+  // Tooltip text for disabled tabs — mirrors reference's title attributes set
+  // by `updateHomeReaderTabAvailability` (index.html:3469-3484) and
+  // `updateLettersTabAvailability` (index.html:3501-3505).
+  const getDisabledTitle = (tab: (typeof TABS)[number]): string | undefined => {
+    if (tab.key === "home" && lessonId === "lesson1") {
+      return language === "ar"
+        ? "السور غير متاحة في الدرس ١"
+        : "Surahs is not available in Lesson 1";
+    }
+    if (tab.key === "reader" && lessonId === "lesson1") {
+      return language === "ar"
+        ? "الآية غير متاحة في الدرس ١"
+        : "Verse is not available in Lesson 1";
+    }
+    if (tab.key === "letters") {
+      return language === "ar"
+        ? "الحروف متاحة فقط في الدرس ١ والدرس ٢"
+        : "Letters is only available in Lesson 1 and Lesson 2";
+    }
+    return undefined;
+  };
+
   return (
     <>
       {/* Desktop pill nav (hidden on mobile) */}
@@ -51,6 +73,7 @@ export function PillTabNav({
         {TABS.map((tab) => {
           const isDisabled = disabledTabs.includes(tab.key);
           const { ar, en } = getLabels(tab);
+          const label = language === "ar" ? ar : en;
           return (
             <Button
               key={tab.key}
@@ -58,6 +81,7 @@ export function PillTabNav({
               size="sm"
               disabled={isDisabled}
               onClick={() => onTabChange(tab.key)}
+              title={isDisabled ? getDisabledTitle(tab) ?? label : label}
               className={cn(
                 "h-auto rounded-none px-2.5 py-1.5 text-sm font-medium cursor-pointer",
                 "text-muted-foreground hover:text-foreground hover:bg-transparent",
@@ -66,7 +90,7 @@ export function PillTabNav({
                 isDisabled && "opacity-30 cursor-not-allowed",
               )}
             >
-              {language === "ar" ? ar : en}
+              {label}
             </Button>
           );
         })}
@@ -78,6 +102,7 @@ export function PillTabNav({
           {TABS.map((tab) => {
             const isDisabled = disabledTabs.includes(tab.key);
             const { ar, en } = getLabels(tab);
+            const label = language === "ar" ? ar : en;
             return (
               <Button
                 key={tab.key}
@@ -85,6 +110,7 @@ export function PillTabNav({
                 size="sm"
                 disabled={isDisabled}
                 onClick={() => onTabChange(tab.key)}
+                title={isDisabled ? getDisabledTitle(tab) ?? label : label}
                 className={cn(
                   "h-auto rounded-lg px-2 py-2 text-xs font-medium cursor-pointer",
                   "text-muted-foreground hover:text-foreground",
@@ -93,7 +119,7 @@ export function PillTabNav({
                   isDisabled && "opacity-30 cursor-not-allowed",
                 )}
               >
-                {language === "ar" ? ar : en}
+                {label}
               </Button>
             );
           })}

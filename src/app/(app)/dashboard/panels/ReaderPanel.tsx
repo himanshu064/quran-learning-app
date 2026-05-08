@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Shuffle, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -82,6 +82,7 @@ export function ReaderPanel() {
     prev: lessonPrev,
     next: lessonNext,
     goTo: lessonGoTo,
+    shuffle: lessonShuffle,
   } = useLessonContext();
   const { selectedWord, setSelectedWord } = useSelectedWord();
 
@@ -454,7 +455,7 @@ export function ReaderPanel() {
         </div>
       )}
 
-      {/* Ayah box */}
+      {/* Ayah box — grows naturally with verse content; the card scrolls. */}
       {isTextLoading ? (
         <Skeleton className="h-56 rounded-2xl" />
       ) : (
@@ -626,8 +627,46 @@ export function ReaderPanel() {
         </div>
       )}
 
-      {/* Lesson word nav — previous/next only */}
-      {totalSlides > 0 && (
+      {/* Ayah-level nav (◀ / ▶) — sequentially walk through verses regardless
+          of lesson state. Mirrors reference's `ayahNavRow` (index.html:3535-3553)
+          which lives in the ayah container and navigates via `gotoRelativeAyah`
+          (index.html:4872). Shown whenever a verse is loaded; in our app the
+          lesson nav row sits below this and complements (rather than hides) it
+          so the user always has both options. */}
+      {verses.length > 0 && (
+        <div className="flex items-center justify-center gap-2" dir="ltr">
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8 rounded-full cursor-pointer"
+            onClick={() => goToAyah(-1)}
+            disabled={surah === 1 && ayahFrom === 1}
+            title={language === "ar" ? "الآية السابقة" : "Previous ayah"}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8 rounded-full cursor-pointer"
+            onClick={() => goToAyah(1)}
+            disabled={surah === 114 && ayahFrom === maxAyah}
+            title={language === "ar" ? "الآية التالية" : "Next ayah"}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+
+      {/* Lesson word nav — prev / play / next / shuffle. Shuffle button mirrors
+          reference's `lessonShuffleBtn` (index.html:2469-2476) which picks a
+          random slide via `shuffle()` from useLessonContext.
+
+          Hidden on L1 (letter slides) to match the reference: when
+          `currentLessonId === 'lesson1'` the reference's `gridMode` is true and
+          `updateLessonUIVisibility` (index.html:4310-4312) hides the lesson
+          nav row entirely, leaving only the ayah-level prev/next arrows above. */}
+      {totalSlides > 0 && !letterSlide && (
         <div className="flex items-center justify-center gap-2">
           <Button
             variant="outline"
@@ -659,6 +698,15 @@ export function ReaderPanel() {
             title={language === "ar" ? "التالي" : "Next"}
           >
             <SkipForward className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8 rounded-full cursor-pointer"
+            onClick={lessonShuffle}
+            title={language === "ar" ? "اختيار عشوائي" : "Random"}
+          >
+            <Shuffle className="h-4 w-4" />
           </Button>
         </div>
       )}
