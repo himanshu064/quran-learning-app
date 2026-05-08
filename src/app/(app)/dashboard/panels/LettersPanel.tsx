@@ -100,12 +100,16 @@ export function AlphabetGrid() {
   return (
     <div className="flex flex-1 items-start justify-center p-6">
     <div className="flex w-full max-w-5xl flex-col gap-4 rounded-2xl border border-border bg-card p-5">
-      {/* Today's lesson header banner — matches reference */}
+      {/* Today's lesson header banner — matches reference. Topic is ALWAYS in Arabic
+          (extracted from labelAr); only the prefix is localized — mirrors the reference's
+          updateHeadlineForCurrentLesson at index.html:3640-3657 where cfg.topic is the
+          Arabic string and only `headlinePrefix` flips between languages. */}
       <div className="flex items-center justify-between rounded-[1.125rem] border border-border bg-card px-4 py-3">
         <span className="text-sm font-medium">
-          {language === "ar"
-            ? `درس اليوم: ${config.labelAr.split("—")[1]?.trim() || config.labelAr}`
-            : `Today's lesson: ${config.labelEn.split("—")[1]?.trim() || config.labelEn}`}
+          {(language === "ar" ? "درس اليوم: " : "Today's lesson: ")}
+          <span dir="rtl" className="font-uthmani">
+            {config.labelAr.split("—")[1]?.trim() || config.labelAr}
+          </span>
         </span>
         <span className="rounded-full border border-border px-3 py-1 text-xs">
           {language === "ar"

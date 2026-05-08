@@ -179,6 +179,28 @@ export function ReaderPanel() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wordSlide]);
 
+  // Clear cross-tab "selected word" state and the flashcard overlay whenever
+  // the displayed verse no longer matches them. Mirrors the reference's
+  // behaviour of stripping `.lesson-focus` / clearing lesson UI on every
+  // surah/ayah navigation (index.html:4136-4140 surah card click,
+  // 4926-4930 ayah prev/next, 4960-4964 "continue where you left",
+  // 6825-6829 lesson change), so a word selected in one verse doesn't
+  // bleed into a different surah/ayah after the user navigates away.
+  //
+  // Word clicks themselves do NOT trigger a clear: the click sets
+  // selectedWord and lessonGoTo's auto-navigate keeps wordSlide.surah/ayah
+  // in step with the displayed verse, so the mismatch checks below stay
+  // false. A clear only fires on external navigation (Surahs tab click,
+  // lesson prev/next, manual surah/ayah input change).
+  useEffect(() => {
+    if (selectedWord && (selectedWord.surah !== surah || selectedWord.ayah !== ayahFrom)) {
+      setSelectedWord(null);
+    }
+    if (wordSlide && (wordSlide.surah !== surah || wordSlide.ayah !== ayahFrom)) {
+      setShowOverlay(false);
+    }
+  }, [surah, ayahFrom, selectedWord, wordSlide, setSelectedWord]);
+
   // Keep local input strings in sync when URL state changes externally (lesson nav)
   useEffect(() => { setSurahInput(String(surah)); }, [surah]);
   useEffect(() => { setAyahFromInput(String(ayahFrom)); }, [ayahFrom]);
@@ -557,43 +579,50 @@ export function ReaderPanel() {
           </div>
 
           {/* Lesson overlay (flash card) — word slides only, not letter slides.
-              Clicking the WORD plays its audio (and highlights it on hover);
-              clicking outside the word still toggles the overlay back to the verse. */}
-          {showOverlay && wordSlide && (
-            <div
-              className="absolute inset-0 z-20 flex flex-col items-center justify-center overflow-hidden bg-card/95 p-6 text-center backdrop-blur-sm"
-              dir="rtl"
-            >
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  playWordAudio(
-                    wordSlide.surah,
-                    wordSlide.ayah,
-                    wordSlide.wordIndex,
-                  );
-                }}
-                className={cn(
-                  "font-uthmani text-[4rem] sm:text-[4.5rem] leading-[1.5] truncate max-w-full px-6 py-2 rounded-2xl",
-                  "cursor-pointer transition-all duration-200",
-                  "hover:bg-primary/10 hover:text-primary hover:scale-[1.04]",
-                  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/70",
-                  isPlaying &&
-                    currentAyah === wordSlide.ayah &&
-                    currentWordIndex === wordSlide.wordIndex &&
-                    "bg-blue-500/14 text-blue-500 outline outline-2 outline-blue-500/70",
-                )}
+              The flashcard tracks the same source the verse highlight does
+              (selectedWord first, falling back to wordSlide). Otherwise a
+              user-clicked word that isn't part of the lesson slide list
+              would highlight in the verse but the flashcard would still
+              show the old lesson word — a confusing mismatch. */}
+          {(() => {
+            const flashWord = selectedWord || wordSlide;
+            if (!showOverlay || !flashWord) return null;
+            return (
+              <div
+                className="absolute inset-0 z-20 flex flex-col items-center justify-center overflow-hidden bg-card/95 p-6 text-center backdrop-blur-sm"
+                dir="rtl"
               >
-                {wordSlide.word}
-              </button>
-              <p className="mt-3 text-xs text-muted-foreground">
-                {language === "ar"
-                  ? "اضغط على الكلمة للاستماع، أو على البطاقة لإظهار الآية"
-                  : "Tap the word to hear it, or tap the card for the full verse"}
-              </p>
-            </div>
-          )}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    playWordAudio(
+                      flashWord.surah,
+                      flashWord.ayah,
+                      flashWord.wordIndex,
+                    );
+                  }}
+                  className={cn(
+                    "font-uthmani text-[4rem] sm:text-[4.5rem] leading-[1.5] truncate max-w-full px-6 py-2 rounded-2xl",
+                    "cursor-pointer transition-all duration-200",
+                    "hover:bg-primary/10 hover:text-primary hover:scale-[1.04]",
+                    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/70",
+                    isPlaying &&
+                      currentAyah === flashWord.ayah &&
+                      currentWordIndex === flashWord.wordIndex &&
+                      "bg-blue-500/14 text-blue-500 outline outline-2 outline-blue-500/70",
+                  )}
+                >
+                  {flashWord.word}
+                </button>
+                <p className="mt-3 text-xs text-muted-foreground">
+                  {language === "ar"
+                    ? "اضغط على الكلمة للاستماع، أو على البطاقة لإظهار الآية"
+                    : "Tap the word to hear it, or tap the card for the full verse"}
+                </p>
+              </div>
+            );
+          })()}
         </div>
       )}
 

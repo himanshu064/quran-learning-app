@@ -314,6 +314,7 @@ export function McqPanel() {
     setHasListened(false);
     setFirstAudioStarted(false);
     setHasFinishedFirstListen(false);
+    setShowResults(false);
     setPendingAutoPlay(true);
   }, [questionIndex, totalQuestions, score, config.id, saveMcqScore]);
 

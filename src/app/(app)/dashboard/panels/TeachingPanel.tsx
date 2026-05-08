@@ -181,14 +181,21 @@ function TeachingPanelInner() {
   return (
     <div className="flex flex-1 items-start justify-center p-6">
     <div className="flex w-full max-w-3xl flex-col gap-3 rounded-2xl border border-border bg-card p-4">
-      {/* Headline card */}
+      {/* Headline card. Topic always rendered in Arabic — only the prefix is
+          localized — matches reference's updateHeadlineForCurrentLesson
+          (index.html:3640-3657). */}
       <div className="flex items-center justify-between rounded-[1.125rem] border border-border bg-card px-4 py-3">
         <span className="text-sm font-medium">
           {selectedWord
             ? (language === "ar" ? "الكلمة المختارة" : "Selected word")
-            : language === "ar"
-              ? `درس اليوم: ${config.labelAr.split("—")[1]?.trim() || config.labelAr}`
-              : `Today's lesson: ${config.labelEn.split("—")[1]?.trim() || config.labelEn}`}
+            : (
+              <>
+                {language === "ar" ? "درس اليوم: " : "Today's lesson: "}
+                <span dir="rtl" className="font-uthmani">
+                  {config.labelAr.split("—")[1]?.trim() || config.labelAr}
+                </span>
+              </>
+            )}
         </span>
         <Badge variant="outline" className="text-xs">
           {selectedWord
@@ -359,48 +366,75 @@ function LetterCard({
     if (letterSlide.audio) playLetterAudio(`/${letterSlide.audio}`);
   }, [letterSlide.audio, playLetterAudio, stop, stopIntro]);
 
-  // On mount: if restoring to a saved position, skip intro — the navigation effect
-  // will play the correct letter after goTo fires. If starting fresh at letter 1,
-  // play the instruction audio then auto-play the first letter.
+  // On mount: if restoring to a saved position, skip intro and auto-play the
+  // restored letter directly. Otherwise play the instruction audio then chain
+  // into the first letter's audio.
+  //
+  // The `cancelled` flag mirrors McqPanel's mount effect so React 18 StrictMode's
+  // mount → cleanup → mount sequence doesn't double-fire the intro or leak the
+  // first attempt's `.catch()` into the second mount's audio.
   useEffect(() => {
-    if (skipIntro) return;
+    if (skipIntro) {
+      const path = letterAudioPathRef.current;
+      if (path) playLetterAudioRef.current(path);
+      return;
+    }
+
+    let cancelled = false;
     const audio = new Audio("/audio/lesson1_letters_instruction_en.mp3");
     introAudioRef.current = audio;
-    const playLetter = () => {
+
+    const playLetterAfterIntro = () => {
+      if (cancelled) return;
       introAudioRef.current = null;
       const path = letterAudioPathRef.current;
       if (path) playLetterAudioRef.current(path);
     };
-    audio.onended = playLetter;
-    audio.play().catch(playLetter);
+
+    audio.addEventListener("ended", playLetterAfterIntro);
+    audio.play().catch(playLetterAfterIntro);
+
     return () => {
-      if (introAudioRef.current) {
-        introAudioRef.current.onended = null;
-        introAudioRef.current.pause();
-        introAudioRef.current.src = "";
-        introAudioRef.current = null;
-      }
+      cancelled = true;
+      if (introAudioRef.current === audio) introAudioRef.current = null;
+      audio.pause();
+      audio.src = "";
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // When the letter changes (prev/next navigation): stop intro and auto-play new letter.
-  const isFirstRender = useRef(true);
+  // When the letter actually changes (prev/next navigation): stop intro and
+  // auto-play the new letter. Tracking the last-played path (instead of an
+  // `isFirstRender` boolean) is StrictMode-safe: the boolean would flip on the
+  // first mount, then the second strict-mode mount would mistake itself for a
+  // navigation and call stopIntro() — killing the intro audio before it plays.
+  const lastPlayedAudioRef = useRef<string>("");
   useEffect(() => {
-    if (isFirstRender.current) { isFirstRender.current = false; return; }
+    const path = letterSlide.audio ? `/${letterSlide.audio}` : "";
+    if (!path) return;
+    if (lastPlayedAudioRef.current === "") {
+      // First time we've seen this letter — leave the intro effect to handle it.
+      lastPlayedAudioRef.current = path;
+      return;
+    }
+    if (lastPlayedAudioRef.current === path) return;
+    lastPlayedAudioRef.current = path;
     stopIntro();
-    if (letterSlide.audio) playLetterAudio(`/${letterSlide.audio}`);
+    playLetterAudio(path);
   }, [letterSlide.audio, playLetterAudio, stopIntro]);
 
   return (
     <div className="flex flex-1 items-start justify-center p-6">
     <div className="flex w-full max-w-3xl flex-col gap-3 rounded-2xl border border-border bg-card p-4">
-      {/* Headline card */}
+      {/* Headline card. Topic always rendered in Arabic — only the prefix is
+          localized — matches reference's updateHeadlineForCurrentLesson
+          (index.html:3640-3657). */}
       <div className="flex items-center justify-between rounded-[1.125rem] border border-border bg-card px-4 py-3">
         <span className="text-sm font-medium">
-          {language === "ar"
-            ? `درس اليوم: ${configLabelAr.split("—")[1]?.trim() || configLabelAr}`
-            : `Today's lesson: ${configLabelEn.split("—")[1]?.trim() || configLabelEn}`}
+          {language === "ar" ? "درس اليوم: " : "Today's lesson: "}
+          <span dir="rtl" className="font-uthmani">
+            {configLabelAr.split("—")[1]?.trim() || configLabelAr}
+          </span>
         </span>
         <Badge variant="outline" className="text-xs">
           {language === "ar"

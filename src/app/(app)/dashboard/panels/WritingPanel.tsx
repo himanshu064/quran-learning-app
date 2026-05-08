@@ -348,6 +348,7 @@ export function WritingPanel() {
       setFeedback({ text: "", type: "" });
       setRevealed(false);
       setHasListened(false);
+      setShowResults(false);
       setPendingAutoPlay(true);
     }
   }, [wordIndex, total]);
@@ -516,49 +517,64 @@ export function WritingPanel() {
           </div>
         )}
 
-        {/* Letter buttons — green circles */}
-        <div className="mb-4 flex flex-wrap justify-center gap-2">
-          {letterPool.map((letter, i) => (
-            <button
-              key={`${letter}-${i}`}
-              onClick={() => appendLetter(letter)}
-              disabled={!hasListened || isPlaying || revealed}
-              className={cn(
-                "flex items-center justify-center rounded-xl bg-emerald-500 font-uthmani text-white transition-all hover:bg-emerald-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40",
-                "min-w-[3.5rem] px-[1.4rem] py-4 text-[2rem]",
-              )}
-              dir="rtl"
-            >
-              {letter}
-            </button>
-          ))}
-        </div>
+        {/* Letter buttons (green pills) — hidden until the user has triggered
+            Listen for this question. Only the letter pool is gated; the harakat
+            toolbar below stays visible at all times. hasListened resets per-question
+            in advanceToNext so the gate fires on every word/letter.
 
-        {/* Harakat toolbar — 3 groups: Basic, Tanwin, Quranic */}
-        {!isLetterMode && (
-          <div className="mb-4 space-y-2">
-            {[
-              { label: language === "ar" ? "أساسية:" : "Basic:", items: HARAKAT_BASIC },
-              { label: language === "ar" ? "تنوين:" : "Tanwin:", items: HARAKAT_TANWIN },
-              { label: language === "ar" ? "قرآنية:" : "Quranic:", items: HARAKAT_QURANIC },
-            ].map((group) => (
-              <div key={group.label} className="flex items-center justify-center gap-2 rounded-[1.125rem] border border-border bg-muted px-3 py-2">
-                <span className="me-1 shrink-0 text-xs text-muted-foreground">{group.label}</span>
-                {group.items.map((h) => (
-                  <button
-                    key={h.key}
-                    onClick={() => applyHaraka(h.key)}
-                    disabled={!hasListened || isPlaying || revealed || typedLetters.length === 0}
-                    className="flex items-center justify-center rounded-xl bg-orange-500 font-uthmani text-[2.2rem] text-white transition-all hover:bg-orange-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 min-w-[3.25rem] px-[0.7rem] py-[0.55rem]"
-                    title={language === "ar" ? h.label : h.labelEn}
-                  >
-                    {h.display}
-                  </button>
-                ))}
-              </div>
+            The `pendingAutoPlay` half of the gate prevents a one-frame flicker on
+            Restart Session and Next word: those handlers reset hasListened=false
+            and queue pendingAutoPlay=true in the same batch. The auto-play effect
+            then fires and `playCurrentItem` flips hasListened back to true — but
+            without `pendingAutoPlay` in the gate, React would paint once between
+            those two commits with buttons hidden, causing a visible flicker.
+            Including pendingAutoPlay keeps the gate continuously true across the
+            transition. */}
+        {(hasListened || pendingAutoPlay) && (
+          <div className="mb-4 flex flex-wrap justify-center gap-2">
+            {letterPool.map((letter, i) => (
+              <button
+                key={`${letter}-${i}`}
+                onClick={() => appendLetter(letter)}
+                disabled={isPlaying || revealed}
+                className={cn(
+                  "flex items-center justify-center rounded-xl bg-emerald-500 font-uthmani text-white transition-all hover:bg-emerald-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40",
+                  "min-w-[3.5rem] px-[1.4rem] py-4 text-[2rem]",
+                )}
+                dir="rtl"
+              >
+                {letter}
+              </button>
             ))}
           </div>
         )}
+
+        {/* Harakat toolbar — 3 groups: Basic, Tanwin, Quranic. Always visible
+            regardless of listen state or letter/word mode — matches the reference's
+            renderWritingToolbar() at index.html:6035-6063 which is called once at
+            init with no conditional hide. */}
+        <div className="mb-4 space-y-2">
+          {[
+            { label: language === "ar" ? "أساسية:" : "Basic:", items: HARAKAT_BASIC },
+            { label: language === "ar" ? "تنوين:" : "Tanwin:", items: HARAKAT_TANWIN },
+            { label: language === "ar" ? "قرآنية:" : "Quranic:", items: HARAKAT_QURANIC },
+          ].map((group) => (
+            <div key={group.label} className="flex items-center justify-center gap-2 rounded-[1.125rem] border border-border bg-muted px-3 py-2">
+              <span className="me-1 shrink-0 text-xs text-muted-foreground">{group.label}</span>
+              {group.items.map((h) => (
+                <button
+                  key={h.key}
+                  onClick={() => applyHaraka(h.key)}
+                  disabled={!hasListened || isPlaying || revealed || typedLetters.length === 0}
+                  className="flex items-center justify-center rounded-xl bg-orange-500 font-uthmani text-[2.2rem] text-white transition-all hover:bg-orange-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 min-w-[3.25rem] px-[0.7rem] py-[0.55rem]"
+                  title={language === "ar" ? h.label : h.labelEn}
+                >
+                  {h.display}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
 
         {/* Edit controls */}
         <div className="mb-4 flex items-center justify-center gap-2">

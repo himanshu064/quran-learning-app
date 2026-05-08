@@ -56,7 +56,7 @@ export function SurahsPanel({
 
   return (
     <div className="flex flex-1 items-start justify-center p-6">
-    <div className="flex w-full max-w-3xl flex-col gap-3 rounded-2xl border border-border bg-card p-4">
+    <div className="flex w-full max-w-5xl flex-col gap-3 rounded-2xl border border-border bg-card p-4">
       {/* Chips row */}
       <div className="flex flex-wrap gap-2">
         {lastSurahMeta && (
@@ -74,7 +74,9 @@ export function SurahsPanel({
         </Badge>
       </div>
 
-      {/* Continue where you left */}
+      {/* Continue where you left — visually larger than the per-surah cards in
+          the list below, matching the prominence the reference gives the
+          "continue" card vs. the all-surahs grid. */}
       {lastSurahMeta && (
         <>
           <p className="text-sm text-muted-foreground">
@@ -83,27 +85,27 @@ export function SurahsPanel({
           <div
             role="button"
             tabIndex={0}
-            className="grid cursor-pointer grid-cols-[auto_1fr_auto] items-center gap-3 rounded-[1.125rem] border border-border bg-card p-3 transition-all hover:border-primary/30 hover:-translate-y-px"
+            className="grid cursor-pointer grid-cols-[auto_1fr_auto] items-center gap-4 rounded-4xl border border-border bg-card px-5 py-4 transition-all hover:border-primary/40 hover:-translate-y-px"
             onClick={() => handleSurahClick(lastSurah!, lastAyah || 1)}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleSurahClick(lastSurah!, lastAyah || 1); }}
           >
-            <div className="grid h-9 w-9 place-items-center rounded-full border border-border text-sm font-bold text-primary">
+            <div className="grid h-20 w-20 place-items-center rounded-2xl border border-border bg-primary/10 text-lg font-bold text-primary">
               {lastSurah}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">
+              <p className="truncate text-base font-semibold">
                 {lastSurahMeta.name_simple} · {lastSurahMeta.verses_count}{" "}
                 {language === "ar" ? "آيات" : "verses"}
               </p>
-              <p className="truncate text-xs text-muted-foreground">
+              <p className="truncate text-sm text-muted-foreground">
                 {language === "ar" ? "آخر آية:" : "Last ayah:"} {lastAyah || 1}
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-2">
-              <span className="font-uthmani text-base font-semibold" dir="rtl">
+              <span className="font-uthmani text-2xl font-semibold text-primary" dir="rtl">
                 {lastSurahMeta.name_arabic}
               </span>
-              <ChevronLeft className="h-4 w-4 text-muted-foreground" />
+              <ChevronLeft className="h-5 w-5 text-muted-foreground" />
             </div>
           </div>
         </>
@@ -111,7 +113,7 @@ export function SurahsPanel({
 
       {/* Search */}
       <div className="relative">
-        <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="pointer-events-none absolute inset-s-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
           type="text"
           value={query}

@@ -37,12 +37,10 @@ const TAB_ORDER: TabKey[] = [
 ];
 
 // Default-tab rules:
-// - Lesson 1: "letters" (alphabet grid) — matches reference where home/reader
-//   redirect to letters on L1 (Omar App Final/index.html:6986–6994).
-// - Other lessons: prefer "reader"; if disabled, walk TAB_ORDER and pick the
-//   first enabled one.
+// Reference defaults to Verse (reader) on every lesson, including L1
+// (Omar App Final/index.html:6890 sets currentScreenName='reader' at startup,
+// and the L1 reset path at :6834-6843 also lands on reader).
 function getDefaultTab(lessonId: string): TabKey {
-  if (lessonId === "lesson1") return "letters";
   const disabled = getDisabledTabs(lessonId);
   return TAB_ORDER.find((t) => !disabled.includes(t)) ?? "reader";
 }
