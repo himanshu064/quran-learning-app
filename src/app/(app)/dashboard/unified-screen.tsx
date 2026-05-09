@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useQueryState, parseAsInteger, parseAsString } from "nuqs";
 import { UnifiedTopbar } from "@/components/app/UnifiedTopbar";
 import type { TabKey } from "@/components/app/PillTabNav";
@@ -47,7 +47,7 @@ function getDefaultTab(lessonId: string): TabKey {
 
 export function UnifiedScreen() {
   const { stop } = useAudioContext();
-  const { lessonId } = useLessonContext();
+  const { lessonId, slides } = useLessonContext();
 
   // Pre-compute the lesson-aware default so we can both:
   //  (a) feed it into useQueryState as the parser default (used when the URL has no ?tab=)
@@ -100,6 +100,57 @@ export function UnifiedScreen() {
       setTab(lessonDefaultTab);
     }
   }, [disabledTabs, activeTab, lessonDefaultTab, setTab]);
+
+  // On a hard page reload (F5 / Ctrl-R), force the tab back to the lesson
+  // default (Verse) regardless of what `?tab=` is in the URL. Client-side
+  // navigations and back/forward keep their preserved tab.
+  useEffect(() => {
+    const nav = performance.getEntriesByType("navigation")[0] as
+      | PerformanceNavigationTiming
+      | undefined;
+    if (nav?.type === "reload") {
+      setTab(lessonDefaultTab);
+    }
+    // Run only once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // On lesson change (user picks a new lesson from the dropdown), reset the
+  // tab to Verse (reader) AND mark the verse position as needing a sync to
+  // the new lesson's first word slide. Mirrors reference behaviour at
+  // index.html:6835/6867-6868 (always end on reader) and :5150-5151
+  // (showLesson(0) sets surahInput.value/ayahNumberInput.value from the
+  // first slide). Skip the very first render so the URL's ?tab= and
+  // ?surah=/?ayah= are not clobbered on initial mount.
+  const prevLessonIdRef = useRef(lessonId);
+  const pendingVerseSyncRef = useRef(false);
+  useEffect(() => {
+    if (prevLessonIdRef.current !== lessonId) {
+      prevLessonIdRef.current = lessonId;
+      setTab(lessonDefaultTab);
+      pendingVerseSyncRef.current = true;
+    }
+  }, [lessonId, lessonDefaultTab, setTab]);
+
+  // Once the new lesson's slides have loaded, snap the verse inputs/URL to
+  // the first word slide's surah/ayah. Letter-only lessons (Lesson 1) have no
+  // word slides — in that case we leave the verse position untouched, which
+  // matches the reference's L1 reset path that doesn't call showLesson(0)
+  // until the user navigates to a real lesson (index.html:6834-6863).
+  useEffect(() => {
+    if (!pendingVerseSyncRef.current) return;
+    if (!slides || slides.length === 0) return;
+    const firstWord = slides.find((s) => s.type === "word");
+    if (!firstWord) {
+      // Letter-only lesson — clear the pending flag without touching the URL.
+      pendingVerseSyncRef.current = false;
+      return;
+    }
+    pendingVerseSyncRef.current = false;
+    setSurah(firstWord.surah);
+    setAyah(firstWord.ayah);
+    setAyahTo(0);
+  }, [slides, setSurah, setAyah, setAyahTo]);
 
   return (
     <SelectedWordProvider>

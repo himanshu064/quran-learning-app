@@ -565,7 +565,7 @@ export function WritingPanel() {
                 <button
                   key={h.key}
                   onClick={() => applyHaraka(h.key)}
-                  disabled={!hasListened || isPlaying || revealed || typedLetters.length === 0}
+                  disabled={isPlaying || revealed}
                   className="flex items-center justify-center rounded-xl bg-orange-500 font-uthmani text-[2.2rem] text-white transition-all hover:bg-orange-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 min-w-[3.25rem] px-[0.7rem] py-[0.55rem]"
                   title={language === "ar" ? h.label : h.labelEn}
                 >

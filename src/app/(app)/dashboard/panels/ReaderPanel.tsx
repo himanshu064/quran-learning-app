@@ -219,12 +219,22 @@ export function ReaderPanel() {
     return result;
   }, [quranText, surah, ayahFrom, ayahTo, maxAyah]);
 
-  // Save reading position
-  const hasUserNavigated = useRef(false);
+  // Save reading position on every surah/ayah change. The initial mount is
+  // skipped ONLY when the URL has no explicit `?surah=`/`?ayah=` params (i.e.,
+  // the panel mounted at parser defaults 1:1 with no user intent) — that
+  // protects a previously-saved position from being clobbered on a fresh app
+  // load that happens to land on the Verse tab. Any URL with explicit params
+  // (e.g., navigated from the Surahs card, lesson change, deep link) is saved
+  // immediately so the Continue card reflects the user's actual position.
+  // Mirrors reference's `saveLastRead()` call inside `renderAyah`
+  // (Omar App Final/index.html:4862).
+  const hasMountedReader = useRef(false);
   useEffect(() => {
-    if (!hasUserNavigated.current) {
-      hasUserNavigated.current = true;
-      return;
+    if (!hasMountedReader.current) {
+      hasMountedReader.current = true;
+      const sp = new URLSearchParams(window.location.search);
+      const urlHasPosition = sp.has("surah") || sp.has("ayah");
+      if (!urlHasPosition) return;
     }
     if (surah && ayahFrom) {
       savePosition({ surah, ayah: ayahFrom });

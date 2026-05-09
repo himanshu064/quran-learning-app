@@ -56,9 +56,20 @@ export function useProgress() {
       const key = `${surah}:${ayah}`;
       if (key === lastSavedPosition.current) return;
       lastSavedPosition.current = key;
+      // Optimistic cache update so consumers like the "Continue where you
+      // left" card on the Surahs panel see the new position immediately,
+      // without waiting for the server roundtrip + refetch.
+      queryClient.setQueryData(
+        SETTINGS_KEY,
+        (prev: Record<string, unknown> | undefined) => ({
+          ...(prev ?? {}),
+          lastReadSurah: surah,
+          lastReadAyah: ayah,
+        }),
+      );
       saveReadingPosition(surah, ayah).catch(() => {});
     },
-    [],
+    [queryClient],
   );
 
   const saveLastLessonFn = useCallback(
