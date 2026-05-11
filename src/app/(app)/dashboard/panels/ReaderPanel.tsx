@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { Play, Pause, SkipBack, SkipForward, Shuffle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Play, Pause, Shuffle, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -692,13 +692,12 @@ export function ReaderPanel() {
         </div>
       )}
 
-      {/* Ayah-level nav (◀ / ▶) — sequentially walk through verses regardless
-          of lesson state. Mirrors reference's `ayahNavRow` (index.html:3535-3553)
-          which lives in the ayah container and navigates via `gotoRelativeAyah`
-          (index.html:4872). Shown whenever a verse is loaded; in our app the
-          lesson nav row sits below this and complements (rather than hides) it
-          so the user always has both options. */}
-      {verses.length > 0 && (
+      {/* Ayah-level nav (◀ / ▶) — sequentially walk through verses.
+          Mirrors reference's `ayahNavRow` (index.html:3535-3553); hidden in
+          lesson mode per index.html:4316 (`lessonModeActive ? 'none' : 'flex'`)
+          so only the lesson nav row's prev/next/shuffle shows when a lesson
+          is active. */}
+      {verses.length > 0 && totalSlides === 0 && (
         <div className="flex items-center justify-center gap-2" dir="ltr">
           <Button
             variant="outline"
@@ -723,14 +722,16 @@ export function ReaderPanel() {
         </div>
       )}
 
-      {/* Lesson word nav — prev / play / next / shuffle. Shuffle button mirrors
-          reference's `lessonShuffleBtn` (index.html:2469-2476) which picks a
-          random slide via `shuffle()` from useLessonContext.
+      {/* Lesson word nav — prev / next / shuffle. Matches reference's
+          `lessonNavRow` (index.html:2452-2477) which contains exactly these
+          three buttons. The Play/Pause control lives in the recitation card
+          below (matching the reference's separate recitation section), not
+          here.
 
           Hidden on L1 (letter slides) to match the reference: when
           `currentLessonId === 'lesson1'` the reference's `gridMode` is true and
           `updateLessonUIVisibility` (index.html:4310-4312) hides the lesson
-          nav row entirely, leaving only the ayah-level prev/next arrows above. */}
+          nav row entirely. */}
       {totalSlides > 0 && !letterSlide && (
         <div className="flex items-center justify-center gap-2">
           <Button
@@ -738,31 +739,18 @@ export function ReaderPanel() {
             size="icon"
             className="h-8 w-8 rounded-full cursor-pointer"
             onClick={lessonPrev}
-            title={language === "ar" ? "السابق" : "Previous"}
+            title={language === "ar" ? "الكلمة السابقة" : "Previous"}
           >
-            <SkipBack className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8 rounded-full cursor-pointer"
-            onClick={isPlaying ? stop : handlePlay}
-            title={language === "ar" ? "تشغيل" : "Play"}
-          >
-            {isPlaying ? (
-              <Pause className="h-4 w-4" />
-            ) : (
-              <Play className="h-4 w-4" />
-            )}
+            <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
             size="icon"
             className="h-8 w-8 rounded-full cursor-pointer"
             onClick={lessonNext}
-            title={language === "ar" ? "التالي" : "Next"}
+            title={language === "ar" ? "الكلمة التالية" : "Next"}
           >
-            <SkipForward className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
