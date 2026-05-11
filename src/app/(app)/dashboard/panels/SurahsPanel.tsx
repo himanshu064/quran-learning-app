@@ -55,8 +55,7 @@ export function SurahsPanel({
   };
 
   return (
-    <div className="flex flex-1 items-start justify-center p-6">
-    <div className="flex w-full max-w-5xl flex-col gap-3 rounded-2xl border border-border bg-card p-4">
+    <div className="flex w-full flex-1 flex-col gap-3 p-4">
       {/* Chips row */}
       <div className="flex flex-wrap gap-2">
         {lastSurahMeta && (
@@ -184,7 +183,6 @@ export function SurahsPanel({
           </div>
         );
       })()}
-    </div>
     </div>
   );
 }

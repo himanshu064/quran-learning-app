@@ -92,6 +92,16 @@ export function ReaderPanel() {
   // When a word is clicked in the verse we navigate the lesson slide but must NOT
   // flip to the flashcard — the user is already looking at the verse.
   const skipNextOverlayRef = useRef(false);
+  // Word clicks also must NOT sync the URL's surah/ayah/to to the new lesson
+  // slide. If the user has a range like 1-5 active and clicks a word inside
+  // ayah 3, snapping the URL to ayah 3 (and clearing `to`) collapses their
+  // range view. Reference behaviour: a word click only plays audio
+  // (index.html:4479-4497), never alters the displayed verse range.
+  const skipNextNavSyncRef = useRef(false);
+
+  // Inline error message shown right after the `to` input when the user
+  // enters a number that doesn't correspond to a real ayah in this surah.
+  const [ayahToError, setAyahToError] = useState("");
 
   // Floating bubble is only shown after user has triggered playback at least once.
   const [hasPlayedOnce, setHasPlayedOnce] = useState(false);
@@ -159,6 +169,12 @@ export function ReaderPanel() {
     if (!wordSlide) return; // slides still loading — keep refs stale so effect re-runs on load
     prevLessonIdRef.current = lessonId;
     prevSlideIndexRef.current = slideIndex;
+    // Word click: suppress this nav sync so the user's selected range / displayed
+    // ayah is preserved (reference plays audio only on word click).
+    if (skipNextNavSyncRef.current) {
+      skipNextNavSyncRef.current = false;
+      return;
+    }
     if (wordSlide.surah !== surah || wordSlide.ayah !== ayahFrom) {
       setSurah(wordSlide.surah);
       setAyahFrom(wordSlide.ayah);
@@ -203,8 +219,8 @@ export function ReaderPanel() {
   }, [surah, ayahFrom, selectedWord, wordSlide, setSelectedWord]);
 
   // Keep local input strings in sync when URL state changes externally (lesson nav)
-  useEffect(() => { setSurahInput(String(surah)); }, [surah]);
-  useEffect(() => { setAyahFromInput(String(ayahFrom)); }, [ayahFrom]);
+  useEffect(() => { setSurahInput(String(surah)); setAyahToError(""); }, [surah]);
+  useEffect(() => { setAyahFromInput(String(ayahFrom)); setAyahToError(""); }, [ayahFrom]);
   useEffect(() => { setAyahToInput(ayahTo > 0 ? String(ayahTo) : ""); }, [ayahTo]);
 
   const verses = useMemo(() => {
@@ -293,6 +309,7 @@ export function ReaderPanel() {
       );
       if (matchIndex !== -1) {
         skipNextOverlayRef.current = true; // don't flip to flashcard on word click
+        skipNextNavSyncRef.current = true; // don't snap URL/range to the clicked word's ayah
         lessonGoTo(matchIndex);
       }
     },
@@ -411,23 +428,58 @@ export function ReaderPanel() {
           min={ayahFrom}
           max={maxAyah}
           value={ayahToInput}
-          placeholder={String(ayahFrom)}
+          placeholder={String(maxAyah)}
           onChange={(e) => {
-            setAyahToInput(e.target.value);
-            if (e.target.value === "") { setAyahTo(0); return; }
-            const v = parseInt(e.target.value, 10);
-            if (!isNaN(v) && v >= ayahFrom && v <= maxAyah) setAyahTo(v);
+            const raw = e.target.value;
+            setAyahToInput(raw);
+            if (raw === "") {
+              setAyahTo(0);
+              setAyahToError("");
+              return;
+            }
+            const v = parseInt(raw, 10);
+            if (isNaN(v)) {
+              setAyahToError("");
+              return;
+            }
+            if (v > maxAyah) {
+              setAyahToError(
+                language === "ar"
+                  ? `الآية ${v} غير موجودة في هذه السورة`
+                  : `Ayah ${v} does not exist in this surah`,
+              );
+              return;
+            }
+            if (v < ayahFrom) {
+              setAyahToError(
+                language === "ar"
+                  ? "نطاق الآيات غير صحيح"
+                  : "Ayah range is incorrect",
+              );
+              return;
+            }
+            setAyahToError("");
+            setAyahTo(v);
           }}
           onBlur={() => {
-            if (ayahToInput === "") return;
+            if (ayahToInput === "") {
+              setAyahToError("");
+              return;
+            }
             const v = parseInt(ayahToInput, 10);
             if (isNaN(v) || v < ayahFrom || v > maxAyah) {
-              setAyahToInput("");
               setAyahTo(0);
+              return;
             }
+            setAyahToError("");
           }}
           className="w-16 rounded-lg border border-border bg-transparent px-2 py-1 text-center text-sm outline-none focus:border-primary"
         />
+        {ayahToError && (
+          <span className="text-xs text-destructive ms-2" role="alert">
+            {ayahToError}
+          </span>
+        )}
       </div>
 
       {/* Surah header ornament */}
