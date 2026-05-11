@@ -476,7 +476,10 @@ export function ReaderPanel() {
           className="w-16 rounded-lg border border-border bg-transparent px-2 py-1 text-center text-sm outline-none focus:border-primary"
         />
         {ayahToError && (
-          <span className="text-xs text-destructive ms-2" role="alert">
+          <span
+            className="ms-2 rounded-md bg-red-500/15 px-2 py-1 text-xs font-medium text-red-400"
+            role="alert"
+          >
             {ayahToError}
           </span>
         )}
