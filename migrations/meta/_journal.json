@@ -8,6 +8,13 @@
       "when": 1775460064062,
       "tag": "0000_nifty_black_bird",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1782298167444,
+      "tag": "0001_nebulous_fallen_one",
+      "breakpoints": true
     }
   ]
 }

@@ -1,17 +1,15 @@
 import { cache } from "react";
+import { db } from "./database";
+import { siteSetting } from "@/db/schema";
 
 /**
  * Fetches all site settings as a key-value map.
- * In M1, returns defaults. Full DB-backed implementation in M3.
+ * Cached per request via React `cache()` — safe to call multiple times
+ * in the same server render without hitting the DB again.
  */
 export const getSettings = cache(async (): Promise<Record<string, string>> => {
-  return {
-    app_name: "Quran Learning",
-    default_language: "ar",
-    default_theme: "dark",
-    maintenance_mode: "false",
-    registration_enabled: "true",
-  };
+  const rows = await db.select().from(siteSetting);
+  return Object.fromEntries(rows.map((r) => [r.key, r.value ?? ""]));
 });
 
 /**

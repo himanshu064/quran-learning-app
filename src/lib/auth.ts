@@ -7,6 +7,7 @@ import {
   user,
   verification,
 } from "@/db/auth-schema";
+import { auditLog } from "@/db/schema";
 import { db } from "./database";
 import { sendPasswordResetEmail, sendVerificationEmail } from "./email";
 
@@ -98,7 +99,25 @@ export const auth = betterAuth({
             .set({ lastLoginAt: new Date() })
             .where(eq(user.id, userId));
 
-          // Audit logging will be added in Milestone 3
+          // Audit log for admin login
+          const [userData] = await db
+            .select({ role: user.role, email: user.email })
+            .from(user)
+            .where(eq(user.id, userId));
+
+          if (userData?.role === "admin") {
+            await db.insert(auditLog).values({
+              userId,
+              action: "login",
+              actionCategory: "login",
+              entityType: "session",
+              entityName: userData.email,
+              status: "success",
+              ipAddress: session.ipAddress || "unknown",
+              userAgent: session.userAgent || undefined,
+              description: `Admin ${userData.email} signed in`,
+            });
+          }
         },
       },
     },

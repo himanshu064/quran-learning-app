@@ -1,10 +1,21 @@
 import type { Metadata } from "next";
-import { AdminDashboard } from "./admin-dashboard";
+import { getDashboardStats } from "@/lib/admin/queries";
+import { DashboardContent } from "./dashboard-content";
 
-export const metadata: Metadata = {
-  title: "Admin Dashboard",
-};
+export const metadata: Metadata = { title: "Admin Dashboard" };
 
-export default function AdminPage() {
-  return <AdminDashboard />;
+export default async function AdminDashboardPage() {
+  const stats = await getDashboardStats();
+
+  return (
+    <DashboardContent
+      stats={{
+        ...stats,
+        recentRegistrations: stats.recentRegistrations.map((u) => ({
+          ...u,
+          createdAt: u.createdAt.toISOString(),
+        })),
+      }}
+    />
+  );
 }
